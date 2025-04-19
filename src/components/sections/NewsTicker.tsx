@@ -5,6 +5,7 @@ interface NewsTickerProps {
   items: {
     text: string;
     link: string;
+    date?: string; // Optional date for each news item
   }[];
   className?: string;
 }
@@ -18,13 +19,16 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
             BREAKING:
           </div>
           <div className="overflow-hidden">
-            <div className="whitespace-nowrap inline-block animate-marquee">
+            <div className="whitespace-nowrap inline-block animate-[marquee_40s_linear_infinite] hover:pause-animation">
               {items.map((item, index) => (
                 <a
                   key={index}
                   href={item.link}
-                  className="inline-block mx-4 text-sm hover:text-highlight transition-colors"
+                  className="inline-block mx-4 text-sm group hover:text-highlight transition-colors"
                 >
+                  {item.date && (
+                    <span className="text-highlight text-xs mr-2">{item.date}</span>
+                  )}
                   {item.text}
                 </a>
               ))}
@@ -33,8 +37,11 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 <a
                   key={`repeat-${index}`}
                   href={item.link}
-                  className="inline-block mx-4 text-sm hover:text-highlight transition-colors"
+                  className="inline-block mx-4 text-sm group hover:text-highlight transition-colors"
                 >
+                  {item.date && (
+                    <span className="text-highlight text-xs mr-2">{item.date}</span>
+                  )}
                   {item.text}
                 </a>
               ))}

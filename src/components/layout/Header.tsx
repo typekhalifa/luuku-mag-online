@@ -30,7 +30,7 @@ const Header = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="block lg:hidden"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -90,7 +90,7 @@ const Header = () => {
           </Button>
         </div>
 
-        {/* Search Bar (Slide Down Animation) */}
+        {/* Search Bar */}
         <div
           className={cn(
             "overflow-hidden transition-all duration-300 ease-in-out",
@@ -125,7 +125,7 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* Mobile Menu Overlay */}
+        {/* Mobile Menu */}
         <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       </div>
     </header>
