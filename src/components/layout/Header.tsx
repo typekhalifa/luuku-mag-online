@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Facebook, Instagram, Menu, Search, Twitter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,13 +12,11 @@ const Header = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    // Close search if open when menu is toggled
     if (isSearchOpen) setIsSearchOpen(false);
   };
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
-    // Close menu if open when search is toggled
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
@@ -33,7 +30,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="block"
+              className="block md:hidden"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -46,6 +43,13 @@ const Header = () => {
             "flex items-center", 
             isMobile ? "mr-auto ml-2" : "mx-auto md:mx-0 md:mr-auto"
           )}>
+            {!isMobile && (
+              <img 
+                src="/lovable-uploads/logo.png" 
+                alt="LUUKU MAG Logo" 
+                className="w-8 h-8 mr-2"
+              />
+            )}
             <h1 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl font-heading">
               <span className="text-highlight">LUUKU</span> MAG
             </h1>
@@ -117,23 +121,25 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Desktop Navigation - Always visible on desktop, hidden on mobile */}
+        {/* Desktop Navigation - Hidden on mobile */}
         <nav className={cn(
-          "py-3",
-          isMobile ? "hidden" : "flex items-center justify-center"
+          "py-3 bg-[#1A1F2C] mt-4 -mx-4 md:-mx-8",
+          isMobile ? "hidden" : "block"
         )}>
-          <ul className="flex items-center space-x-8">
-            {['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
-              <li key={item}>
-                <a
-                  href="#"
-                  className="text-sm font-medium transition-colors hover:text-highlight"
-                >
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="container">
+            <ul className="flex items-center justify-center space-x-8">
+              {['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-sm font-medium text-white uppercase transition-all hover:text-highlight relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-highlight after:scale-x-0 after:origin-right after:transition-transform hover:after:scale-x-100 hover:after:origin-left"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
 
         {/* Mobile Menu */}
