@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Facebook, Instagram, Menu, Search, Twitter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -47,7 +48,7 @@ const Header = () => {
               <img 
                 src="/lovable-uploads/logo.png" 
                 alt="LUUKU MAG Logo" 
-                className="w-8 h-8 mr-2"
+                className="w-12 h-12 mr-4 rounded-full object-cover"
               />
             )}
             <h1 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl font-heading">
@@ -150,3 +151,4 @@ const Header = () => {
 };
 
 export default Header;
+
