@@ -4,10 +4,12 @@ import { Facebook, Instagram, Menu, Search, Twitter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import MobileNav from "./MobileNav";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -26,19 +28,24 @@ const Header = () => {
       <div className="container p-4 md:px-8">
         {/* Top Bar */}
         <div className="flex items-center justify-between">
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="block lg:hidden"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </Button>
+          {/* Mobile Menu Button - Only visible on mobile */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="block"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </Button>
+          )}
 
           {/* Logo */}
-          <div className="flex items-center mr-auto ml-2 lg:ml-0">
+          <div className={cn(
+            "flex items-center", 
+            isMobile ? "mr-auto ml-2" : "mx-auto md:mx-0 md:mr-auto"
+          )}>
             <h1 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl font-heading">
               <span className="text-highlight">LUUKU</span> MAG
             </h1>
@@ -79,15 +86,16 @@ const Header = () => {
           </div>
 
           {/* Mobile Search Icon */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSearch}
-            aria-label="Search"
-            className="md:hidden"
-          >
-            <Search size={20} />
-          </Button>
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSearch}
+              aria-label="Search"
+            >
+              <Search size={20} />
+            </Button>
+          )}
         </div>
 
         {/* Search Bar */}
@@ -109,8 +117,11 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex lg:items-center lg:justify-center py-3">
+        {/* Desktop Navigation - Always visible on desktop, hidden on mobile */}
+        <nav className={cn(
+          "py-3",
+          isMobile ? "hidden" : "flex items-center justify-center"
+        )}>
           <ul className="flex items-center space-x-8">
             {['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
               <li key={item}>

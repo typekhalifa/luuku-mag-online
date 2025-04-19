@@ -1,7 +1,7 @@
 
-import { useState } from "react";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { X, Facebook, Instagram, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -24,10 +24,19 @@ const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-center h-16 border-b">
+        <div className="flex items-center justify-between h-16 px-4 border-b">
           <h2 className="text-xl font-bold tracking-tight font-heading">
             <span className="text-highlight">LUUKU</span> MAG
           </h2>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            aria-label="Close menu"
+            className="text-gray-500 hover:text-highlight"
+          >
+            <X size={24} />
+          </Button>
         </div>
         
         <nav className="flex-1 overflow-auto">

@@ -19,15 +19,15 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
             BREAKING:
           </div>
           <div className="overflow-hidden">
-            <div className="whitespace-nowrap inline-block animate-[marquee_40s_linear_infinite] hover:pause-animation">
+            <div className="whitespace-nowrap inline-block animate-[marquee_60s_linear_infinite] hover:pause-animation">
               {items.map((item, index) => (
                 <a
                   key={index}
                   href={item.link}
-                  className="inline-block mx-4 text-sm group hover:text-highlight transition-colors"
+                  className="inline-block mx-4 text-sm group transition-colors hover:text-highlight"
                 >
                   {item.date && (
-                    <span className="text-highlight text-xs mr-2">{item.date}</span>
+                    <span className="text-highlight text-xs mr-2 font-semibold">{item.date}</span>
                   )}
                   {item.text}
                 </a>
@@ -37,10 +37,10 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 <a
                   key={`repeat-${index}`}
                   href={item.link}
-                  className="inline-block mx-4 text-sm group hover:text-highlight transition-colors"
+                  className="inline-block mx-4 text-sm group transition-colors hover:text-highlight"
                 >
                   {item.date && (
-                    <span className="text-highlight text-xs mr-2">{item.date}</span>
+                    <span className="text-highlight text-xs mr-2 font-semibold">{item.date}</span>
                   )}
                   {item.text}
                 </a>

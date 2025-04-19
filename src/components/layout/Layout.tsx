@@ -2,6 +2,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import BackToTop from "./BackToTop";
+import "./layout.css"; // Import CSS for custom animations
 
 interface LayoutProps {
   children: React.ReactNode;
