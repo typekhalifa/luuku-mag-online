@@ -33,6 +33,30 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          email: string
+          id: string
+          message: string
+          name: string | null
+          sent_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          message: string
+          name?: string | null
+          sent_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          message?: string
+          name?: string | null
+          sent_at?: string
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           article_id: string
@@ -51,6 +75,24 @@ export type Database = {
           author_name?: string | null
           id?: string
           liked_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          email: string
+          id: string
+          subscribed_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          subscribed_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          subscribed_at?: string
         }
         Relationships: []
       }
