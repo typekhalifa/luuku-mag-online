@@ -7,9 +7,10 @@ import { Heart } from "lucide-react";
 interface LikeButtonProps {
   articleId: string;
   className?: string;
+  size?: "default" | "sm" | "lg" | "icon";  // added optional size prop matching Button's variant sizes
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ articleId, className }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ articleId, className, size = "default" }) => {
   const [likes, setLikes] = useState<number>(0);
   const [clicked, setClicked] = useState<boolean>(false);
 
@@ -33,7 +34,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({ articleId, className }) => {
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [articleId]);
 
   const handleLike = async () => {
@@ -49,7 +52,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ articleId, className }) => {
   return (
     <Button
       variant={clicked ? "highlight" : "outline"}
-      size="sm"
+      size={size}
       className={className}
       onClick={handleLike}
       disabled={clicked}
@@ -62,3 +65,4 @@ const LikeButton: React.FC<LikeButtonProps> = ({ articleId, className }) => {
 };
 
 export default LikeButton;
+
