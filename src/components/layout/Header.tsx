@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Facebook, Instagram, Menu, Search, Twitter, X, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,22 +18,22 @@ const Header = () => {
     const saved = window.localStorage.getItem("theme");
     if (saved === "dark") {
       setTheme("dark");
-      document.body.classList.add("dark");
+      document.documentElement.classList.add("dark");
     } else {
       setTheme("light");
-      document.body.classList.remove("dark");
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
-  // Toggle body class & persist to localStorage
+  // Toggle html class & persist to localStorage
   const toggleTheme = () => {
     if (theme === "light") {
       setTheme("dark");
-      document.body.classList.add("dark");
+      document.documentElement.classList.add("dark");
       window.localStorage.setItem("theme", "dark");
     } else {
       setTheme("light");
-      document.body.classList.remove("dark");
+      document.documentElement.classList.remove("dark");
       window.localStorage.setItem("theme", "light");
     }
   };
@@ -169,7 +168,7 @@ const Header = () => {
           )}
         >
           <div className="flex items-center w-full px-3 bg-gray-100 dark:bg-[#22293a] rounded-md focus-within:ring-1 focus-within:ring-highlight">
-            <Search size={18} className="text-gray-400" />
+            <Search size={18} className="text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               placeholder="Search articles..."
@@ -220,4 +219,3 @@ const Header = () => {
 };
 
 export default Header;
-

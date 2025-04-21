@@ -11,3 +11,62 @@
 .hover\:pause-animation:hover {
   animation-play-state: paused;
 }
+
+/* Dark mode specific styles for news sections */
+.dark .bg-gray-50 {
+  background-color: #161b28;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-800,
+.dark .text-gray-900 {
+  color: #e1e1e1;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: #2a3042;
+}
+
+/* Style for article cards in dark mode */
+.dark .hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* Category and date badges in dark mode */
+.dark .bg-gray-100 {
+  background-color: #2a3042;
+  color: #e1e1e1;
+}
+
+/* Ensure hover states work well in dark mode */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #1f2636;
+}
+
+/* Make sure images have proper contrast in dark mode */
+.dark img {
+  filter: brightness(0.9);
+}
+
+/* Improve text readability on dark backgrounds */
+.dark article p,
+.dark .news-content p {
+  color: #ccd0d8;
+}
+
+/* Fix headings in dark mode */
+.dark h1, 
+.dark h2, 
+.dark h3, 
+.dark h4, 
+.dark h5, 
+.dark h6 {
+  color: #ffffff;
+}
+
+/* Highlight color stays consistent in dark mode */
+.dark .text-highlight,
+.dark .hover\:text-highlight:hover {
+  color: #e08b6c;
+}
