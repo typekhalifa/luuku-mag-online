@@ -193,7 +193,7 @@ const Header = () => {
                 "Youth",
                 "Culture",
                 "Sport",
-                "Opportunities"
+                "Opportunities",
               ].map((item) => (
                 <li key={item}>
                   <a
@@ -207,6 +207,17 @@ const Header = () => {
                   </a>
                 </li>
               ))}
+              <li key="Analytics">
+                <a
+                  href="/analytics"
+                  className={cn(
+                    "text-sm font-heading font-semibold uppercase transition-all px-2 py-1 text-gray-900 dark:text-white tracking-wide relative",
+                    "hover:text-highlight after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 after:bg-highlight after:scale-x-0 hover:after:scale-x-100 after:origin-right hover:after:origin-left after:transition-transform"
+                  )}
+                >
+                  Analytics
+                </a>
+              </li>
             </ul>
           </div>
         </nav>
