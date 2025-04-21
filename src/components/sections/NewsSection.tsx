@@ -1,5 +1,6 @@
-
 import { cn } from "@/lib/utils";
+import CommentSection from "../CommentSection";
+import LikeButton from "../LikeButton";
 
 export interface NewsArticle {
   id: number;
@@ -93,6 +94,12 @@ const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
         </h3>
         <p className="text-sm text-gray-600 mb-2">{article.excerpt}</p>
         <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex gap-3 mt-4 items-center">
+          <LikeButton articleId={String(article.id)} />
+        </div>
+        <div className="mt-2">
+          <CommentSection articleId={String(article.id)} />
+        </div>
       </div>
     </div>
   );
@@ -120,6 +127,12 @@ const ArticleCard = ({ article }: { article: NewsArticle }) => {
           </a>
         </h3>
         <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex gap-3 mt-3 items-center">
+          <LikeButton articleId={String(article.id)} size="sm" />
+        </div>
+        <div className="mt-2">
+          <CommentSection articleId={String(article.id)} />
+        </div>
       </div>
     </div>
   );
@@ -145,6 +158,9 @@ const SmallArticleCard = ({ article }: { article: NewsArticle }) => {
           </a>
         </h3>
         <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex gap-3 mt-2 items-center">
+          <LikeButton articleId={String(article.id)} size="sm" />
+        </div>
       </div>
     </div>
   );
@@ -171,6 +187,12 @@ const ListArticleCard = ({ article }: { article: NewsArticle }) => {
         </h3>
         <p className="text-sm text-gray-600 mb-1 hidden md:block">{article.excerpt}</p>
         <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex gap-3 mt-2 items-center">
+          <LikeButton articleId={String(article.id)} size="sm" />
+        </div>
+        <div className="mt-2">
+          <CommentSection articleId={String(article.id)} />
+        </div>
       </div>
     </div>
   );
