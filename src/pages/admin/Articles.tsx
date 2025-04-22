@@ -11,9 +11,10 @@ import {
   TableBody,
   TableCaption,
 } from "@/components/ui/table";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import CreateArticleDialog from "@/components/articles/CreateArticleDialog";
 
 const Articles: React.FC = () => {
   const [articles, setArticles] = useState<any[]>([]);
@@ -48,9 +49,7 @@ const Articles: React.FC = () => {
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Manage Articles</h1>
-        <Button>
-          <PlusIcon className="mr-2 h-4 w-4" /> New Article
-        </Button>
+        <CreateArticleDialog />
       </div>
 
       <Table>
@@ -59,6 +58,7 @@ const Articles: React.FC = () => {
           <TableRow>
             <TableHead>Title</TableHead>
             <TableHead>Category</TableHead>
+            <TableHead>Author</TableHead>
             <TableHead>Published</TableHead>
             <TableHead>Featured</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -67,17 +67,18 @@ const Articles: React.FC = () => {
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">Loading articles...</TableCell>
+              <TableCell colSpan={6} className="text-center">Loading articles...</TableCell>
             </TableRow>
           ) : articles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">No articles found</TableCell>
+              <TableCell colSpan={6} className="text-center">No articles found</TableCell>
             </TableRow>
           ) : (
             articles.map((article) => (
               <TableRow key={article.id}>
                 <TableCell className="font-medium">{article.title}</TableCell>
                 <TableCell>{article.category}</TableCell>
+                <TableCell>{article.author}</TableCell>
                 <TableCell>{new Date(article.published_at).toLocaleDateString()}</TableCell>
                 <TableCell>{article.featured ? "Yes" : "No"}</TableCell>
                 <TableCell className="text-right">
