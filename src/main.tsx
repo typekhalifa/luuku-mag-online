@@ -1,7 +1,8 @@
 
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
 
 // Check for saved theme before rendering to avoid flash
 const darkMode = window.localStorage.getItem('theme') === 'dark';
@@ -11,4 +12,7 @@ if (darkMode) {
   document.documentElement.classList.remove('dark');
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error('Root element not found');
+
+createRoot(rootElement).render(<App />);
