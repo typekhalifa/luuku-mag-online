@@ -11,17 +11,18 @@ import {
   TableBody,
   TableCaption,
 } from "@/components/ui/table";
-import { PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { RefreshCwIcon } from "lucide-react";
 import CreateArticleDialog from "@/components/articles/CreateArticleDialog";
+import ArticleListRow from "@/components/articles/ArticleListRow";
 
 const Articles: React.FC = () => {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchArticles = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("articles")
@@ -38,7 +39,17 @@ const Articles: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchArticles();
+  };
+
+  const handleDeleteArticle = (deletedId: string) => {
+    setArticles((prev) => prev.filter((article) => article.id !== deletedId));
   };
 
   useEffect(() => {
@@ -49,7 +60,18 @@ const Articles: React.FC = () => {
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Manage Articles</h1>
-        <CreateArticleDialog />
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className={refreshing ? "animate-spin" : ""}
+          >
+            <RefreshCwIcon className="h-4 w-4" />
+          </Button>
+          <CreateArticleDialog onSuccess={fetchArticles} />
+        </div>
       </div>
 
       <Table>
@@ -58,7 +80,6 @@ const Articles: React.FC = () => {
           <TableRow>
             <TableHead>Title</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Author</TableHead>
             <TableHead>Published</TableHead>
             <TableHead>Featured</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -67,29 +88,23 @@ const Articles: React.FC = () => {
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">Loading articles...</TableCell>
+              <TableCell colSpan={5} className="text-center">
+                Loading articles...
+              </TableCell>
             </TableRow>
           ) : articles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">No articles found</TableCell>
+              <TableCell colSpan={5} className="text-center">
+                No articles found
+              </TableCell>
             </TableRow>
           ) : (
             articles.map((article) => (
-              <TableRow key={article.id}>
-                <TableCell className="font-medium">{article.title}</TableCell>
-                <TableCell>{article.category}</TableCell>
-                <TableCell>{article.author}</TableCell>
-                <TableCell>{new Date(article.published_at).toLocaleDateString()}</TableCell>
-                <TableCell>{article.featured ? "Yes" : "No"}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <PencilIcon className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                    <TrashIcon className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <ArticleListRow
+                key={article.id}
+                article={article}
+                onDelete={handleDeleteArticle}
+              />
             ))
           )}
         </TableBody>
