@@ -15,6 +15,14 @@ import {
   ChartLegend,
   ChartTooltip,
 } from "@/components/ui/chart";
+import {
+  BarChart as ReBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const PERIODS = [
   { label: "Last 7 days", value: "7" },
@@ -76,6 +84,20 @@ const fetchAnalytics = async (period: string) => {
   return { articles: data, counts: data };
 };
 
+// BarChart component definition
+const BarChart = ({ data, width = 600, height = 260 }: { data: any[]; width?: number; height?: number }) => {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <ReBarChart data={data} layout="vertical" margin={{ left: 40, right: 16, top: 8, bottom: 8 }}>
+        <XAxis type="number" />
+        <YAxis dataKey="title" type="category" width={120} />
+        <Bar dataKey="commentCount" fill="#3b82f6" radius={[8, 8, 8, 8]} />
+        <Tooltip />
+      </ReBarChart>
+    </ResponsiveContainer>
+  );
+};
+
 const Analytics: React.FC = () => {
   const [period, setPeriod] = useState("7");
   const [loading, setLoading] = useState(false);
@@ -120,9 +142,7 @@ const Analytics: React.FC = () => {
             },
           }}
         >
-          {(width: number, height: number) => (
-            <BarChart width={width} height={height} data={analytics.articles.slice(0, 10)} />
-          )}
+          <BarChart data={analytics.articles.slice(0, 10)} />
         </ChartContainer>
       </div>
       <Table>
@@ -165,28 +185,5 @@ const Analytics: React.FC = () => {
     </div>
   );
 };
-
-// BarChart sub-component
-import {
-  BarChart as ReBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-function BarChart({ data, width = 600, height = 260 }: { data: any[]; width?: number; height?: number }) {
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <ReBarChart data={data} layout="vertical" margin={{ left: 40, right: 16, top: 8, bottom: 8 }}>
-        <XAxis type="number" />
-        <YAxis dataKey="title" type="category" width={120} />
-        <Bar dataKey="commentCount" fill="#3b82f6" radius={[8, 8, 8, 8]} />
-        <Tooltip />
-      </ReBarChart>
-    </ResponsiveContainer>
-  );
-}
 
 export default Analytics;
