@@ -32,12 +32,17 @@ type FormData = {
   featured: boolean;
 };
 
-export default function CreateArticleDialog() {
+interface CreateArticleDialogProps {
+  onSuccess?: () => Promise<void> | void;
+}
+
+export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogProps) {
   const { toast } = useToast();
   const form = useForm<FormData>();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -84,6 +89,12 @@ export default function CreateArticleDialog() {
       form.reset();
       setImageFile(null);
       setImagePreview(null);
+      setOpen(false);
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        await onSuccess();
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -96,7 +107,7 @@ export default function CreateArticleDialog() {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <PlusIcon className="mr-2 h-4 w-4" /> New Article
