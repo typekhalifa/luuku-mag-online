@@ -104,6 +104,7 @@ const Articles: React.FC = () => {
                 key={article.id}
                 article={article}
                 onDelete={handleDeleteArticle}
+                onUpdate={fetchArticles}
               />
             ))
           )}

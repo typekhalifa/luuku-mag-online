@@ -16,21 +16,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import EditArticleDialog from "./EditArticleDialog";
 
 interface ArticleListRowProps {
   article: {
     id: string;
     title: string;
     category: string;
-    author: string | null;
     published_at: string;
     featured: boolean;
     image_url: string | null;
+    content: string;
+    excerpt: string;
   };
   onDelete: (id: string) => void;
+  onUpdate: () => void;
 }
 
-const ArticleListRow = ({ article, onDelete }: ArticleListRowProps) => {
+const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -72,8 +75,8 @@ const ArticleListRow = ({ article, onDelete }: ArticleListRowProps) => {
           )}
           <div>
             <div className="font-medium">{article.title}</div>
-            <div className="text-sm text-muted-foreground truncate max-w-[180px]">
-              {article.author || "Anonymous"}
+            <div className="text-sm text-muted-foreground">
+              Admin
             </div>
           </div>
         </div>
@@ -90,9 +93,10 @@ const ArticleListRow = ({ article, onDelete }: ArticleListRowProps) => {
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <EyeIcon className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <PencilIcon className="h-4 w-4" />
-          </Button>
+          <EditArticleDialog 
+            article={article} 
+            onSuccess={onUpdate}
+          />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
