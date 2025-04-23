@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NewsTicker from "@/components/sections/NewsTicker";
 import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
@@ -15,23 +16,38 @@ type Article = {
   published_at: string;
 };
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 export default function ArticlesPublic() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const query = useQuery();
+  const navigate = useNavigate();
+
+  const filteredCategory = query.get("category");
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const { data, error } = await supabase
+      let supabaseQuery = supabase
         .from("articles")
-        .select(
-          "id, title, excerpt, image_url, category, published_at"
-        )
+        .select("id, title, excerpt, image_url, category, published_at")
         .order("published_at", { ascending: false });
+
+      if (filteredCategory) {
+        supabaseQuery = supabaseQuery.ilike(
+          "category",
+          filteredCategory
+        );
+      }
+
+      const { data, error } = await supabaseQuery;
       if (!error && data) setArticles(data as Article[]);
       setLoading(false);
     };
     fetchArticles();
-  }, []);
+  }, [filteredCategory]);
 
   const breakingNews = [
     { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
@@ -73,45 +89,67 @@ export default function ArticlesPublic() {
     }
   ];
 
+  const transformArticle = (article: Article) => ({
+    id: parseInt(article.id),
+    title: article.title,
+    excerpt: article.excerpt || "",
+    image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
+    category: article.category,
+    date: new Date(article.published_at).toLocaleDateString(),
+    link: `/articles/${article.id}`
+  });
+
   const worldArticles = articles.filter(a => a.category?.toLowerCase() === 'world').map(transformArticle);
   const politicsArticles = articles.filter(a => a.category?.toLowerCase() === 'politics').map(transformArticle);
-  const businessArticles = articles.filter(a => a.category?.toLowerCase() === 'business' || a.category?.toLowerCase() === 'finance').map(transformArticle);
+  const businessArticles = articles.filter(a => ['business', 'finance'].includes(a.category?.toLowerCase())).map(transformArticle);
   const sportArticles = articles.filter(a => a.category?.toLowerCase() === 'sport').map(transformArticle);
   const technologyArticles = articles.filter(a => a.category?.toLowerCase() === 'technology').map(transformArticle);
   const opportunitiesArticles = articles.filter(a => a.category?.toLowerCase() === 'opportunities').map(transformArticle);
+  const youthArticles = articles.filter(a => a.category?.toLowerCase() === 'youth').map(transformArticle);
+  const cultureArticles = articles.filter(a => a.category?.toLowerCase() === 'culture').map(transformArticle);
   const latestArticles = articles.slice(0, 6).map(transformArticle);
 
-  function getFirstInCategory(category: string) {
-    const a = articles.find(a => a.category && a.category.toLowerCase() === category);
-    return a ? transformArticle(a) : null;
+  // Helper to get the first X unique categories for "Our Picks"
+  function getFirstOfEach(categories: string[]) {
+    const picks: any[] = [];
+    categories.forEach(category => {
+      const found = articles.find(a => a.category && a.category.toLowerCase() === category);
+      if (found) picks.push(transformArticle(found));
+    });
+    return picks;
   }
-  const ourPicksArticles = [
-    getFirstInCategory("technology"),
-    getFirstInCategory("world"),
-    getFirstInCategory("opportunities"),
-  ].filter(Boolean);
-
-  function transformArticle(article: Article) {
-    return {
-      id: parseInt(article.id),
-      title: article.title,
-      excerpt: article.excerpt || "",
-      image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
-      category: article.category,
-      date: new Date(article.published_at).toLocaleDateString(),
-      link: `/articles/${article.id}`
-    };
-  }
+  // Customize: up to 4 categories (add or change here as you wish)
+  const ourPicksCategories = ["technology", "world", "opportunities", "sport"];
+  const ourPicksArticles = getFirstOfEach(ourPicksCategories);
 
   return (
     <Layout>
       <NewsTicker items={breakingNews} />
-      
+
       <NewsCarousel 
         items={featuredArticles.length > 0 ? featuredArticles : defaultCarouselItems} 
       />
 
-      {loading ? (
+      {/* If filtered by category, show only that section */}
+      {filteredCategory ? (
+        <>
+        <div className="container pt-8">
+          <button
+            className="mb-4 text-highlight font-semibold underline"
+            onClick={() => navigate("/articles")}
+          >
+            &larr; All Articles
+          </button>
+        </div>
+        <NewsSection
+          key={filteredCategory}
+          title={filteredCategory.charAt(0).toUpperCase() + filteredCategory.slice(1)}
+          articles={articles.map(transformArticle)}
+          layout="grid"
+        />
+        </>
+      ) : (
+      loading ? (
         <div className="container py-20 text-center">
           <div className="text-2xl">Loading articles...</div>
         </div>
@@ -126,7 +164,7 @@ export default function ArticlesPublic() {
             articles={latestArticles}
             layout="grid"
           />
-          
+
           {ourPicksArticles.length > 0 && (
             <NewsSection 
               title="Our Picks" 
@@ -135,7 +173,7 @@ export default function ArticlesPublic() {
               className="bg-gray-50"
             />
           )}
-          
+
           {worldArticles.length > 0 && (
             <NewsSection 
               title="World" 
@@ -177,7 +215,33 @@ export default function ArticlesPublic() {
               layout="grid"
             />
           )}
+
+          {youthArticles.length > 0 && (
+            <NewsSection
+              title="Youth"
+              articles={youthArticles}
+              layout="grid"
+            />
+          )}
+
+          {cultureArticles.length > 0 && (
+            <NewsSection
+              title="Culture"
+              articles={cultureArticles}
+              layout="grid"
+            />
+          )}
+
+          {opportunitiesArticles.length > 0 && (
+            <NewsSection
+              title="Opportunities"
+              articles={opportunitiesArticles}
+              layout="featured"
+            />
+          )}
+
         </>
+      )
       )}
     </Layout>
   );

@@ -30,9 +30,6 @@ export default function Index() {
           <Button asChild>
             <Link to="/articles">View Articles</Link>
           </Button>
-          <Button asChild>
-            <Link to="/admin/login">Admin Portal</Link>
-          </Button>
         </div>
       </div>
     </Layout>

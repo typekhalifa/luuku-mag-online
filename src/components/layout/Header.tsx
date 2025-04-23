@@ -1,14 +1,17 @@
+
 import { useState, useEffect } from "react";
 import { Facebook, Instagram, Menu, Search, Twitter, X, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import MobileNav from "./MobileNav";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   // Theme state
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -46,6 +49,28 @@ const Header = () => {
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     if (isMenuOpen) setIsMenuOpen(false);
+  };
+
+  // All categories for navigation
+  const navCategories = [
+    { name: "Home", path: "/" },
+    { name: "World", category: "world" },
+    { name: "Politics", category: "politics" },
+    { name: "Finance", category: "finance" },
+    { name: "Technology", category: "technology" },
+    { name: "Youth", category: "youth" },
+    { name: "Culture", category: "culture" },
+    { name: "Sport", category: "sport" },
+    { name: "Opportunities", category: "opportunities" },
+  ];
+
+  const handleNavClick = (item: any) => {
+    if (item.category) {
+      navigate(`/articles?category=${encodeURIComponent(item.category)}`);
+    } else if (item.path) {
+      navigate(item.path);
+    }
+    setIsMenuOpen(false);
   };
 
   return (
@@ -184,27 +209,16 @@ const Header = () => {
         )}>
           <div className="container">
             <ul className="flex items-center justify-center space-x-6 bg-[#e8ebe9] dark:bg-[#1a2332] rounded-lg shadow px-6 py-2">
-              {[
-                "Home",
-                "World",
-                "Politics",
-                "Finance",
-                "Technology",
-                "Youth",
-                "Culture",
-                "Sport",
-                "Opportunities",
-              ].map((item) => (
-                <li key={item}>
-                  <a
-                    href="#"
+              {navCategories.map((item) => (
+                <li key={item.name}>
+                  <button
                     className={cn(
-                      "text-sm font-heading font-semibold uppercase transition-all px-2 py-1 text-gray-900 dark:text-white tracking-wide relative",
-                      "hover:text-highlight after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 after:bg-highlight after:scale-x-0 hover:after:scale-x-100 after:origin-right hover:after:origin-left after:transition-transform"
+                      "text-sm font-heading font-semibold uppercase transition-all px-2 py-1 text-gray-900 dark:text-white tracking-wide relative bg-transparent border-none outline-none hover:text-highlight after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 after:bg-highlight after:scale-x-0 hover:after:scale-x-100 after:origin-right hover:after:origin-left after:transition-transform cursor-pointer"
                     )}
+                    onClick={() => handleNavClick(item)}
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -219,3 +233,5 @@ const Header = () => {
 };
 
 export default Header;
+
+// This file is getting pretty long and should be refactored into smaller components for maintainability.
