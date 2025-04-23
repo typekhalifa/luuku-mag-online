@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -34,7 +33,6 @@ export default function ArticlesPublic() {
     fetchArticles();
   }, []);
 
-  // Mock data for news ticker
   const breakingNews = [
     { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
     { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
@@ -43,7 +41,6 @@ export default function ArticlesPublic() {
     { text: "Sports league announces expansion to new cities", link: "#", date: "Today" },
   ];
 
-  // Mock data for carousel
   const featuredArticles = articles.slice(0, 3).map((article, index) => ({
     id: parseInt(article.id),
     title: article.title,
@@ -52,7 +49,6 @@ export default function ArticlesPublic() {
     link: `/articles/${article.id}`
   }));
 
-  // Default carousel items if no articles available
   const defaultCarouselItems = [
     {
       id: 1,
@@ -77,16 +73,24 @@ export default function ArticlesPublic() {
     }
   ];
 
-  // Group articles by category
   const worldArticles = articles.filter(a => a.category?.toLowerCase() === 'world').map(transformArticle);
   const politicsArticles = articles.filter(a => a.category?.toLowerCase() === 'politics').map(transformArticle);
   const businessArticles = articles.filter(a => a.category?.toLowerCase() === 'business' || a.category?.toLowerCase() === 'finance').map(transformArticle);
   const sportArticles = articles.filter(a => a.category?.toLowerCase() === 'sport').map(transformArticle);
   const technologyArticles = articles.filter(a => a.category?.toLowerCase() === 'technology').map(transformArticle);
+  const opportunitiesArticles = articles.filter(a => a.category?.toLowerCase() === 'opportunities').map(transformArticle);
   const latestArticles = articles.slice(0, 6).map(transformArticle);
-  const ourPicksArticles = [1, 4, 5].map(i => articles[i]).filter(Boolean).map(transformArticle);
-  
-  // Transform article to NewsArticle format
+
+  function getFirstInCategory(category: string) {
+    const a = articles.find(a => a.category && a.category.toLowerCase() === category);
+    return a ? transformArticle(a) : null;
+  }
+  const ourPicksArticles = [
+    getFirstInCategory("technology"),
+    getFirstInCategory("world"),
+    getFirstInCategory("opportunities"),
+  ].filter(Boolean);
+
   function transformArticle(article: Article) {
     return {
       id: parseInt(article.id),
@@ -101,10 +105,8 @@ export default function ArticlesPublic() {
 
   return (
     <Layout>
-      {/* Breaking News Ticker */}
       <NewsTicker items={breakingNews} />
       
-      {/* Featured Carousel */}
       <NewsCarousel 
         items={featuredArticles.length > 0 ? featuredArticles : defaultCarouselItems} 
       />
@@ -119,14 +121,12 @@ export default function ArticlesPublic() {
         </div>
       ) : (
         <>
-          {/* Latest Articles */}
           <NewsSection 
             title="Latest Articles" 
             articles={latestArticles}
             layout="grid"
           />
           
-          {/* Our Picks */}
           {ourPicksArticles.length > 0 && (
             <NewsSection 
               title="Our Picks" 
@@ -136,7 +136,6 @@ export default function ArticlesPublic() {
             />
           )}
           
-          {/* World News */}
           {worldArticles.length > 0 && (
             <NewsSection 
               title="World" 
@@ -145,7 +144,6 @@ export default function ArticlesPublic() {
             />
           )}
 
-          {/* Politics */}
           {politicsArticles.length > 0 && (
             <NewsSection 
               title="Politics" 
@@ -155,7 +153,6 @@ export default function ArticlesPublic() {
             />
           )}
 
-          {/* Sports */}
           {sportArticles.length > 0 && (
             <NewsSection 
               title="Sport" 
@@ -164,7 +161,6 @@ export default function ArticlesPublic() {
             />
           )}
 
-          {/* Business */}
           {businessArticles.length > 0 && (
             <NewsSection 
               title="Business & Finance" 
@@ -174,7 +170,6 @@ export default function ArticlesPublic() {
             />
           )}
 
-          {/* Technology */}
           {technologyArticles.length > 0 && (
             <NewsSection 
               title="Technology" 
