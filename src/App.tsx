@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,8 +12,8 @@ import Dashboard from "./pages/admin/Dashboard";
 import Articles from "./pages/admin/Articles";
 import Analytics from "./pages/admin/Analytics";
 import Users from "./pages/admin/Users";
+import ArticlesPublic from "./pages/ArticlesPublic";
 
-// Create a client
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -28,6 +27,7 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/articles" element={<ArticlesPublic />} />
                 <Route path="/admin/login" element={<Login />} />
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/articles" element={<Articles />} />

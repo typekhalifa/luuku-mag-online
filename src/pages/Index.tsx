@@ -15,6 +15,9 @@ export default function Index() {
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <Button asChild>
+            <Link to="/articles">View Articles</Link>
+          </Button>
+          <Button asChild>
             <Link to="/admin/login">Admin Portal</Link>
           </Button>
         </div>
