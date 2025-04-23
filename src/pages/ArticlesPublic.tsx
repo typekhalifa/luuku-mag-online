@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
+import NewsTicker from "@/components/sections/NewsTicker";
+import NewsCarousel from "@/components/sections/NewsCarousel";
+import NewsSection from "@/components/sections/NewsSection";
 
 type Article = {
   id: string;
@@ -31,48 +34,156 @@ export default function ArticlesPublic() {
     fetchArticles();
   }, []);
 
+  // Mock data for news ticker
+  const breakingNews = [
+    { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
+    { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
+    { text: "Major economic policy shift announced by central bank", link: "#", date: "5h ago" },
+    { text: "International space mission discovers signs of water on distant planet", link: "#", date: "Today" },
+    { text: "Sports league announces expansion to new cities", link: "#", date: "Today" },
+  ];
+
+  // Mock data for carousel
+  const featuredArticles = articles.slice(0, 3).map((article, index) => ({
+    id: parseInt(article.id),
+    title: article.title,
+    image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
+    category: article.category,
+    link: `/articles/${article.id}`
+  }));
+
+  // Default carousel items if no articles available
+  const defaultCarouselItems = [
+    {
+      id: 1,
+      title: "The Future of Sustainable Energy: New Breakthroughs",
+      image: "https://placehold.co/1200x800/e08b6c/white?text=Energy",
+      category: "Technology",
+      link: "#"
+    },
+    {
+      id: 2,
+      title: "Global Economic Outlook: Experts Predict Growth",
+      image: "https://placehold.co/1200x800/e08b6c/white?text=Economics",
+      category: "Finance",
+      link: "#"
+    },
+    {
+      id: 3,
+      title: "The Changing Landscape of International Politics",
+      image: "https://placehold.co/1200x800/e08b6c/white?text=Politics",
+      category: "World",
+      link: "#"
+    }
+  ];
+
+  // Group articles by category
+  const worldArticles = articles.filter(a => a.category?.toLowerCase() === 'world').map(transformArticle);
+  const politicsArticles = articles.filter(a => a.category?.toLowerCase() === 'politics').map(transformArticle);
+  const businessArticles = articles.filter(a => a.category?.toLowerCase() === 'business' || a.category?.toLowerCase() === 'finance').map(transformArticle);
+  const sportArticles = articles.filter(a => a.category?.toLowerCase() === 'sport').map(transformArticle);
+  const technologyArticles = articles.filter(a => a.category?.toLowerCase() === 'technology').map(transformArticle);
+  const latestArticles = articles.slice(0, 6).map(transformArticle);
+  const ourPicksArticles = [1, 4, 5].map(i => articles[i]).filter(Boolean).map(transformArticle);
+  
+  // Transform article to NewsArticle format
+  function transformArticle(article: Article) {
+    return {
+      id: parseInt(article.id),
+      title: article.title,
+      excerpt: article.excerpt || "",
+      image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
+      category: article.category,
+      date: new Date(article.published_at).toLocaleDateString(),
+      link: `/articles/${article.id}`
+    };
+  }
+
   return (
     <Layout>
-      <div className="container py-12">
-        <h1 className="text-4xl font-bold mb-4">Latest Articles</h1>
-        {loading ? (
-          <div>Loading...</div>
-        ) : articles.length === 0 ? (
-          <div>No articles found.</div>
-        ) : (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
-              <Link
-                to={`/articles/${article.id}`}
-                key={article.id}
-                className="group block rounded-lg border shadow-sm hover:shadow-lg transition bg-white dark:bg-gray-900"
-              >
-                {article.image_url && (
-                  <img
-                    src={article.image_url}
-                    alt={article.title}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
-                )}
-                <div className="p-4">
-                  <span className="inline-block mb-2 px-2 py-1 text-xs rounded bg-highlight text-white">
-                    {article.category}
-                  </span>
-                  <h2 className="text-xl font-semibold group-hover:text-highlight">
-                    {article.title}
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
-                    {article.excerpt}
-                  </p>
-                  <div className="text-xs text-muted-foreground mt-2">
-                    {new Date(article.published_at).toLocaleDateString()}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Breaking News Ticker */}
+      <NewsTicker items={breakingNews} />
+      
+      {/* Featured Carousel */}
+      <NewsCarousel 
+        items={featuredArticles.length > 0 ? featuredArticles : defaultCarouselItems} 
+      />
+
+      {loading ? (
+        <div className="container py-20 text-center">
+          <div className="text-2xl">Loading articles...</div>
+        </div>
+      ) : articles.length === 0 ? (
+        <div className="container py-20 text-center">
+          <div className="text-2xl">No articles found.</div>
+        </div>
+      ) : (
+        <>
+          {/* Latest Articles */}
+          <NewsSection 
+            title="Latest Articles" 
+            articles={latestArticles}
+            layout="grid"
+          />
+          
+          {/* Our Picks */}
+          {ourPicksArticles.length > 0 && (
+            <NewsSection 
+              title="Our Picks" 
+              articles={ourPicksArticles}
+              layout="featured"
+              className="bg-gray-50"
+            />
+          )}
+          
+          {/* World News */}
+          {worldArticles.length > 0 && (
+            <NewsSection 
+              title="World" 
+              articles={worldArticles}
+              layout="list"
+            />
+          )}
+
+          {/* Politics */}
+          {politicsArticles.length > 0 && (
+            <NewsSection 
+              title="Politics" 
+              articles={politicsArticles}
+              layout="grid"
+              className="bg-gray-50"
+            />
+          )}
+
+          {/* Sports */}
+          {sportArticles.length > 0 && (
+            <NewsSection 
+              title="Sport" 
+              articles={sportArticles}
+              layout="featured"
+            />
+          )}
+
+          {/* Business */}
+          {businessArticles.length > 0 && (
+            <NewsSection 
+              title="Business & Finance" 
+              articles={businessArticles}
+              layout="list"
+              className="bg-gray-50"
+            />
+          )}
+
+          {/* Technology */}
+          {technologyArticles.length > 0 && (
+            <NewsSection 
+              title="Technology" 
+              articles={technologyArticles}
+              layout="grid"
+            />
+          )}
+        </>
+      )}
     </Layout>
   );
 }
