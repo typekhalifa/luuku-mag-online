@@ -8,7 +8,7 @@ export default function Index() {
     <Layout>
       <div className="container py-20 text-center">
         <h1 className="text-4xl font-extrabold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-          Welcome to the News Magazine
+          Welcome to the Luuku Magazine
         </h1>
         <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
           Your source for the latest news and stories
