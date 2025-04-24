@@ -1,8 +1,9 @@
 
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import NewsTicker from "@/components/sections/NewsTicker";
+import NewsCarousel from "@/components/sections/NewsCarousel";
+import NewsSection from "@/components/sections/NewsSection";
+import InstagramGrid from "@/components/sections/InstagramGrid";
 
 export default function Index() {
   // Mock data for news ticker
@@ -19,18 +20,11 @@ export default function Index() {
       {/* Breaking News Ticker */}
       <NewsTicker items={breakingNews} />
       
-      <div className="container py-20 text-center">
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-          Welcome to the Luuku Magazine
-        </h1>
-        <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
-          Your source for the latest news and stories
-        </p>
-        <div className="mt-8 flex justify-center gap-4">
-          <Button asChild>
-            <Link to="/articles">View Articles</Link>
-          </Button>
-        </div>
+      {/* News Content */}
+      <div className="container py-8">
+        <NewsCarousel />
+        <NewsSection />
+        <InstagramGrid />
       </div>
     </Layout>
   );

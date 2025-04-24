@@ -2,6 +2,7 @@
 import { X, Facebook, Instagram, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -9,6 +10,19 @@ interface MobileNavProps {
 }
 
 const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
+  const navigate = useNavigate();
+
+  const handleNavClick = (category: string) => {
+    if (category === 'Home') {
+      navigate('/');
+    } else {
+      navigate(`/articles?category=${category.toLowerCase()}`);
+    }
+    onClose();
+  };
+
+  const navItems = ['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'];
+
   return (
     <div
       className={cn(
@@ -19,12 +33,12 @@ const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
     >
       <div 
         className={cn(
-          "fixed inset-y-0 left-0 w-3/4 max-w-xs bg-white shadow-xl transition-transform duration-300 flex flex-col",
+          "fixed inset-y-0 left-0 w-3/4 max-w-xs bg-white dark:bg-gray-900 shadow-xl transition-transform duration-300 flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b">
+        <div className="flex items-center justify-between h-16 px-4 border-b dark:border-gray-800">
           <h2 className="text-xl font-bold tracking-tight font-heading">
             <span className="text-highlight">LUUKU</span> MAG
           </h2>
@@ -41,21 +55,20 @@ const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
         
         <nav className="flex-1 overflow-auto">
           <ul className="py-2">
-            {['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
-              <li key={item} className="border-b border-gray-100 last:border-0">
-                <a
-                  href="#"
-                  className="flex items-center px-6 py-3 text-base font-medium transition-colors hover:bg-gray-50 hover:text-highlight"
-                  onClick={onClose}
+            {navItems.map((item) => (
+              <li key={item} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                <button
+                  className="w-full text-left px-6 py-3 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-highlight"
+                  onClick={() => handleNavClick(item)}
                 >
                   {item}
-                </a>
+                </button>
               </li>
             ))}
           </ul>
         </nav>
         
-        <div className="flex items-center justify-center p-4 border-t gap-6">
+        <div className="flex items-center justify-center p-4 border-t dark:border-gray-800 gap-6">
           <a
             href="#"
             aria-label="Facebook"
