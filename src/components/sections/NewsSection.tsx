@@ -1,9 +1,10 @@
+
 import { cn } from "@/lib/utils";
 import CommentSection from "../CommentSection";
 import LikeButton from "../LikeButton";
 
 export interface NewsArticle {
-  id: number;
+  id: number | string;
   title: string;
   excerpt: string;
   image: string;
