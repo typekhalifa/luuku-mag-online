@@ -4,6 +4,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChartIcon, FileTextIcon, MessageSquareIcon, UsersIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import BreakingNewsManager from "@/components/admin/BreakingNewsManager";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = React.useState({
@@ -92,6 +93,20 @@ const Dashboard: React.FC = () => {
               {loading ? "Loading..." : stats.totalContacts}
             </div>
             <p className="text-xs text-muted-foreground">User inquiries</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Manage Breaking News</CardTitle>
+            <CardDescription>
+              Add, edit, and manage breaking news items that appear in the ticker
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BreakingNewsManager />
           </CardContent>
         </Card>
       </div>

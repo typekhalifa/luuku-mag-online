@@ -51,6 +51,36 @@ export type Database = {
         }
         Relationships: []
       }
+      breaking_news: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          date: string | null
+          id: string
+          link: string
+          priority: number | null
+          text: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          date?: string | null
+          id?: string
+          link?: string
+          priority?: number | null
+          text: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          date?: string | null
+          id?: string
+          link?: string
+          priority?: number | null
+          text?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           article_id: string

@@ -1,19 +1,29 @@
-
+import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
 import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
 import InstagramGrid from "@/components/sections/InstagramGrid";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Index() {
-  // Mock data for news ticker
-  const breakingNews = [
-    { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
-    { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
-    { text: "Major economic policy shift announced by central bank", link: "#", date: "5h ago" },
-    { text: "International space mission discovers signs of water on distant planet", link: "#", date: "Today" },
-    { text: "Sports league announces expansion to new cities", link: "#", date: "Today" },
-  ];
+  const [breakingNews, setBreakingNews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBreakingNews = async () => {
+      const { data } = await supabase
+        .from('breaking_news')
+        .select('*')
+        .eq('active', true)
+        .order('priority', { ascending: true });
+      
+      setBreakingNews(data || []);
+      setLoading(false);
+    };
+
+    fetchBreakingNews();
+  }, []);
 
   // Mock data for news carousel
   const carouselItems = [
@@ -131,14 +141,29 @@ export default function Index() {
     }
   ];
 
+  // Get top 6 articles from each category for "Our Picks"
+  const ourPicks = [
+    ...technologyArticles,
+    ...worldArticles,
+    ...opportunitiesArticles
+  ]
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  .slice(0, 6);
+
   return (
     <Layout>
       {/* Breaking News Ticker */}
-      <NewsTicker items={breakingNews} />
+      <NewsTicker items={loading ? [] : breakingNews} />
       
       {/* News Content */}
       <div className="container py-8">
         <NewsCarousel items={carouselItems} />
+        
+        <NewsSection 
+          title="Our Picks" 
+          articles={ourPicks} 
+          layout="grid" 
+        />
         
         <NewsSection 
           title="Technology Updates" 
