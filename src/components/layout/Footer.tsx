@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Facebook, Instagram, Mail, Phone, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -61,9 +60,6 @@ const Footer = () => {
 
   return (
     <footer className="bg-black text-white">
-      {/* Instagram Feed */}
-      <InstagramGrid />
-
       {/* Main Footer Content */}
       <div className="container px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -149,15 +145,14 @@ const Footer = () => {
               </li>
               <li className="flex items-start">
                 <Phone className="w-5 h-5 mr-2 text-highlight mt-0.5" />
-                <a href="tel:+1234567890" className="text-gray-400 hover:text-highlight transition-colors">
-                  +1 (234) 567-890
+                <a href="tel:+250788214751" className="text-gray-400 hover:text-highlight transition-colors">
+                  +250 788 214 751
                 </a>
               </li>
               <li>
                 <p className="text-gray-400">
-                  123 Media Avenue<br />
-                  New York, NY 10001<br />
-                  United States
+                  24XC+QFJ, KG 11 Ave<br />
+                  Kigali, Rwanda
                 </p>
               </li>
               <li>
@@ -232,4 +227,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

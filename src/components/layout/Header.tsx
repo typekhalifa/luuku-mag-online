@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Facebook, Instagram, Menu, Search, Twitter, X, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import MobileNav from "./MobileNav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import SearchResults from "../SearchResults";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +42,7 @@ const Header = () => {
       setTheme("light");
       document.documentElement.classList.remove("dark");
       window.localStorage.setItem("theme", "light");
-    }
+      }
   };
 
   const toggleMenu = () => {
@@ -71,6 +75,116 @@ const Header = () => {
       navigate(item.path);
     }
     setIsMenuOpen(false);
+  };
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+
+  // Search handler
+  const handleSearch = (query: string) => {
+    const technologyArticles = [
+      {
+        id: 1,
+        title: "AI Revolution in Healthcare: New Diagnostic Tools",
+        excerpt: "Artificial intelligence is transforming how doctors diagnose and treat diseases with unprecedented accuracy.",
+        image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470",
+        category: "Technology",
+        date: "2 hours ago",
+        link: "#"
+      },
+      {
+        id: 2,
+        title: "Quantum Computing Milestone Achieved by Research Team",
+        excerpt: "Scientists have reached a significant breakthrough in quantum computing that could revolutionize data processing.",
+        image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1470",
+        category: "Technology",
+        date: "Yesterday",
+        link: "#"
+      },
+      {
+        id: 3,
+        title: "New Smartphone Features Focus on Digital Wellbeing",
+        excerpt: "The latest generation of smartphones includes tools designed to help users manage screen time and online habits.",
+        image: "https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?q=80&w=1026",
+        category: "Technology",
+        date: "2 days ago",
+        link: "#"
+      }
+    ];
+    
+    const worldArticles = [
+      {
+        id: 4,
+        title: "International Climate Agreement Receives Wide Support",
+        excerpt: "Countries around the world are signing onto a new framework for addressing climate change and reducing emissions.",
+        image: "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=1470",
+        category: "World",
+        date: "4 hours ago",
+        link: "#"
+      },
+      {
+        id: 5,
+        title: "Diplomatic Relations Improve Between Rival Nations",
+        excerpt: "A historic meeting between leaders signals a potential thaw in long-standing international tensions.",
+        image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?q=80&w=1469",
+        category: "World",
+        date: "Today",
+        link: "#"
+      },
+      {
+        id: 6,
+        title: "Cultural Exchange Program Launches Across Continents",
+        excerpt: "A new initiative aims to build bridges between diverse communities through art, music, and education.",
+        image: "https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?q=80&w=1470",
+        category: "World",
+        date: "3 days ago",
+        link: "#"
+      }
+    ];
+    
+    const opportunitiesArticles = [
+      {
+        id: 7,
+        title: "Scholarship Program Opens Applications for International Students",
+        excerpt: "A major foundation announces funding opportunities for students from developing countries to study abroad.",
+        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1470",
+        category: "Opportunities",
+        date: "1 day ago",
+        link: "#"
+      },
+      {
+        id: 8,
+        title: "Green Technology Startups Receive Major Investment",
+        excerpt: "Venture capital firms are pouring resources into innovative companies addressing environmental challenges.",
+        image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1470",
+        category: "Opportunities",
+        date: "1 week ago",
+        link: "#"
+      },
+      {
+        id: 9,
+        title: "Remote Work Revolution Creates New Career Paths",
+        excerpt: "Companies embracing flexible work arrangements are opening doors for talent regardless of location.",
+        image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=1469",
+        category: "Opportunities",
+        date: "5 days ago",
+        link: "#"
+      }
+    ];
+    const allArticles = [
+      ...technologyArticles,
+      ...worldArticles,
+      ...opportunitiesArticles
+    ];
+    
+    const filteredResults = allArticles.filter(article => 
+      article.title.toLowerCase().includes(query.toLowerCase()) ||
+      article.category.toLowerCase().includes(query.toLowerCase()) ||
+      (article.excerpt && article.excerpt.toLowerCase().includes(query.toLowerCase()))
+    );
+    
+    setSearchResults(filteredResults);
   };
 
   return (
@@ -131,10 +245,11 @@ const Header = () => {
             >
               <Instagram size={18} />
             </a>
+            {/* Update search icon click handler */}
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleSearch}
+              onClick={() => setIsSearchDialogOpen(true)}
               aria-label="Search"
               className="hover:text-highlight"
             >
@@ -183,24 +298,33 @@ const Header = () => {
           )}
         </div>
 
-        {/* Search Bar */}
-        <div
-          className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out",
-            isSearchOpen
-              ? "max-h-20 opacity-100 py-3"
-              : "max-h-0 opacity-0 py-0"
-          )}
-        >
-          <div className="flex items-center w-full px-3 bg-gray-100 dark:bg-[#22293a] rounded-md focus-within:ring-1 focus-within:ring-highlight">
+      {/* Search Dialog */}
+      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <div className="flex items-center w-full px-3 bg-gray-100 dark:bg-[#22293a] rounded-md focus-within:ring-1 focus-within:ring-highlight mb-4">
             <Search size={18} className="text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               placeholder="Search articles..."
               className="w-full px-2 py-2 bg-transparent border-none focus:outline-none text-black dark:text-white"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleSearch(e.target.value);
+              }}
+              autoFocus
             />
           </div>
-        </div>
+          <SearchResults 
+            results={searchResults} 
+            onClose={() => {
+              setIsSearchDialogOpen(false);
+              setSearchQuery("");
+              setSearchResults([]);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className={cn(
