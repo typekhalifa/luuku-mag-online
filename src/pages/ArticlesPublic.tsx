@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -90,7 +89,7 @@ export default function ArticlesPublic() {
   ];
 
   const transformArticle = (article: Article) => ({
-    id: parseInt(article.id),
+    id: article.id,
     title: article.title,
     excerpt: article.excerpt || "",
     image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
@@ -109,7 +108,6 @@ export default function ArticlesPublic() {
   const cultureArticles = articles.filter(a => a.category?.toLowerCase() === 'culture').map(transformArticle);
   const latestArticles = articles.slice(0, 6).map(transformArticle);
 
-  // Helper to get the first X unique categories for "Our Picks"
   function getFirstOfEach(categories: string[]) {
     const picks: any[] = [];
     categories.forEach(category => {
@@ -118,7 +116,7 @@ export default function ArticlesPublic() {
     });
     return picks;
   }
-  // Customize: up to 4 categories (add or change here as you wish)
+
   const ourPicksCategories = ["technology", "world", "opportunities", "sport"];
   const ourPicksArticles = getFirstOfEach(ourPicksCategories);
 
@@ -130,7 +128,6 @@ export default function ArticlesPublic() {
         items={featuredArticles.length > 0 ? featuredArticles : defaultCarouselItems} 
       />
 
-      {/* If filtered by category, show only that section */}
       {filteredCategory ? (
         <>
         <div className="container pt-8">

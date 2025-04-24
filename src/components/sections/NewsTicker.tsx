@@ -5,12 +5,14 @@ interface NewsTickerProps {
   items: {
     text: string;
     link: string;
-    date?: string; // Optional date for each news item
+    date?: string;
   }[];
   className?: string;
 }
 
 const NewsTicker = ({ items, className }: NewsTickerProps) => {
+  if (items.length === 0) return null;
+
   return (
     <div className={cn("bg-black text-white overflow-hidden", className)}>
       <div className="container py-2 px-4">

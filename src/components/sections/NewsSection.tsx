@@ -74,7 +74,7 @@ const NewsSection = ({
 const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
   return (
     <div className="group">
-      <a href={article.link} className="block relative aspect-[16/9] mb-4 overflow-hidden">
+      <a href={`/articles/${article.id}`} className="block relative aspect-[16/9] mb-4 overflow-hidden">
         <img 
           src={article.image} 
           alt={article.title} 
@@ -88,7 +88,7 @@ const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
       </a>
       <div>
         <h3 className="text-xl font-bold font-heading mb-2">
-          <a href={article.link} className="hover:text-highlight transition-colors">
+          <a href={`/articles/${article.id}`} className="hover:text-highlight transition-colors">
             {article.title}
           </a>
         </h3>
@@ -108,7 +108,7 @@ const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
 const ArticleCard = ({ article }: { article: NewsArticle }) => {
   return (
     <div className="group">
-      <a href={article.link} className="block relative aspect-[4/3] mb-3 overflow-hidden">
+      <a href={`/articles/${article.id}`} className="block relative aspect-[4/3] mb-3 overflow-hidden">
         <img 
           src={article.image} 
           alt={article.title} 
@@ -122,7 +122,7 @@ const ArticleCard = ({ article }: { article: NewsArticle }) => {
       </a>
       <div>
         <h3 className="text-lg font-bold font-heading mb-2">
-          <a href={article.link} className="hover:text-highlight transition-colors">
+          <a href={`/articles/${article.id}`} className="hover:text-highlight transition-colors">
             {article.title}
           </a>
         </h3>
@@ -141,7 +141,7 @@ const ArticleCard = ({ article }: { article: NewsArticle }) => {
 const SmallArticleCard = ({ article }: { article: NewsArticle }) => {
   return (
     <div className="group flex">
-      <a href={article.link} className="block relative w-1/3 aspect-square mr-3 overflow-hidden flex-shrink-0">
+      <a href={`/articles/${article.id}`} className="block relative w-1/3 aspect-square mr-3 overflow-hidden flex-shrink-0">
         <img 
           src={article.image} 
           alt={article.title} 
@@ -153,7 +153,7 @@ const SmallArticleCard = ({ article }: { article: NewsArticle }) => {
           {article.category}
         </span>
         <h3 className="text-base font-bold font-heading">
-          <a href={article.link} className="hover:text-highlight transition-colors">
+          <a href={`/articles/${article.id}`} className="hover:text-highlight transition-colors">
             {article.title}
           </a>
         </h3>
@@ -169,7 +169,7 @@ const SmallArticleCard = ({ article }: { article: NewsArticle }) => {
 const ListArticleCard = ({ article }: { article: NewsArticle }) => {
   return (
     <div className="group flex items-center pb-4 border-b">
-      <a href={article.link} className="block relative w-1/4 md:w-1/5 aspect-[4/3] mr-4 overflow-hidden flex-shrink-0">
+      <a href={`/articles/${article.id}`} className="block relative w-1/4 md:w-1/5 aspect-[4/3] mr-4 overflow-hidden flex-shrink-0">
         <img 
           src={article.image} 
           alt={article.title} 
@@ -181,7 +181,7 @@ const ListArticleCard = ({ article }: { article: NewsArticle }) => {
           {article.category}
         </span>
         <h3 className="text-base md:text-lg font-bold font-heading mb-1">
-          <a href={article.link} className="hover:text-highlight transition-colors">
+          <a href={`/articles/${article.id}`} className="hover:text-highlight transition-colors">
             {article.title}
           </a>
         </h3>
