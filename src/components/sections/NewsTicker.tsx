@@ -14,13 +14,13 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
   if (items.length === 0) return null;
 
   return (
-    <div className={cn("bg-black text-white py-2 overflow-hidden w-full", className)}>
+    <div className={cn("bg-black text-white py-2 overflow-hidden w-full sticky top-0 z-50", className)}>
       <div className="container relative flex items-center">
         <div className="mr-4 font-bold text-highlight whitespace-nowrap">
           BREAKING:
         </div>
         <div className="overflow-hidden flex-1">
-          <div className="animate-marquee whitespace-nowrap inline-block hover:pause-animation">
+          <div className="animate-marquee whitespace-nowrap inline-block">
             {items.map((item, index) => (
               <a
                 key={index}

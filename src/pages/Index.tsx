@@ -150,50 +150,73 @@ export default function Index() {
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0, 6);
 
+  // If no breaking news is available, use these mock items
+  const fallbackBreakingNews = [
+    {
+      text: "Global Economic Summit to address climate initiatives next month",
+      link: "#",
+      date: "Just now"
+    },
+    {
+      text: "Tech giants announce collaboration on AI safety standards",
+      link: "#",
+      date: "2 hours ago"
+    },
+    {
+      text: "Major breakthrough in renewable energy storage announced",
+      link: "#",
+      date: "Today"
+    }
+  ];
+
+  // Use real breaking news if available, otherwise use fallback
+  const displayedBreakingNews = loading || breakingNews.length === 0 
+    ? fallbackBreakingNews 
+    : breakingNews.map(item => ({
+        text: item.text,
+        link: item.link,
+        date: item.date
+      }));
+
   return (
-    <>
-      {/* Breaking News Ticker - Always at the very top, outside of Layout */}
+    <Layout>
+      {/* Breaking News Ticker - Positioned at the top, inside Layout */}
       <NewsTicker 
-        items={loading ? [] : breakingNews.map(item => ({
-          text: item.text,
-          link: item.link,
-          date: item.date
-        }))} 
+        items={displayedBreakingNews}
+        className="mb-4" 
       />
       
-      <Layout>
-        <div className="container py-8">
-          {/* Featured News Carousel - Directly below the ticker */}
-          <NewsCarousel items={carouselItems} className="mb-8" />
-          
-          {/* Other News Sections */}
-          <NewsSection 
-            title="Our Picks" 
-            articles={ourPicks} 
-            layout="grid" 
-          />
-          
-          <NewsSection 
-            title="Technology Updates" 
-            articles={technologyArticles} 
-            layout="grid" 
-          />
-          
-          <NewsSection 
-            title="World News" 
-            articles={worldArticles} 
-            layout="featured" 
-          />
-          
-          <NewsSection 
-            title="Latest Opportunities" 
-            articles={opportunitiesArticles} 
-            layout="list" 
-          />
-          
-          <InstagramGrid />
-        </div>
-      </Layout>
-    </>
+      <div className="container py-8">
+        {/* Featured News Carousel - Directly below the ticker */}
+        <NewsCarousel items={carouselItems} className="mb-8" />
+        
+        {/* Other News Sections */}
+        <NewsSection 
+          title="Our Picks" 
+          articles={ourPicks} 
+          layout="grid" 
+        />
+        
+        <NewsSection 
+          title="Technology Updates" 
+          articles={technologyArticles} 
+          layout="grid" 
+        />
+        
+        <NewsSection 
+          title="World News" 
+          articles={worldArticles} 
+          layout="featured" 
+        />
+        
+        <NewsSection 
+          title="Latest Opportunities" 
+          articles={opportunitiesArticles} 
+          layout="list" 
+        />
+        
+        <InstagramGrid />
+      </div>
+    </Layout>
   );
 }
