@@ -152,13 +152,21 @@ export default function Index() {
 
   return (
     <Layout>
-      {/* Breaking News Ticker */}
-      <NewsTicker items={loading ? [] : breakingNews} />
+      {/* Breaking News Ticker - Always at the very top */}
+      <NewsTicker 
+        items={loading ? [] : breakingNews.map(item => ({
+          text: item.text,
+          link: item.link,
+          date: item.date
+        }))} 
+      />
       
       {/* News Content */}
       <div className="container py-8">
-        <NewsCarousel items={carouselItems} />
+        {/* Featured News Carousel - Directly below the ticker */}
+        <NewsCarousel items={carouselItems} className="mb-8" />
         
+        {/* Other News Sections */}
         <NewsSection 
           title="Our Picks" 
           articles={ourPicks} 
