@@ -20,7 +20,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
           BREAKING:
         </div>
         <div className="overflow-hidden flex-1">
-          <div className="animate-marquee whitespace-nowrap inline-block">
+          <div className="animate-marquee whitespace-nowrap inline-block hover:pause-animation">
             {items.map((item, index) => (
               <a
                 key={index}
