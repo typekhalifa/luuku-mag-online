@@ -151,8 +151,8 @@ export default function Index() {
   .slice(0, 6);
 
   return (
-    <Layout>
-      {/* Breaking News Ticker - Always at the very top */}
+    <>
+      {/* Breaking News Ticker - Always at the very top, outside of Layout */}
       <NewsTicker 
         items={loading ? [] : breakingNews.map(item => ({
           text: item.text,
@@ -161,38 +161,39 @@ export default function Index() {
         }))} 
       />
       
-      {/* News Content */}
-      <div className="container py-8">
-        {/* Featured News Carousel - Directly below the ticker */}
-        <NewsCarousel items={carouselItems} className="mb-8" />
-        
-        {/* Other News Sections */}
-        <NewsSection 
-          title="Our Picks" 
-          articles={ourPicks} 
-          layout="grid" 
-        />
-        
-        <NewsSection 
-          title="Technology Updates" 
-          articles={technologyArticles} 
-          layout="grid" 
-        />
-        
-        <NewsSection 
-          title="World News" 
-          articles={worldArticles} 
-          layout="featured" 
-        />
-        
-        <NewsSection 
-          title="Latest Opportunities" 
-          articles={opportunitiesArticles} 
-          layout="list" 
-        />
-        
-        <InstagramGrid />
-      </div>
-    </Layout>
+      <Layout>
+        <div className="container py-8">
+          {/* Featured News Carousel - Directly below the ticker */}
+          <NewsCarousel items={carouselItems} className="mb-8" />
+          
+          {/* Other News Sections */}
+          <NewsSection 
+            title="Our Picks" 
+            articles={ourPicks} 
+            layout="grid" 
+          />
+          
+          <NewsSection 
+            title="Technology Updates" 
+            articles={technologyArticles} 
+            layout="grid" 
+          />
+          
+          <NewsSection 
+            title="World News" 
+            articles={worldArticles} 
+            layout="featured" 
+          />
+          
+          <NewsSection 
+            title="Latest Opportunities" 
+            articles={opportunitiesArticles} 
+            layout="list" 
+          />
+          
+          <InstagramGrid />
+        </div>
+      </Layout>
+    </>
   );
 }

@@ -14,7 +14,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
   if (items.length === 0) return null;
 
   return (
-    <div className={cn("bg-black text-white py-2 overflow-hidden", className)}>
+    <div className={cn("bg-black text-white py-2 overflow-hidden w-full", className)}>
       <div className="container relative flex items-center">
         <div className="mr-4 font-bold text-highlight whitespace-nowrap">
           BREAKING:
