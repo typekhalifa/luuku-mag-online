@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface NewsTickerProps {
@@ -11,6 +12,8 @@ interface NewsTickerProps {
 }
 
 const NewsTicker = ({ items, className }: NewsTickerProps) => {
+  const [isPaused, setIsPaused] = useState(false);
+
   if (items.length === 0) return null;
 
   return (
@@ -19,8 +22,17 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
         <div className="mr-4 font-bold text-highlight whitespace-nowrap">
           BREAKING:
         </div>
-        <div className="overflow-hidden flex-1">
-          <div className="animate-marquee whitespace-nowrap inline-block hover:pause-animation">
+        <div 
+          className="overflow-hidden flex-1"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div 
+            className={cn(
+              "whitespace-nowrap inline-block",
+              isPaused ? "" : "animate-marquee"
+            )}
+          >
             {items.map((item, index) => (
               <a
                 key={index}
