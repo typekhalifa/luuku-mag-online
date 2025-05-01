@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PencilIcon, TrashIcon, EyeIcon } from "lucide-react";
+import { PencilIcon, TrashIcon, EyeIcon, ClockIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +18,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import EditArticleDialog from "./EditArticleDialog";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Link } from "react-router-dom";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ArticleListRowProps {
   article: {
@@ -40,8 +46,30 @@ interface ArticleListRowProps {
 const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   
+  // Parse the date safely
   const publishDate = new Date(article.published_at);
   const isValidDate = !isNaN(publishDate.getTime());
+  
+  // Format date relative to now for display
+  const getFormattedDate = () => {
+    if (!isValidDate) return "Invalid date";
+    
+    if (isToday(publishDate)) {
+      return `Today, ${format(publishDate, "h:mm a")}`;
+    } else if (isYesterday(publishDate)) {
+      return `Yesterday, ${format(publishDate, "h:mm a")}`;
+    } else if (new Date().getFullYear() === publishDate.getFullYear()) {
+      return format(publishDate, "MMM d, h:mm a");
+    } else {
+      return format(publishDate, "MMM d, yyyy");
+    }
+  };
+  
+  // Get relative time for tooltip
+  const getRelativeTime = () => {
+    if (!isValidDate) return "";
+    return formatDistanceToNow(publishDate, { addSuffix: true });
+  };
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -98,22 +126,48 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
         </Badge>
       </TableCell>
       <TableCell>
-        {isValidDate ? format(publishDate, "MMM d, yyyy") : "Invalid date"}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1">
+                <ClockIcon className="h-3 w-3 text-muted-foreground" />
+                <span>{getFormattedDate()}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="text-xs">
+                <div>Published {getRelativeTime()}</div>
+                <div className="text-muted-foreground">
+                  {isValidDate ? format(publishDate, "PPPp") : "Invalid date"}
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       <TableCell>
         {article.featured ? (
-          <Badge variant="default" className="bg-highlight text-white">Featured</Badge>
+          <Badge variant="success" className="font-normal">Featured</Badge>
         ) : (
           <Badge variant="outline">Standard</Badge>
         )}
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
-          <Link to={`/articles/${article.id}`} target="_blank">
-            <Button variant="ghost" size="icon" className="h-8 w-8" title="Preview article">
-              <EyeIcon className="h-4 w-4" />
-            </Button>
-          </Link>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to={`/articles/${article.id}`} target="_blank">
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <EyeIcon className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View article</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
           <EditArticleDialog 
             article={article} 
