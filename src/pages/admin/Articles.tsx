@@ -13,14 +13,40 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { RefreshCwIcon } from "lucide-react";
+import { RefreshCwIcon, SearchIcon } from "lucide-react";
 import CreateArticleDialog from "@/components/articles/CreateArticleDialog";
 import ArticleListRow from "@/components/articles/ArticleListRow";
+import { Input } from "@/components/ui/input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const categories = [
+  "All",
+  "World",
+  "Politics",
+  "Technology",
+  "Sports",
+  "Finance",
+  "Health",
+  "Entertainment",
+  "Education",
+  "Opportunities"
+];
 
 const Articles: React.FC = () => {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [filteredArticles, setFilteredArticles] = useState<any[]>([]);
 
   const fetchArticles = async () => {
     try {
@@ -31,6 +57,7 @@ const Articles: React.FC = () => {
 
       if (error) throw error;
       setArticles(data || []);
+      setFilteredArticles(data || []);
     } catch (error: any) {
       toast({
         title: "Error fetching articles",
@@ -43,6 +70,31 @@ const Articles: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    let result = articles;
+    
+    // Apply category filter
+    if (categoryFilter !== "All") {
+      result = result.filter(article => article.category === categoryFilter);
+    }
+    
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(article => 
+        article.title.toLowerCase().includes(term) || 
+        (article.excerpt && article.excerpt.toLowerCase().includes(term)) ||
+        (article.author && article.author.toLowerCase().includes(term))
+      );
+    }
+    
+    setFilteredArticles(result);
+  }, [articles, searchTerm, categoryFilter]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchArticles();
@@ -52,9 +104,33 @@ const Articles: React.FC = () => {
     setArticles((prev) => prev.filter((article) => article.id !== deletedId));
   };
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
+  const renderTableSkeleton = () => (
+    <>
+      {[1, 2, 3, 4].map((i) => (
+        <TableRow key={i}>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-12 w-12" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-3 w-[150px]" />
+              </div>
+            </div>
+          </TableCell>
+          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+          <TableCell className="text-right">
+            <div className="flex justify-end gap-2">
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+            </div>
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
+  );
 
   return (
     <AdminLayout>
@@ -74,32 +150,69 @@ const Articles: React.FC = () => {
         </div>
       </div>
 
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="relative">
+              <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search articles..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select
+              value={categoryFilter}
+              onValueChange={setCategoryFilter}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="text-right text-sm text-muted-foreground">
+              {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''} found
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Table>
-        <TableCaption>A list of all published articles</TableCaption>
+        <TableCaption>
+          {filteredArticles.length === 0 && !loading
+            ? "No articles found matching your criteria"
+            : "Manage your published articles"}
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Published</TableHead>
-            <TableHead>Featured</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
+            renderTableSkeleton()
+          ) : filteredArticles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">
-                Loading articles...
-              </TableCell>
-            </TableRow>
-          ) : articles.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center">
-                No articles found
+              <TableCell colSpan={5} className="text-center py-10">
+                <div className="flex flex-col items-center justify-center text-muted-foreground">
+                  <p className="mb-2">No articles found</p>
+                  <p className="text-sm">Try adjusting your search or filters</p>
+                </div>
               </TableCell>
             </TableRow>
           ) : (
-            articles.map((article) => (
+            filteredArticles.map((article) => (
               <ArticleListRow
                 key={article.id}
                 article={article}

@@ -17,6 +17,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import EditArticleDialog from "./EditArticleDialog";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface ArticleListRowProps {
   article: {
@@ -28,6 +31,7 @@ interface ArticleListRowProps {
     image_url: string | null;
     content: string;
     excerpt: string;
+    author: string | null;
   };
   onDelete: (id: string) => void;
   onUpdate: () => void;
@@ -35,6 +39,9 @@ interface ArticleListRowProps {
 
 const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  const publishDate = new Date(article.published_at);
+  const isValidDate = !isNaN(publishDate.getTime());
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -66,43 +73,59 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
     <TableRow key={article.id}>
       <TableCell className="w-[250px]">
         <div className="flex items-center gap-3">
-          {article.image_url && (
+          {article.image_url ? (
             <img
               src={article.image_url}
               alt={article.title}
-              className="h-12 w-12 rounded object-cover"
+              className="h-16 w-16 rounded-md object-cover"
             />
+          ) : (
+            <div className="h-16 w-16 bg-muted rounded-md flex items-center justify-center text-muted-foreground">
+              No image
+            </div>
           )}
-          <div>
-            <div className="font-medium">{article.title}</div>
-            <div className="text-sm text-muted-foreground">
-              Admin
+          <div className="flex-1 min-w-0">
+            <div className="font-medium truncate">{article.title}</div>
+            <div className="text-sm text-muted-foreground truncate">
+              By {article.author || "Admin"}
             </div>
           </div>
         </div>
       </TableCell>
       <TableCell>
-        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-secondary">
+        <Badge variant="secondary" className="font-normal">
           {article.category}
-        </span>
+        </Badge>
       </TableCell>
-      <TableCell>{new Date(article.published_at).toLocaleDateString()}</TableCell>
-      <TableCell>{article.featured ? "Yes" : "No"}</TableCell>
+      <TableCell>
+        {isValidDate ? format(publishDate, "MMM d, yyyy") : "Invalid date"}
+      </TableCell>
+      <TableCell>
+        {article.featured ? (
+          <Badge variant="default" className="bg-highlight text-white">Featured</Badge>
+        ) : (
+          <Badge variant="outline">Standard</Badge>
+        )}
+      </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <EyeIcon className="h-4 w-4" />
-          </Button>
+          <Link to={`/articles/${article.id}`} target="_blank">
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Preview article">
+              <EyeIcon className="h-4 w-4" />
+            </Button>
+          </Link>
+          
           <EditArticleDialog 
             article={article} 
             onSuccess={onUpdate}
           />
+          
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-destructive"
+                className="h-8 w-8 text-destructive hover:bg-destructive/10"
               >
                 <TrashIcon className="h-4 w-4" />
               </Button>
