@@ -38,7 +38,12 @@ interface CreateArticleDialogProps {
 
 export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogProps) {
   const { toast } = useToast();
-  const form = useForm<FormData>();
+  const form = useForm<FormData>({
+    defaultValues: {
+      author: "Luuku Magazine", // Default author value
+      featured: false,
+    }
+  });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +91,10 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
         description: "Article created successfully",
       });
       
-      form.reset();
+      form.reset({
+        author: "Luuku Magazine", // Reset form but keep default author
+        featured: false,
+      });
       setImageFile(null);
       setImagePreview(null);
       setOpen(false);
