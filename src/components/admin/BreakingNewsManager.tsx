@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import {
   Table,
@@ -19,7 +20,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Edit, Save, X } from "lucide-react";
+import { Trash2, Edit, Save, X, FileText } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const BreakingNewsManager = () => {
   const [news, setNews] = useState<any[]>([]);
@@ -29,10 +37,12 @@ const BreakingNewsManager = () => {
     text: "", 
     link: "#", 
     priority: 0, 
-    article_id: null 
+    article_id: null,
+    content: "" // Added full content field
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editItem, setEditItem] = useState<any>(null);
+  const [viewingItem, setViewingItem] = useState<any>(null);
 
   const fetchNews = async () => {
     const { data, error } = await supabase
@@ -105,7 +115,7 @@ const BreakingNewsManager = () => {
       description: "The breaking news item has been added successfully.",
     });
 
-    setNewItem({ text: "", link: "#", priority: 0, article_id: null });
+    setNewItem({ text: "", link: "#", priority: 0, article_id: null, content: "" });
     fetchNews();
   };
 
@@ -156,7 +166,8 @@ const BreakingNewsManager = () => {
       text: item.text,
       link: item.link,
       priority: item.priority,
-      article_id: item.article_id
+      article_id: item.article_id,
+      content: item.content || ""
     });
   };
 
@@ -177,7 +188,8 @@ const BreakingNewsManager = () => {
         text: editItem.text,
         link: linkToUse,
         priority: editItem.priority,
-        article_id: editItem.article_id
+        article_id: editItem.article_id,
+        content: editItem.content
       })
       .eq("id", editingId);
 
@@ -234,6 +246,14 @@ const BreakingNewsManager = () => {
     }
   };
 
+  const formatRelativeTime = (dateString: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleAdd} className="space-y-4">
@@ -281,6 +301,14 @@ const BreakingNewsManager = () => {
             />
           </div>
         </div>
+        
+        <Textarea
+          placeholder="Full news content (optional)"
+          value={newItem.content}
+          onChange={(e) => setNewItem({ ...newItem, content: e.target.value })}
+          className="min-h-[100px]"
+        />
+        
         <Button type="submit">Add Breaking News</Button>
       </form>
 
@@ -371,7 +399,7 @@ const BreakingNewsManager = () => {
                 </TableCell>
                 <TableCell>{item.active ? "Active" : "Inactive"}</TableCell>
                 <TableCell>
-                  {item.date ? new Date(item.date).toLocaleString() : "N/A"}
+                  {item.date ? formatRelativeTime(item.date) : "N/A"}
                 </TableCell>
                 <TableCell className="text-right">
                   {editingId === item.id ? (
@@ -395,6 +423,13 @@ const BreakingNewsManager = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
+                        onClick={() => setViewingItem(item)}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
                         onClick={() => startEditing(item)}
                       >
                         <Edit className="h-4 w-4" />
@@ -414,6 +449,36 @@ const BreakingNewsManager = () => {
           )}
         </TableBody>
       </Table>
+
+      {/* Dialog to view full news content */}
+      <Dialog open={!!viewingItem} onOpenChange={() => setViewingItem(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{viewingItem?.text}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 space-y-4">
+            <div className="text-sm text-muted-foreground">
+              {viewingItem?.date ? formatRelativeTime(viewingItem.date) : "N/A"}
+            </div>
+            {viewingItem?.content ? (
+              <div className="prose max-w-none">
+                {viewingItem.content}
+              </div>
+            ) : (
+              <div className="italic text-muted-foreground">No detailed content available</div>
+            )}
+            {viewingItem?.article_id && (
+              <div className="pt-4">
+                <Button asChild variant="outline">
+                  <a href={`/articles/${viewingItem.article_id}`} target="_blank" rel="noopener noreferrer">
+                    View linked article
+                  </a>
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

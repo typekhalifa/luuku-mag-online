@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -6,7 +5,7 @@ import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
 import InstagramGrid from "@/components/sections/InstagramGrid";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Index() {
   const [breakingNews, setBreakingNews] = useState<any[]>([]);
@@ -27,12 +26,13 @@ export default function Index() {
     fetchBreakingNews();
   }, []);
 
-  // Format the breaking news items to include the date in readable format
+  // Format the breaking news items to include the date in relative format
   const formattedBreakingNews = breakingNews.map(item => {
     let formattedDate = '';
     if (item.date) {
       try {
-        formattedDate = format(new Date(item.date), 'MMM d, h:mm a');
+        // Format the date as "X time ago" (e.g. "1 hour ago", "5 minutes ago")
+        formattedDate = formatDistanceToNow(new Date(item.date), { addSuffix: true });
       } catch (e) {
         formattedDate = '';
       }
