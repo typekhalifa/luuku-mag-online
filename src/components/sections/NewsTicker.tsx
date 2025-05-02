@@ -38,13 +38,11 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
               <a
                 key={index}
                 href={item.link}
-                className="inline-block mx-4 text-sm hover:text-highlight transition-colors"
+                className="inline-flex items-center mx-4 text-sm hover:text-highlight transition-colors"
               >
-                {item.date && (
-                  <span className="text-highlight text-xs mr-2 font-semibold">
-                    {item.date}
-                  </span>
-                )}
+                <span className="text-highlight text-xs mr-2 font-semibold">
+                  {item.date} ·
+                </span>
                 {item.text}
               </a>
             ))}
