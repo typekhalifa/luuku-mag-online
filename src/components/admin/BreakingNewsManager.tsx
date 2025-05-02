@@ -201,8 +201,23 @@ const BreakingNewsManager = () => {
   };
 
   const handleArticleChange = (articleId: string | null) => {
-    if (articleId) {
-      // If editing an item
+    if (articleId === "none") {
+      // If "No linked article" is selected
+      if (editingId) {
+        setEditItem({
+          ...editItem,
+          article_id: null,
+          link: "#"
+        });
+      } else {
+        setNewItem({
+          ...newItem,
+          article_id: null,
+          link: "#"
+        });
+      }
+    } else if (articleId) {
+      // If a specific article is selected
       if (editingId) {
         setEditItem({
           ...editItem,
@@ -210,7 +225,6 @@ const BreakingNewsManager = () => {
           link: `/articles/${articleId}`
         });
       } else {
-        // If adding a new item
         setNewItem({
           ...newItem,
           article_id: articleId,
@@ -232,14 +246,14 @@ const BreakingNewsManager = () => {
           />
           <div className="flex gap-2 items-center">
             <Select 
-              value={newItem.article_id || ''} 
-              onValueChange={(value) => handleArticleChange(value || null)}
+              value={newItem.article_id || "none"} 
+              onValueChange={(value) => handleArticleChange(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Link to article (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No linked article</SelectItem>
+                <SelectItem value="none">No linked article</SelectItem>
                 {articles.map((article) => (
                   <SelectItem key={article.id} value={article.id}>
                     {article.title}
@@ -311,14 +325,14 @@ const BreakingNewsManager = () => {
                   {editingId === item.id ? (
                     <div className="flex flex-col gap-2">
                       <Select 
-                        value={editItem?.article_id || ''} 
-                        onValueChange={(value) => handleArticleChange(value || null)}
+                        value={editItem?.article_id || "none"} 
+                        onValueChange={(value) => handleArticleChange(value)}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Link to article" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No linked article</SelectItem>
+                          <SelectItem value="none">No linked article</SelectItem>
                           {articles.map((article) => (
                             <SelectItem key={article.id} value={article.id}>
                               {article.title}
