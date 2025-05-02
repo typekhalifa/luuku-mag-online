@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -5,6 +6,7 @@ import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
 import InstagramGrid from "@/components/sections/InstagramGrid";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 export default function Index() {
   const [breakingNews, setBreakingNews] = useState<any[]>([]);
@@ -24,6 +26,23 @@ export default function Index() {
 
     fetchBreakingNews();
   }, []);
+
+  // Format the breaking news items to include the date in readable format
+  const formattedBreakingNews = breakingNews.map(item => {
+    let formattedDate = '';
+    if (item.date) {
+      try {
+        formattedDate = format(new Date(item.date), 'MMM d, h:mm a');
+      } catch (e) {
+        formattedDate = '';
+      }
+    }
+    
+    return {
+      ...item,
+      date: formattedDate
+    };
+  });
 
   // Mock data for news carousel
   const carouselItems = [
@@ -170,13 +189,9 @@ export default function Index() {
   ];
 
   // Use real breaking news if available, otherwise use fallback
-  const displayedBreakingNews = loading || breakingNews.length === 0 
+  const displayedBreakingNews = loading || formattedBreakingNews.length === 0 
     ? fallbackBreakingNews 
-    : breakingNews.map(item => ({
-        text: item.text,
-        link: item.link,
-        date: item.date
-      }));
+    : formattedBreakingNews;
 
   return (
     <Layout>

@@ -29,28 +29,14 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
         >
           <div 
             className={cn(
-              "whitespace-nowrap inline-block",
-              isPaused ? "" : "animate-marquee"
+              "whitespace-nowrap inline-block animate-ticker",
+              isPaused ? "paused" : ""
             )}
+            style={{ animationDuration: `${Math.max(10, items.length * 5)}s` }}
           >
             {items.map((item, index) => (
               <a
                 key={index}
-                href={item.link}
-                className="inline-block mx-4 text-sm hover:text-highlight transition-colors"
-              >
-                {item.date && (
-                  <span className="text-highlight text-xs mr-2 font-semibold">
-                    {item.date}
-                  </span>
-                )}
-                {item.text}
-              </a>
-            ))}
-            {/* Duplicate items for seamless loop */}
-            {items.map((item, index) => (
-              <a
-                key={`dup-${index}`}
                 href={item.link}
                 className="inline-block mx-4 text-sm hover:text-highlight transition-colors"
               >
