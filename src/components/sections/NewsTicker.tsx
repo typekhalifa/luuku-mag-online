@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { formatDistanceToNow } from "date-fns";
 
 interface NewsTickerProps {
   items: {
@@ -33,7 +32,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
               "whitespace-nowrap inline-block animate-ticker",
               isPaused ? "paused" : ""
             )}
-            style={{ animationDuration: `${Math.max(10, items.length * 5)}s` }}
+            style={{ animationDuration: `${Math.max(5, items.length * 3)}s` }}
           >
             {items.map((item, index) => (
               <a

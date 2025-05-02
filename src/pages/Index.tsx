@@ -39,10 +39,14 @@ export default function Index() {
     }
     
     return {
-      ...item,
+      text: item.text,
+      link: item.link,
       date: formattedDate
     };
   });
+
+  // Don't use fallback news if we have real breaking news
+  const displayedBreakingNews = loading ? [] : formattedBreakingNews;
 
   // Mock data for news carousel
   const carouselItems = [
@@ -169,37 +173,15 @@ export default function Index() {
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0, 6);
 
-  // If no breaking news is available, use these mock items
-  const fallbackBreakingNews = [
-    {
-      text: "Global Economic Summit to address climate initiatives next month",
-      link: "#",
-      date: "Just now"
-    },
-    {
-      text: "Tech giants announce collaboration on AI safety standards",
-      link: "#",
-      date: "2 hours ago"
-    },
-    {
-      text: "Major breakthrough in renewable energy storage announced",
-      link: "#",
-      date: "Today"
-    }
-  ];
-
-  // Use real breaking news if available, otherwise use fallback
-  const displayedBreakingNews = loading || formattedBreakingNews.length === 0 
-    ? fallbackBreakingNews 
-    : formattedBreakingNews;
-
   return (
     <Layout>
-      {/* Breaking News Ticker - Positioned at the top, inside Layout */}
-      <NewsTicker 
-        items={displayedBreakingNews}
-        className="mb-4" 
-      />
+      {/* Breaking News Ticker - Only show if we have items to display */}
+      {displayedBreakingNews.length > 0 && (
+        <NewsTicker 
+          items={displayedBreakingNews}
+          className="mb-4" 
+        />
+      )}
       
       <div className="container py-8">
         {/* Featured News Carousel - Directly below the ticker */}

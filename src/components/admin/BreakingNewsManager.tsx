@@ -27,6 +27,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 const BreakingNewsManager = () => {
@@ -181,6 +182,9 @@ const BreakingNewsManager = () => {
 
     // If an article is selected, use its URL as the link
     const linkToUse = editItem.article_id ? `/articles/${editItem.article_id}` : editItem.link;
+    
+    // Update the date when editing to reflect the latest update
+    const timestamp = new Date().toISOString();
 
     const { error } = await supabase
       .from("breaking_news")
@@ -189,7 +193,8 @@ const BreakingNewsManager = () => {
         link: linkToUse,
         priority: editItem.priority,
         article_id: editItem.article_id,
-        content: editItem.content
+        content: editItem.content,
+        date: timestamp // Update the date to current time
       })
       .eq("id", editingId);
 
@@ -455,11 +460,11 @@ const BreakingNewsManager = () => {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{viewingItem?.text}</DialogTitle>
+            <DialogDescription>
+              {viewingItem?.date ? formatRelativeTime(viewingItem.date) : "N/A"}
+            </DialogDescription>
           </DialogHeader>
           <div className="mt-2 space-y-4">
-            <div className="text-sm text-muted-foreground">
-              {viewingItem?.date ? formatRelativeTime(viewingItem.date) : "N/A"}
-            </div>
             {viewingItem?.content ? (
               <div className="prose max-w-none">
                 {viewingItem.content}
