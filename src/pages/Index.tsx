@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -27,9 +26,10 @@ export default function Index() {
     fetchBreakingNews();
   }, []);
 
-  // Format the breaking news items to include the date in relative format
+  // Format the breaking news items to display the date BEFORE the text
   const formattedBreakingNews = breakingNews.map(item => {
     let formattedDate = '';
+    
     if (item.date) {
       try {
         // Check if the date is already in a relative format (contains "ago")
@@ -46,6 +46,7 @@ export default function Index() {
     }
     
     return {
+      // We now keep the date and text separate so they appear correctly in the NewsTicker component
       text: item.text,
       link: item.link,
       date: formattedDate

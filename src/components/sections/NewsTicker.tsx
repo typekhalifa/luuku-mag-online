@@ -34,7 +34,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 "whitespace-nowrap inline-block animate-ticker",
                 isPaused ? "paused" : ""
               )}
-              style={{ animationDuration: `${Math.max(60, items.length * 15)}s` }} // Much slower animation
+              style={{ animationDuration: `${Math.max(30, items.length * 8)}s` }} // Faster animation
             >
               {items.map((item, index) => (
                 <a
