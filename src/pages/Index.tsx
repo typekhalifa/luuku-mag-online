@@ -31,10 +31,16 @@ export default function Index() {
     let formattedDate = '';
     if (item.date) {
       try {
-        // Format the date as "X time ago" (e.g. "1 hour ago", "5 minutes ago")
-        formattedDate = formatDistanceToNow(new Date(item.date), { addSuffix: true });
+        // Check if the date is already in a relative format (contains "ago")
+        if (item.date.includes("ago")) {
+          formattedDate = item.date;
+        } else {
+          // Format the date as "X time ago" (e.g. "1 hour ago", "5 minutes ago")
+          formattedDate = formatDistanceToNow(new Date(item.date), { addSuffix: true });
+        }
       } catch (e) {
-        formattedDate = '';
+        console.error("Error formatting date:", e);
+        formattedDate = item.date || ''; // Fallback to the original date string or empty
       }
     }
     

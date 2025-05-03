@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Edit, Save, X, FileText } from "lucide-react";
+import { Trash2, Edit, Save, X, FileText, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog,
@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 const BreakingNewsManager = () => {
@@ -39,7 +40,8 @@ const BreakingNewsManager = () => {
     link: "#", 
     priority: 0, 
     article_id: null,
-    content: "" // Added full content field
+    content: "", 
+    date: new Date().toISOString() // Set current date/time by default
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editItem, setEditItem] = useState<any>(null);
@@ -97,7 +99,7 @@ const BreakingNewsManager = () => {
       .from("breaking_news")
       .insert([{
         ...newItem,
-        date: timestamp,
+        date: newItem.date || timestamp,
         // If an article is selected, use its URL as the link
         link: newItem.article_id ? `/articles/${newItem.article_id}` : newItem.link
       }]);
@@ -116,7 +118,15 @@ const BreakingNewsManager = () => {
       description: "The breaking news item has been added successfully.",
     });
 
-    setNewItem({ text: "", link: "#", priority: 0, article_id: null, content: "" });
+    setNewItem({ 
+      text: "", 
+      link: "#", 
+      priority: 0, 
+      article_id: null, 
+      content: "", 
+      date: new Date().toISOString() 
+    });
+    
     fetchNews();
   };
 
@@ -168,7 +178,8 @@ const BreakingNewsManager = () => {
       link: item.link,
       priority: item.priority,
       article_id: item.article_id,
-      content: item.content || ""
+      content: item.content || "",
+      date: item.date || new Date().toISOString()
     });
   };
 
@@ -182,9 +193,6 @@ const BreakingNewsManager = () => {
 
     // If an article is selected, use its URL as the link
     const linkToUse = editItem.article_id ? `/articles/${editItem.article_id}` : editItem.link;
-    
-    // Update the date when editing to reflect the latest update
-    const timestamp = new Date().toISOString();
 
     const { error } = await supabase
       .from("breaking_news")
@@ -194,7 +202,7 @@ const BreakingNewsManager = () => {
         priority: editItem.priority,
         article_id: editItem.article_id,
         content: editItem.content,
-        date: timestamp // Update the date to current time
+        date: editItem.date || new Date().toISOString() // Use the edited date or current time
       })
       .eq("id", editingId);
 
@@ -255,8 +263,13 @@ const BreakingNewsManager = () => {
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
     } catch (e) {
-      return "N/A";
+      return dateString || "N/A";
     }
+  };
+
+  const viewNewsPublicPage = (item: any) => {
+    // Open the news item public page in a new tab
+    window.open(`/breaking-news/${item.id}`, '_blank');
   };
 
   return (
@@ -295,15 +308,34 @@ const BreakingNewsManager = () => {
               onChange={(e) =>
                 setNewItem({ ...newItem, priority: parseInt(e.target.value) || 0 })
               }
-              className="w-1/2"
+              className="w-1/3"
             />
             <Input
               placeholder="Custom link (if no article)"
               value={newItem.link}
               onChange={(e) => setNewItem({ ...newItem, link: e.target.value })}
               disabled={!!newItem.article_id}
-              className="w-1/2"
+              className="w-2/3"
             />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            type="datetime-local"
+            value={newItem.date ? new Date(newItem.date).toISOString().slice(0, 16) : ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value) {
+                setNewItem({ ...newItem, date: new Date(value).toISOString() });
+              } else {
+                setNewItem({ ...newItem, date: new Date().toISOString() });
+              }
+            }}
+            className="w-full"
+          />
+          <div className="text-sm text-muted-foreground pt-2">
+            Will display as: {newItem.date ? formatRelativeTime(newItem.date) : "N/A"}
           </div>
         </div>
         
@@ -311,7 +343,7 @@ const BreakingNewsManager = () => {
           placeholder="Full news content (optional)"
           value={newItem.content}
           onChange={(e) => setNewItem({ ...newItem, content: e.target.value })}
-          className="min-h-[100px]"
+          className="min-h-[150px]"
         />
         
         <Button type="submit">Add Breaking News</Button>
@@ -324,7 +356,7 @@ const BreakingNewsManager = () => {
             <TableHead>Link</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Created</TableHead>
+            <TableHead>Time</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -404,7 +436,24 @@ const BreakingNewsManager = () => {
                 </TableCell>
                 <TableCell>{item.active ? "Active" : "Inactive"}</TableCell>
                 <TableCell>
-                  {item.date ? formatRelativeTime(item.date) : "N/A"}
+                  {editingId === item.id ? (
+                    <Input
+                      type="datetime-local"
+                      value={editItem?.date ? new Date(editItem.date).toISOString().slice(0, 16) : ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value) {
+                          setEditItem({ ...editItem, date: new Date(value).toISOString() });
+                        } else {
+                          setEditItem({ ...editItem, date: new Date().toISOString() });
+                        }
+                      }}
+                    />
+                  ) : (
+                    <span title={item.date}>
+                      {item.date ? formatRelativeTime(item.date) : "N/A"}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   {editingId === item.id ? (
@@ -472,15 +521,22 @@ const BreakingNewsManager = () => {
             ) : (
               <div className="italic text-muted-foreground">No detailed content available</div>
             )}
-            {viewingItem?.article_id && (
-              <div className="pt-4">
-                <Button asChild variant="outline">
+            
+            <div className="pt-4">
+              {viewingItem?.article_id && (
+                <Button asChild variant="outline" className="mr-2">
                   <a href={`/articles/${viewingItem.article_id}`} target="_blank" rel="noopener noreferrer">
                     View linked article
                   </a>
                 </Button>
-              </div>
-            )}
+              )}
+              
+              <Button variant="outline">
+                <a href={`/breaking-news/${viewingItem?.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                  View public page <ExternalLink className="ml-1 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
