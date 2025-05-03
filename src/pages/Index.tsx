@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -32,7 +33,7 @@ export default function Index() {
     if (item.date) {
       try {
         // Check if the date is already in a relative format (contains "ago")
-        if (item.date.includes("ago")) {
+        if (typeof item.date === 'string' && item.date.includes("ago")) {
           formattedDate = item.date;
         } else {
           // Format the date as "X time ago" (e.g. "1 hour ago", "5 minutes ago")
@@ -40,7 +41,7 @@ export default function Index() {
         }
       } catch (e) {
         console.error("Error formatting date:", e);
-        formattedDate = item.date || ''; // Fallback to the original date string or empty
+        formattedDate = item.date ? (typeof item.date === 'string' ? item.date : '') : ''; 
       }
     }
     

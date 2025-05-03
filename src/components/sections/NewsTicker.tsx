@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NewsTickerProps {
   items: {
@@ -17,39 +18,41 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
   if (items.length === 0) return null;
 
   return (
-    <div className={cn("bg-black text-white py-2 overflow-hidden w-full sticky top-0 z-50", className)}>
+    <div className={cn("bg-black text-white py-2 overflow-hidden w-full", className)}>
       <div className="container relative flex items-center">
         <div className="mr-4 font-bold text-highlight whitespace-nowrap">
           BREAKING:
         </div>
-        <div 
-          className="overflow-hidden flex-1"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
+        <ScrollArea className="w-full">
           <div 
-            className={cn(
-              "whitespace-nowrap inline-block animate-ticker",
-              isPaused ? "paused" : ""
-            )}
-            style={{ animationDuration: `${Math.max(30, items.length * 10)}s` }} // Even slower animation
+            className="overflow-hidden flex-1"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
-            {items.map((item, index) => (
-              <a
-                key={index}
-                href={item.link}
-                className="inline-flex items-center mx-4 text-sm hover:text-highlight transition-colors"
-              >
-                {item.date && (
-                  <span className="text-highlight text-xs mr-2 font-semibold">
-                    {item.date} ·
-                  </span>
-                )}
-                {item.text}
-              </a>
-            ))}
+            <div 
+              className={cn(
+                "whitespace-nowrap inline-block animate-ticker",
+                isPaused ? "paused" : ""
+              )}
+              style={{ animationDuration: `${Math.max(60, items.length * 15)}s` }} // Much slower animation
+            >
+              {items.map((item, index) => (
+                <a
+                  key={index}
+                  href={item.link}
+                  className="inline-flex items-center mx-6 text-sm hover:text-highlight transition-colors"
+                >
+                  {item.date && (
+                    <span className="text-highlight text-xs mr-2 font-semibold">
+                      {item.date}
+                    </span>
+                  )}
+                  {item.text}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );
