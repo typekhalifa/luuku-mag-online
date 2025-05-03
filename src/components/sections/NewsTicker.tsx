@@ -32,7 +32,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
               "whitespace-nowrap inline-block animate-ticker",
               isPaused ? "paused" : ""
             )}
-            style={{ animationDuration: `${Math.max(5, items.length * 3)}s` }}
+            style={{ animationDuration: `${Math.max(15, items.length * 6)}s` }} // Significantly slow down the animation
           >
             {items.map((item, index) => (
               <a
@@ -40,9 +40,11 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 href={item.link}
                 className="inline-flex items-center mx-4 text-sm hover:text-highlight transition-colors"
               >
-                <span className="text-highlight text-xs mr-2 font-semibold">
-                  {item.date} ·
-                </span>
+                {item.date && (
+                  <span className="text-highlight text-xs mr-2 font-semibold">
+                    {item.date} ·
+                  </span>
+                )}
                 {item.text}
               </a>
             ))}
