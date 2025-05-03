@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -46,10 +47,9 @@ export default function Index() {
     }
     
     return {
-      // We now keep the date and text separate so they appear correctly in the NewsTicker component
       text: item.text,
       link: item.link,
-      date: formattedDate
+      date: formattedDate // This is the properly formatted date
     };
   });
 

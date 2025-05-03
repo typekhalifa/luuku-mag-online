@@ -34,7 +34,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 "whitespace-nowrap inline-block animate-ticker",
                 isPaused ? "paused" : ""
               )}
-              style={{ animationDuration: `${Math.max(30, items.length * 8)}s` }} // Faster animation
+              style={{ animationDuration: `${Math.max(20, items.length * 5)}s` }} // Even faster animation
             >
               {items.map((item, index) => (
                 <a
@@ -42,11 +42,9 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                   href={item.link}
                   className="inline-flex items-center mx-6 text-sm hover:text-highlight transition-colors"
                 >
-                  {item.date && (
-                    <span className="text-highlight text-xs mr-2 font-semibold">
-                      {item.date}
-                    </span>
-                  )}
+                  <span className="text-highlight text-xs mr-2 font-semibold">
+                    {item.date || ""}
+                  </span>
                   {item.text}
                 </a>
               ))}
