@@ -49,7 +49,7 @@ export default function Index() {
     return {
       text: item.text,
       link: item.link,
-      date: formattedDate // This is the properly formatted date
+      date: formattedDate // This is the properly formatted date that will be displayed
     };
   });
 

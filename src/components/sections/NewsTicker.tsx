@@ -34,7 +34,7 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                 "whitespace-nowrap inline-block animate-ticker",
                 isPaused ? "paused" : ""
               )}
-              style={{ animationDuration: `${Math.max(20, items.length * 5)}s` }} // Even faster animation
+              style={{ animationDuration: `${Math.max(15, items.length * 3)}s` }} // Even faster animation
             >
               {items.map((item, index) => (
                 <a
@@ -42,7 +42,8 @@ const NewsTicker = ({ items, className }: NewsTickerProps) => {
                   href={item.link}
                   className="inline-flex items-center mx-6 text-sm hover:text-highlight transition-colors"
                 >
-                  <span className="text-highlight text-xs mr-2 font-semibold">
+                  {/* Always show the date element, but it might be empty if no date provided */}
+                  <span className="text-highlight text-xs mr-2 font-semibold whitespace-nowrap">
                     {item.date || ""}
                   </span>
                   {item.text}
