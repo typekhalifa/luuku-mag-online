@@ -54,6 +54,8 @@ export type Database = {
       breaking_news: {
         Row: {
           active: boolean | null
+          article_id: string | null
+          content: string | null
           created_at: string
           date: string | null
           id: string
@@ -63,6 +65,8 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          article_id?: string | null
+          content?: string | null
           created_at?: string
           date?: string | null
           id?: string
@@ -72,6 +76,8 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          article_id?: string | null
+          content?: string | null
           created_at?: string
           date?: string | null
           id?: string
