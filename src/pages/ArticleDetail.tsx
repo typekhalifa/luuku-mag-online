@@ -36,6 +36,20 @@ const ArticleDetail = () => {
     fetchArticle();
   }, [id]);
 
+  // Function to format content with proper paragraphs
+  const formatContent = (content: string) => {
+    if (!content) return [];
+    
+    // Split by double line breaks for paragraphs
+    const paragraphs = content.split(/\n\n+/);
+    
+    // Handle single line breaks within paragraphs
+    return paragraphs.map(paragraph => {
+      // Replace single line breaks with <br> tags
+      return paragraph.split(/\n/).join("<br />");
+    });
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -119,8 +133,14 @@ const ArticleDetail = () => {
               </p>
             )}
             
-            <div className="prose max-w-none">
-              {article.content}
+            <div className="prose max-w-none space-y-6">
+              {formatContent(article.content).map((paragraph, i) => (
+                <div 
+                  key={i} 
+                  className="text-base leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: paragraph }}
+                />
+              ))}
             </div>
 
             <div className="mt-8 pt-6 border-t">

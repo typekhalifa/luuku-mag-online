@@ -71,6 +71,20 @@ const BreakingNewsDetail = () => {
     }
   };
 
+  // Function to format content with proper paragraphs
+  const formatContent = (content: string) => {
+    if (!content) return [];
+    
+    // Split by double line breaks for paragraphs
+    const paragraphs = content.split(/\n\n+/);
+    
+    // Handle single line breaks within paragraphs
+    return paragraphs.map(paragraph => {
+      // Replace single line breaks with <br> tags
+      return paragraph.split(/\n/).join("<br />");
+    });
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -114,9 +128,13 @@ const BreakingNewsDetail = () => {
           <h1 className="text-3xl font-bold mb-6">{newsItem.text}</h1>
           
           {newsItem.content ? (
-            <div className="prose max-w-none my-8">
-              {newsItem.content.split('\n').map((paragraph: string, i: number) => (
-                paragraph ? <p key={i}>{paragraph}</p> : <br key={i} />
+            <div className="prose max-w-none my-8 space-y-6">
+              {formatContent(newsItem.content).map((paragraph, i) => (
+                <div 
+                  key={i} 
+                  className="text-base leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: paragraph }}
+                />
               ))}
             </div>
           ) : (
