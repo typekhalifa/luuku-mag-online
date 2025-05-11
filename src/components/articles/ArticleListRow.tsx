@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PencilIcon, TrashIcon, EyeIcon, ClockIcon } from "lucide-react";
+import { PencilIcon, TrashIcon, EyeIcon, ClockIcon, StarIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -157,7 +157,10 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
             <Badge variant="success" className="font-normal">Featured</Badge>
           )}
           {article.our_pick && (
-            <Badge variant="outline" className="font-normal bg-amber-50">Our Pick</Badge>
+            <Badge variant="outline" className="font-normal bg-amber-50 border-amber-300">
+              <StarIcon className="h-3 w-3 mr-1 text-amber-500" />
+              Our Pick
+            </Badge>
           )}
           {!article.featured && !article.our_pick && (
             <Badge variant="outline">Standard</Badge>

@@ -50,15 +50,31 @@ const Articles: React.FC = () => {
 
   const fetchArticles = async () => {
     try {
+      setRefreshing(true);
+      
+      // Fetch all articles without any filters
       const { data, error } = await supabase
         .from("articles")
         .select("*")
         .order("published_at", { ascending: false });
 
       if (error) throw error;
-      setArticles(data || []);
-      setFilteredArticles(data || []);
+      
+      // Handle nullable fields - ensure our_pick and views have default values
+      const processedData = data?.map(article => ({
+        ...article,
+        our_pick: article.our_pick || false,
+        views: article.views || 0
+      })) || [];
+      
+      setArticles(processedData);
+      
+      // Apply current filters
+      applyFilters(processedData);
+      
+      console.log("Fetched articles:", processedData.length);
     } catch (error: any) {
+      console.error("Error fetching articles:", error);
       toast({
         title: "Error fetching articles",
         description: error.message,
@@ -74,8 +90,8 @@ const Articles: React.FC = () => {
     fetchArticles();
   }, []);
 
-  useEffect(() => {
-    let result = articles;
+  const applyFilters = (articlesToFilter = articles) => {
+    let result = [...articlesToFilter];
     
     // Apply category filter
     if (categoryFilter !== "All") {
@@ -86,17 +102,21 @@ const Articles: React.FC = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(article => 
-        article.title.toLowerCase().includes(term) || 
+        article.title?.toLowerCase().includes(term) || 
         (article.excerpt && article.excerpt.toLowerCase().includes(term)) ||
         (article.author && article.author.toLowerCase().includes(term))
       );
     }
     
     setFilteredArticles(result);
-  }, [articles, searchTerm, categoryFilter]);
+  };
+  
+  // Apply filters when filters or articles change
+  useEffect(() => {
+    applyFilters();
+  }, [searchTerm, categoryFilter, articles]);
 
   const handleRefresh = async () => {
-    setRefreshing(true);
     await fetchArticles();
   };
 
