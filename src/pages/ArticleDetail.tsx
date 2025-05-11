@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,11 @@ interface ArticleWithViews {
   title: string;
   updated_at: string;
   views?: number; // Make views optional since it's newly added
+}
+
+// Create a type for the update payload that includes views
+interface ArticleUpdatePayload {
+  views: number;
 }
 
 const ArticleDetail = () => {
@@ -55,11 +61,10 @@ const ArticleDetail = () => {
       setViewCount(currentViews + 1);
       
       // Update view count in database
-      // Using type assertion to allow views property
-      const updatePayload = { views: currentViews + 1 };
+      // Use type assertion to tell TypeScript that this update payload is valid
       await supabase
         .from("articles")
-        .update(updatePayload)
+        .update({ views: currentViews + 1 } as unknown as ArticleUpdatePayload)
         .eq("id", id);
       
       // Fetch related articles in the same category
