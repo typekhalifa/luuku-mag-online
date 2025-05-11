@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon, BadgeIcon, EyeIcon } from "lucide-react";
 
-// Define an interface that extends the database type but includes the views property
+// Define an interface for the article with views
 interface ArticleWithViews {
   author: string | null;
   category: string;
@@ -23,11 +24,6 @@ interface ArticleWithViews {
   slug: string | null;
   title: string;
   updated_at: string;
-  views?: number; // Make views optional since it's newly added
-}
-
-// Create a type for the update payload that includes views
-interface ArticleUpdatePayload {
   views: number;
 }
 
@@ -55,21 +51,20 @@ const ArticleDetail = () => {
       const articleData = data as ArticleWithViews;
       setArticle(articleData);
       
-      // Safely get view count, defaulting to 0 if undefined
+      // Get view count, defaulting to 0 if undefined
       const currentViews = articleData.views || 0;
       setViewCount(currentViews + 1);
       
       // Update view count in database
-      // Use a double type assertion to bypass TypeScript's type checking
       await supabase
         .from("articles")
-        .update({ views: currentViews + 1 } as any)
+        .update({ views: currentViews + 1 })
         .eq("id", id);
       
       // Fetch related articles in the same category
       const { data: related, error: relatedError } = await supabase
         .from("articles")
-        .select("id, title, image_url, excerpt, category, published_at")
+        .select("id, title, image_url, excerpt, category, published_at, views")
         .eq("category", articleData.category)
         .neq("id", id)
         .order("published_at", { ascending: false })
@@ -246,9 +241,17 @@ const ArticleDetail = () => {
                         <div className="p-4">
                           <Badge className="mb-2">{related.category}</Badge>
                           <h3 className="font-medium line-clamp-2">{related.title}</h3>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {formatArticleDate(related.published_at)}
-                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <p className="text-xs text-muted-foreground">
+                              {formatArticleDate(related.published_at)}
+                            </p>
+                            {related.views !== undefined && (
+                              <p className="text-xs flex items-center text-muted-foreground">
+                                <EyeIcon className="h-3 w-3 mr-1" />
+                                {related.views}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </Card>
                     </Link>

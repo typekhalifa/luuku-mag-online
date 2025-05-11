@@ -22,6 +22,7 @@ export type Database = {
           slug: string | null
           title: string
           updated_at: string
+          views: number | null
         }
         Insert: {
           author?: string | null
@@ -35,6 +36,7 @@ export type Database = {
           slug?: string | null
           title: string
           updated_at?: string
+          views?: number | null
         }
         Update: {
           author?: string | null
@@ -48,6 +50,7 @@ export type Database = {
           slug?: string | null
           title?: string
           updated_at?: string
+          views?: number | null
         }
         Relationships: []
       }

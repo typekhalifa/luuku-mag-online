@@ -34,10 +34,12 @@ interface ArticleListRowProps {
     category: string;
     published_at: string;
     featured: boolean;
+    our_pick: boolean;
     image_url: string | null;
     content: string;
     excerpt: string;
     author: string | null;
+    views: number;
   };
   onDelete: (id: string) => void;
   onUpdate: () => void;
@@ -117,6 +119,10 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
             <div className="text-sm text-muted-foreground truncate">
               By {article.author || "Admin"}
             </div>
+            <div className="text-xs flex items-center text-muted-foreground mt-1">
+              <EyeIcon className="h-3 w-3 mr-1" />
+              {article.views || 0} views
+            </div>
           </div>
         </div>
       </TableCell>
@@ -146,11 +152,17 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
         </TooltipProvider>
       </TableCell>
       <TableCell>
-        {article.featured ? (
-          <Badge variant="success" className="font-normal">Featured</Badge>
-        ) : (
-          <Badge variant="outline">Standard</Badge>
-        )}
+        <div className="flex gap-2">
+          {article.featured && (
+            <Badge variant="success" className="font-normal">Featured</Badge>
+          )}
+          {article.our_pick && (
+            <Badge variant="outline" className="font-normal bg-amber-50">Our Pick</Badge>
+          )}
+          {!article.featured && !article.our_pick && (
+            <Badge variant="outline">Standard</Badge>
+          )}
+        </div>
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
