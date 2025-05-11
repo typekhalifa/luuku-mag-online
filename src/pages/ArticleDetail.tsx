@@ -33,14 +33,17 @@ const ArticleDetail = () => {
 
       setArticle(data);
       
-      // Increment view count
-      const views = (data.views || 0) + 1;
-      setViewCount(views);
+      // Safely get view count, defaulting to 0 if undefined
+      const currentViews = data.views || 0;
+      setViewCount(currentViews + 1);
       
       // Update view count in database
+      // Using the any type to bypass TypeScript checking
+      // since our database schema has been updated but the types haven't
+      const updatePayload: any = { views: currentViews + 1 };
       await supabase
         .from("articles")
-        .update({ views })
+        .update(updatePayload)
         .eq("id", id);
       
       // Fetch related articles in the same category
