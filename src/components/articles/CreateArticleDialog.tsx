@@ -6,10 +6,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PlusIcon, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import RichTextEditor from "./RichTextEditor";
 
 const categories = [
   "World",
@@ -30,6 +31,7 @@ type FormData = {
   excerpt: string;
   author: string;
   featured: boolean;
+  our_pick: boolean;
 };
 
 interface CreateArticleDialogProps {
@@ -42,6 +44,7 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
     defaultValues: {
       author: "Luuku Magazine", // Default author value
       featured: false,
+      our_pick: false
     }
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -94,6 +97,7 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
       form.reset({
         author: "Luuku Magazine", // Reset form but keep default author
         featured: false,
+        our_pick: false
       });
       setImageFile(null);
       setImagePreview(null);
@@ -185,6 +189,50 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
                   )}
                 />
 
+                <div className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="featured"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Featured Article</FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Display prominently on homepage
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="our_pick"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Our Pick</FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Include in "Our Picks" section
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <FormLabel>Featured Image</FormLabel>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
@@ -211,6 +259,9 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
                           <span className="text-sm text-gray-500">Upload image</span>
                         </>
                       )}
+                      <Button type="button" variant="outline" size="sm" className="mt-2">
+                        {imagePreview ? "Change Image" : "Select Image"}
+                      </Button>
                     </label>
                   </div>
                 </div>
@@ -225,9 +276,8 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
                     <FormItem>
                       <FormLabel>Excerpt</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Input
                           placeholder="Brief summary of the article"
-                          className="h-24"
                           {...field}
                         />
                       </FormControl>
@@ -244,10 +294,10 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
                     <FormItem>
                       <FormLabel>Content</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Article content"
-                          className="min-h-[300px]"
-                          {...field}
+                        <RichTextEditor 
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Write your article content here..."
                         />
                       </FormControl>
                       <FormMessage />

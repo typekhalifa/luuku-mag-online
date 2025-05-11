@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PencilIcon, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import RichTextEditor from "./RichTextEditor";
 
 const categories = [
   "World",
@@ -52,6 +52,7 @@ interface EditArticleDialogProps {
     content: string;
     excerpt: string;
     featured: boolean;
+    our_pick?: boolean;
     image_url: string | null;
     author: string | null;
   };
@@ -64,6 +65,7 @@ interface FormData {
   content: string;
   excerpt: string;
   featured: boolean;
+  our_pick: boolean;
   author: string;
 }
 
@@ -75,6 +77,7 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
       content: article.content || '',
       excerpt: article.excerpt || '',
       featured: article.featured || false,
+      our_pick: article.our_pick || false,
       author: article.author || ''
     },
   });
@@ -123,6 +126,7 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
           content: data.content,
           excerpt: data.excerpt,
           featured: data.featured,
+          our_pick: data.our_pick,
           author: data.author,
           image_url: imageUrl,
           updated_at: new Date().toISOString(),
@@ -221,28 +225,53 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="featured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          Featured Article
-                        </FormLabel>
-                        <FormDescription>
-                          Featured articles are displayed prominently on the homepage
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                <div className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="featured"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Featured Article
+                          </FormLabel>
+                          <FormDescription>
+                            Featured articles are displayed prominently on the homepage
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="our_pick"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Our Pick
+                          </FormLabel>
+                          <FormDescription>
+                            Include in "Our Picks" section on homepage
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="space-y-2">
                   <FormLabel>Featured Image</FormLabel>
@@ -286,9 +315,8 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
                     <FormItem>
                       <FormLabel>Excerpt</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Input 
                           placeholder="Brief summary of the article"
-                          className="h-24"
                           {...field}
                         />
                       </FormControl>
@@ -308,10 +336,10 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
                     <FormItem>
                       <FormLabel>Content</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Article content"
-                          className="min-h-[300px]"
-                          {...field}
+                        <RichTextEditor 
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Write your article content here..."
                         />
                       </FormControl>
                       <FormMessage />
