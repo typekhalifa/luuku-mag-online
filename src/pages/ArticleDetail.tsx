@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,9 +10,25 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon, BadgeIcon, EyeIcon } from "lucide-react";
 
+// Define an interface that extends the database type but includes the views property
+interface ArticleWithViews {
+  author: string | null;
+  category: string;
+  content: string | null;
+  excerpt: string | null;
+  featured: boolean | null;
+  id: string;
+  image_url: string | null;
+  published_at: string;
+  slug: string | null;
+  title: string;
+  updated_at: string;
+  views?: number; // Make views optional since it's newly added
+}
+
 const ArticleDetail = () => {
   const { id } = useParams();
-  const [article, setArticle] = useState<any>(null);
+  const [article, setArticle] = useState<ArticleWithViews | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewCount, setViewCount] = useState(0);
@@ -31,16 +46,17 @@ const ArticleDetail = () => {
         return;
       }
 
-      setArticle(data);
+      // Cast data to our extended interface
+      const articleData = data as ArticleWithViews;
+      setArticle(articleData);
       
       // Safely get view count, defaulting to 0 if undefined
-      const currentViews = data.views || 0;
+      const currentViews = articleData.views || 0;
       setViewCount(currentViews + 1);
       
       // Update view count in database
-      // Using the any type to bypass TypeScript checking
-      // since our database schema has been updated but the types haven't
-      const updatePayload: any = { views: currentViews + 1 };
+      // Using type assertion to allow views property
+      const updatePayload = { views: currentViews + 1 };
       await supabase
         .from("articles")
         .update(updatePayload)
@@ -50,7 +66,7 @@ const ArticleDetail = () => {
       const { data: related, error: relatedError } = await supabase
         .from("articles")
         .select("id, title, image_url, excerpt, category, published_at")
-        .eq("category", data.category)
+        .eq("category", articleData.category)
         .neq("id", id)
         .order("published_at", { ascending: false })
         .limit(4);
@@ -182,7 +198,7 @@ const ArticleDetail = () => {
                 )}
                 
                 <div className="prose max-w-none space-y-6">
-                  {formatContent(article.content).map((paragraph, i) => (
+                  {formatContent(article.content || "").map((paragraph, i) => (
                     <div 
                       key={i} 
                       className="text-base leading-relaxed"
