@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,10 +60,10 @@ const ArticleDetail = () => {
       setViewCount(currentViews + 1);
       
       // Update view count in database
-      // Use type assertion to tell TypeScript that this update payload is valid
+      // Use a double type assertion to bypass TypeScript's type checking
       await supabase
         .from("articles")
-        .update({ views: currentViews + 1 } as unknown as ArticleUpdatePayload)
+        .update({ views: currentViews + 1 } as any)
         .eq("id", id);
       
       // Fetch related articles in the same category
