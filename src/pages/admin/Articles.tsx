@@ -52,7 +52,7 @@ const Articles: React.FC = () => {
     try {
       setRefreshing(true);
       
-      // Fetch all articles without any filters
+      // Fetch all articles from Supabase without any row limit
       const { data, error } = await supabase
         .from("articles")
         .select("*")

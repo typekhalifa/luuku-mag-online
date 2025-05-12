@@ -10,6 +10,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon, BadgeIcon, EyeIcon } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 // Define an interface for the article with views
 interface ArticleWithViews {
@@ -25,6 +26,7 @@ interface ArticleWithViews {
   title: string;
   updated_at: string;
   views: number;
+  our_pick?: boolean | null;
 }
 
 const ArticleDetail = () => {
@@ -79,20 +81,6 @@ const ArticleDetail = () => {
 
     fetchArticle();
   }, [id]);
-
-  // Function to format content with proper paragraphs
-  const formatContent = (content: string) => {
-    if (!content) return [];
-    
-    // Split by double line breaks for paragraphs
-    const paragraphs = content.split(/\n\n+/);
-    
-    // Handle single line breaks within paragraphs
-    return paragraphs.map(paragraph => {
-      // Replace single line breaks with <br> tags
-      return paragraph.split(/\n/).join("<br />");
-    });
-  };
 
   // Format date for display
   const formatArticleDate = (dateString: string) => {
@@ -197,13 +185,11 @@ const ArticleDetail = () => {
                 )}
                 
                 <div className="prose max-w-none space-y-6">
-                  {formatContent(article.content || "").map((paragraph, i) => (
-                    <div 
-                      key={i} 
-                      className="text-base leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: paragraph }}
-                    />
-                  ))}
+                  {article.content && (
+                    <ReactMarkdown className="text-base leading-relaxed">
+                      {article.content}
+                    </ReactMarkdown>
+                  )}
                 </div>
 
                 <div className="mt-8 pt-6 border-t">
