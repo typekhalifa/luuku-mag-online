@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -5,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import NewsTicker from "@/components/sections/NewsTicker";
 import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
+import { toast } from "@/components/ui/use-toast";
 
 type Article = {
   id: string;
@@ -13,6 +15,8 @@ type Article = {
   image_url: string | null;
   category: string;
   published_at: string;
+  our_pick: boolean | null;
+  featured: boolean | null;
 };
 
 function useQuery() {
@@ -21,6 +25,7 @@ function useQuery() {
 
 export default function ArticlesPublic() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [breakingNews, setBreakingNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const query = useQuery();
   const navigate = useNavigate();
@@ -28,65 +33,91 @@ export default function ArticlesPublic() {
   const filteredCategory = query.get("category");
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      let supabaseQuery = supabase
-        .from("articles")
-        .select("id, title, excerpt, image_url, category, published_at")
-        .order("published_at", { ascending: false });
-
-      if (filteredCategory) {
-        supabaseQuery = supabaseQuery.ilike(
-          "category",
-          filteredCategory
-        );
+    const fetchBreakingNews = async () => {
+      try {
+        const { data } = await supabase
+          .from('breaking_news')
+          .select('*')
+          .eq('active', true)
+          .order('priority', { ascending: true });
+        
+        setBreakingNews(data || []);
+      } catch (error) {
+        console.error("Error fetching breaking news:", error);
       }
-
-      const { data, error } = await supabaseQuery;
-      if (!error && data) setArticles(data as Article[]);
-      setLoading(false);
     };
+
+    const fetchArticles = async () => {
+      try {
+        let supabaseQuery = supabase
+          .from("articles")
+          .select("id, title, excerpt, image_url, category, published_at, our_pick, featured")
+          .order("published_at", { ascending: false });
+
+        if (filteredCategory) {
+          supabaseQuery = supabaseQuery.ilike(
+            "category",
+            filteredCategory
+          );
+        }
+
+        const { data, error } = await supabaseQuery;
+        if (error) throw error;
+        if (data) setArticles(data as Article[]);
+        
+      } catch (error: any) {
+        console.error("Error fetching articles:", error);
+        toast({
+          title: "Error fetching articles",
+          description: error.message,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBreakingNews();
     fetchArticles();
   }, [filteredCategory]);
 
-  const breakingNews = [
-    { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
-    { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
-    { text: "Major economic policy shift announced by central bank", link: "#", date: "5h ago" },
-    { text: "International space mission discovers signs of water on distant planet", link: "#", date: "Today" },
-    { text: "Sports league announces expansion to new cities", link: "#", date: "Today" },
-  ];
-
-  const featuredArticles = articles.slice(0, 3).map((article, index) => ({
-    id: parseInt(article.id),
-    title: article.title,
-    image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
-    category: article.category,
-    link: `/articles/${article.id}`
+  // Format breaking news items
+  const formattedBreakingNews = breakingNews.map(item => ({
+    text: item.text,
+    link: item.link || "#",
+    date: item.date || ""
   }));
 
-  const defaultCarouselItems = [
-    {
-      id: 1,
-      title: "The Future of Sustainable Energy: New Breakthroughs",
-      image: "https://placehold.co/1200x800/e08b6c/white?text=Energy",
-      category: "Technology",
-      link: "#"
-    },
-    {
-      id: 2,
-      title: "Global Economic Outlook: Experts Predict Growth",
-      image: "https://placehold.co/1200x800/e08b6c/white?text=Economics",
-      category: "Finance",
-      link: "#"
-    },
-    {
-      id: 3,
-      title: "The Changing Landscape of International Politics",
-      image: "https://placehold.co/1200x800/e08b6c/white?text=Politics",
-      category: "World",
-      link: "#"
-    }
-  ];
+  // Use real breaking news, fallback to static if none available
+  const displayedBreakingNews = formattedBreakingNews.length > 0 ? 
+    formattedBreakingNews : 
+    [
+      { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
+      { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
+      { text: "Major economic policy shift announced by central bank", link: "#", date: "5h ago" },
+    ];
+
+  const featuredArticles = articles
+    .filter(article => article.featured)
+    .slice(0, 3)
+    .map((article, index) => ({
+      id: article.id,
+      title: article.title,
+      image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
+      category: article.category,
+      link: `/articles/${article.id}`
+    }));
+
+  // If no featured articles, use the most recent ones
+  const carouselItems = featuredArticles.length > 0 ? 
+    featuredArticles : 
+    articles.slice(0, 3).map(article => ({
+      id: article.id,
+      title: article.title,
+      image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
+      category: article.category,
+      link: `/articles/${article.id}`
+    }));
 
   const transformArticle = (article: Article) => ({
     id: article.id,
@@ -98,6 +129,7 @@ export default function ArticlesPublic() {
     link: `/articles/${article.id}`
   });
 
+  // Get articles by category
   const worldArticles = articles.filter(a => a.category?.toLowerCase() === 'world').map(transformArticle);
   const politicsArticles = articles.filter(a => a.category?.toLowerCase() === 'politics').map(transformArticle);
   const businessArticles = articles.filter(a => ['business', 'finance'].includes(a.category?.toLowerCase())).map(transformArticle);
@@ -108,25 +140,18 @@ export default function ArticlesPublic() {
   const cultureArticles = articles.filter(a => a.category?.toLowerCase() === 'culture').map(transformArticle);
   const latestArticles = articles.slice(0, 6).map(transformArticle);
 
-  function getFirstOfEach(categories: string[]) {
-    const picks: any[] = [];
-    categories.forEach(category => {
-      const found = articles.find(a => a.category && a.category.toLowerCase() === category);
-      if (found) picks.push(transformArticle(found));
-    });
-    return picks;
-  }
-
-  const ourPicksCategories = ["technology", "world", "opportunities", "sport"];
-  const ourPicksArticles = getFirstOfEach(ourPicksCategories);
+  // Get "Our Picks" articles from tagged articles, fallback to recent articles
+  const ourPicksArticles = articles
+    .filter(a => a.our_pick === true)
+    .map(transformArticle);
 
   return (
     <Layout>
-      <NewsTicker items={breakingNews} />
+      <NewsTicker items={displayedBreakingNews} />
 
-      <NewsCarousel 
-        items={featuredArticles.length > 0 ? featuredArticles : defaultCarouselItems} 
-      />
+      {carouselItems.length > 0 && (
+        <NewsCarousel items={carouselItems} />
+      )}
 
       {filteredCategory ? (
         <>

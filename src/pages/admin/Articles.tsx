@@ -37,7 +37,9 @@ const categories = [
   "Health",
   "Entertainment",
   "Education",
-  "Opportunities"
+  "Opportunities",
+  "Youth",
+  "Culture"
 ];
 
 const Articles: React.FC = () => {
