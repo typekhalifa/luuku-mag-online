@@ -4,7 +4,7 @@ import CommentSection from "../CommentSection";
 import LikeButton from "../LikeButton";
 
 export interface NewsArticle {
-  id: number | string;
+  id: number | string; // Keep both for backward compatibility
   title: string;
   excerpt: string;
   image: string;

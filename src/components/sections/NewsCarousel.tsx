@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 interface NewsCarouselProps {
   items: {
-    id: number;
+    id: string; // Changed from number to string to support UUIDs
     title: string;
     image: string;
     category: string;
