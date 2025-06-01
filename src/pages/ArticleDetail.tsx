@@ -82,6 +82,29 @@ const ArticleDetail = () => {
     fetchArticle();
   }, [id]);
 
+  // Format content with proper paragraphs
+  const formatContent = (content: string | null) => {
+    if (!content) return null;
+    
+    // Split content by double line breaks to create paragraphs
+    const paragraphs = content.split(/\n\s*\n/);
+    
+    return paragraphs.map((paragraph, index) => {
+      // Handle single line breaks within paragraphs
+      const lines = paragraph.split('\n').filter(line => line.trim());
+      
+      return (
+        <div key={index} className="mb-6">
+          {lines.map((line, lineIndex) => (
+            <p key={lineIndex} className="mb-3 text-base leading-relaxed">
+              {line.trim()}
+            </p>
+          ))}
+        </div>
+      );
+    });
+  };
+
   // Format date for display
   const formatArticleDate = (dateString: string) => {
     try {
@@ -184,10 +207,14 @@ const ArticleDetail = () => {
                   </p>
                 )}
                 
-                <div className="prose max-w-none space-y-6">
-                  {article.content && (
-                    <ReactMarkdown className="text-base leading-relaxed">
-                      {article.content}
+                <div className="space-y-6">
+                  {article.content ? (
+                    <div className="prose max-w-none">
+                      {formatContent(article.content)}
+                    </div>
+                  ) : (
+                    <ReactMarkdown className="prose max-w-none text-base leading-relaxed">
+                      {article.content || ""}
                     </ReactMarkdown>
                   )}
                 </div>

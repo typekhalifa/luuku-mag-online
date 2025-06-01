@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -7,6 +8,7 @@ import InstagramGrid from "@/components/sections/InstagramGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Index() {
   const [breakingNews, setBreakingNews] = useState<any[]>([]);
@@ -14,44 +16,43 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBreakingNews = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await supabase
-          .from('breaking_news')
-          .select('*')
-          .eq('active', true)
-          .order('priority', { ascending: true });
-        
-        setBreakingNews(data || []);
-      } catch (error) {
-        console.error("Error fetching breaking news:", error);
-      }
-    };
+        // Fetch both breaking news and articles in parallel
+        const [breakingNewsResponse, articlesResponse] = await Promise.all([
+          supabase
+            .from('breaking_news')
+            .select('*')
+            .eq('active', true)
+            .order('priority', { ascending: true }),
+          supabase
+            .from('articles')
+            .select('*')
+            .order('published_at', { ascending: false })
+            .limit(20) // Limit initial load for better performance
+        ]);
 
-    const fetchArticles = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('articles')
-          .select('*')
-          .order('published_at', { ascending: false });
-          
-        if (error) throw error;
+        if (breakingNewsResponse.data) {
+          setBreakingNews(breakingNewsResponse.data);
+        }
+
+        if (articlesResponse.error) throw articlesResponse.error;
         
-        setArticles(data || []);
-        setLoading(false);
+        setArticles(articlesResponse.data || []);
+        
       } catch (error: any) {
-        console.error("Error fetching articles:", error);
+        console.error("Error fetching data:", error);
         toast({
-          title: "Error fetching articles",
+          title: "Error loading content",
           description: error.message,
           variant: "destructive",
         });
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchBreakingNews();
-    fetchArticles();
+    fetchData();
   }, []);
 
   // Format the breaking news items to display the date BEFORE the text
@@ -126,6 +127,7 @@ export default function Index() {
   const getArticlesByCategory = (category: string) => {
     return articles
       .filter(article => article.category?.toLowerCase() === category.toLowerCase())
+      .slice(0, 6) // Limit to 6 articles per section
       .map(formatArticleForDisplay);
   };
 
@@ -140,6 +142,28 @@ export default function Index() {
     
     return ourPicks.map(formatArticleForDisplay);
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container py-8">
+          {/* Loading skeleton */}
+          <div className="mb-8">
+            <Skeleton className="h-64 w-full rounded-lg" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-48 w-full rounded-lg" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   const technologyArticles = getArticlesByCategory("Technology");
   const worldArticles = getArticlesByCategory("World");
