@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -55,7 +54,7 @@ export default function Index() {
     fetchData();
   }, []);
 
-  // Format the breaking news items to display the date BEFORE the text
+  // Format the breaking news items with better relative time formatting
   const formattedBreakingNews = breakingNews.map(item => {
     let formattedDate = '';
     
@@ -65,8 +64,13 @@ export default function Index() {
         if (typeof item.date === 'string' && item.date.includes("ago")) {
           formattedDate = item.date;
         } else {
-          // Format the date as "X time ago" (e.g. "1 hour ago", "5 minutes ago")
-          formattedDate = formatDistanceToNow(new Date(item.date), { addSuffix: true });
+          // Parse the date and format it as relative time
+          const date = new Date(item.date);
+          if (!isNaN(date.getTime())) {
+            formattedDate = formatDistanceToNow(date, { addSuffix: true });
+          } else {
+            formattedDate = item.date;
+          }
         }
       } catch (e) {
         console.error("Error formatting date:", e);
@@ -77,7 +81,7 @@ export default function Index() {
     return {
       text: item.text,
       link: item.link,
-      date: formattedDate // This is the properly formatted date that will be displayed
+      date: formattedDate
     };
   });
 
@@ -92,7 +96,7 @@ export default function Index() {
       excerpt: article.excerpt || "",
       image: article.image_url || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470",
       category: article.category,
-      date: new Date(article.published_at).toLocaleDateString(),
+      date: formatDistanceToNow(new Date(article.published_at), { addSuffix: true }),
       link: `/articles/${article.id}`
     };
   };

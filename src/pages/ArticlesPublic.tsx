@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -7,6 +6,7 @@ import NewsTicker from "@/components/sections/NewsTicker";
 import NewsCarousel from "@/components/sections/NewsCarousel";
 import NewsSection from "@/components/sections/NewsSection";
 import { toast } from "@/components/ui/use-toast";
+import { formatDistanceToNow } from "date-fns";
 
 type Article = {
   id: string;
@@ -81,20 +81,44 @@ export default function ArticlesPublic() {
     fetchArticles();
   }, [filteredCategory]);
 
-  // Format breaking news items
-  const formattedBreakingNews = breakingNews.map(item => ({
-    text: item.text,
-    link: item.link || "#",
-    date: item.date || ""
-  }));
+  // Format breaking news items with relative time
+  const formattedBreakingNews = breakingNews.map(item => {
+    let formattedDate = '';
+    
+    if (item.date) {
+      try {
+        // Check if the date is already in a relative format (contains "ago")
+        if (typeof item.date === 'string' && item.date.includes("ago")) {
+          formattedDate = item.date;
+        } else {
+          // Parse the date and format it as relative time
+          const date = new Date(item.date);
+          if (!isNaN(date.getTime())) {
+            formattedDate = formatDistanceToNow(date, { addSuffix: true });
+          } else {
+            formattedDate = item.date;
+          }
+        }
+      } catch (e) {
+        console.error("Error formatting date:", e);
+        formattedDate = item.date || "";
+      }
+    }
+    
+    return {
+      text: item.text,
+      link: item.link || "#",
+      date: formattedDate
+    };
+  });
 
   // Use real breaking news, fallback to static if none available
   const displayedBreakingNews = formattedBreakingNews.length > 0 ? 
     formattedBreakingNews : 
     [
-      { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1h ago" },
-      { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3h ago" },
-      { text: "Major economic policy shift announced by central bank", link: "#", date: "5h ago" },
+      { text: "Global summit on climate change concludes with new agreements", link: "#", date: "1 hour ago" },
+      { text: "Tech giant announces breakthrough in quantum computing", link: "#", date: "3 hours ago" },
+      { text: "Major economic policy shift announced by central bank", link: "#", date: "5 hours ago" },
     ];
 
   const featuredArticles = articles
@@ -125,7 +149,7 @@ export default function ArticlesPublic() {
     excerpt: article.excerpt || "",
     image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
     category: article.category,
-    date: new Date(article.published_at).toLocaleDateString(),
+    date: formatDistanceToNow(new Date(article.published_at), { addSuffix: true }),
     link: `/articles/${article.id}`
   });
 

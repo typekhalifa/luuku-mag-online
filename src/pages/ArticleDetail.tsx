@@ -105,11 +105,11 @@ const ArticleDetail = () => {
     });
   };
 
-  // Format date for display
+  // Format date for display with relative time
   const formatArticleDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return format(date, "MMMM d, yyyy");
+      return formatDistanceToNow(date, { addSuffix: true });
     } catch {
       return "";
     }
@@ -147,10 +147,6 @@ const ArticleDetail = () => {
   const publishDate = new Date(article.published_at);
   const isValidPublishDate = !isNaN(publishDate.getTime());
   
-  const formattedDate = isValidPublishDate 
-    ? format(publishDate, "MMMM d, yyyy 'at' h:mm a")
-    : "Invalid date";
-    
   const relativeDate = isValidPublishDate
     ? formatDistanceToNow(publishDate, { addSuffix: true })
     : "Unknown time ago";
@@ -189,10 +185,8 @@ const ArticleDetail = () => {
                   <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-3">
                     <div className="flex items-center gap-1">
                       <ClockIcon className="h-4 w-4" />
-                      <span>Published {formattedDate}</span>
+                      <span>Published {relativeDate}</span>
                     </div>
-                    <span className="mx-1">•</span>
-                    <span>{relativeDate}</span>
                     <span className="mx-1">•</span>
                     <div className="flex items-center gap-1">
                       <EyeIcon className="h-4 w-4" />
