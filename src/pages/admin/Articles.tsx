@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -31,15 +30,12 @@ const categories = [
   "All",
   "World",
   "Politics",
-  "Technology",
-  "Sports",
   "Finance",
-  "Health",
-  "Entertainment",
-  "Education",
-  "Opportunities",
+  "Technology",
   "Youth",
-  "Culture"
+  "Culture",
+  "Sport",
+  "Opportunities"
 ];
 
 const Articles: React.FC = () => {

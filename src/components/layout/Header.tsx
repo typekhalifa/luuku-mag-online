@@ -205,18 +205,11 @@ const Header = () => {
             </Button>
           )}
 
-          {/* Logo */}
+          {/* Logo - Remove the image and keep only text */}
           <div className={cn(
             "flex items-center", 
             isMobile ? "mr-auto ml-2" : "mx-auto md:mx-0 md:mr-auto"
           )}>
-            {!isMobile && (
-              <img 
-                src="/lovable-uploads/logo.png" 
-                alt="LUUKU MAG Logo" 
-                className="w-12 h-12 mr-4 rounded-full object-cover border-2 border-highlight shadow"
-              />
-            )}
             <h1 className="text-xl font-bold tracking-tighter sm:text-2xl md:text-3xl font-heading">
               <span className="text-highlight">LUUKU</span> MAG
             </h1>
@@ -298,33 +291,33 @@ const Header = () => {
           )}
         </div>
 
-      {/* Search Dialog */}
-      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <div className="flex items-center w-full px-3 bg-gray-100 dark:bg-[#22293a] rounded-md focus-within:ring-1 focus-within:ring-highlight mb-4">
-            <Search size={18} className="text-gray-400 dark:text-gray-300" />
-            <input
-              type="text"
-              placeholder="Search articles..."
-              className="w-full px-2 py-2 bg-transparent border-none focus:outline-none text-black dark:text-white"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                handleSearch(e.target.value);
+        {/* Search Dialog */}
+        <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <div className="flex items-center w-full px-3 bg-gray-100 dark:bg-[#22293a] rounded-md focus-within:ring-1 focus-within:ring-highlight mb-4">
+              <Search size={18} className="text-gray-400 dark:text-gray-300" />
+              <input
+                type="text"
+                placeholder="Search articles..."
+                className="w-full px-2 py-2 bg-transparent border-none focus:outline-none text-black dark:text-white"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  handleSearch(e.target.value);
+                }}
+                autoFocus
+              />
+            </div>
+            <SearchResults 
+              results={searchResults} 
+              onClose={() => {
+                setIsSearchDialogOpen(false);
+                setSearchQuery("");
+                setSearchResults([]);
               }}
-              autoFocus
             />
-          </div>
-          <SearchResults 
-            results={searchResults} 
-            onClose={() => {
-              setIsSearchDialogOpen(false);
-              setSearchQuery("");
-              setSearchResults([]);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
 
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className={cn(

@@ -6,8 +6,11 @@ import InstagramGrid from "../sections/InstagramGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  
   // Subscription form state
   const [subEmail, setSubEmail] = useState("");
   const [subLoading, setSubLoading] = useState(false);
@@ -58,6 +61,10 @@ const Footer = () => {
     setContactLoading(false);
   }
 
+  const handleCategoryClick = (category: string) => {
+    navigate(`/articles?category=${encodeURIComponent(category.toLowerCase())}`);
+  };
+
   return (
     <footer className="bg-black text-white">
       {/* Main Footer Content */}
@@ -97,15 +104,18 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Categories - Now functional */}
           <div>
             <h3 className="text-lg font-bold font-heading mb-4">Categories</h3>
             <ul className="space-y-2">
-              {['World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport'].map((item) => (
+              {['World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
                 <li key={item}>
-                  <a href="#" className="text-gray-400 hover:text-highlight transition-colors">
+                  <button 
+                    onClick={() => handleCategoryClick(item)}
+                    className="text-gray-400 hover:text-highlight transition-colors text-left"
+                  >
                     {item}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>

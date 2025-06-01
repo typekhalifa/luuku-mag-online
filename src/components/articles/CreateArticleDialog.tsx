@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -15,12 +14,11 @@ import RichTextEditor from "./RichTextEditor";
 const categories = [
   "World",
   "Politics",
-  "Technology",
-  "Sports",
   "Finance",
-  "Health",
-  "Entertainment",
-  "Education",
+  "Technology",
+  "Youth",
+  "Culture",
+  "Sport",
   "Opportunities"
 ];
 
