@@ -1,38 +1,78 @@
 
 import { Instagram } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface InstagramPost {
+  id: string;
+  imageUrl: string;
+  permalink: string;
+  caption: string;
+}
 
 const InstagramGrid = () => {
-  const [posts, setPosts] = useState<string[]>([]);
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // For now, we'll use placeholder images that represent the type of content luukumag1 might post
-  // In a real implementation, you'd need Instagram Basic Display API or Instagram Graph API
-  const fallbackPosts = [
-    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=500&fit=crop",
-  ];
-
   useEffect(() => {
-    // Simulate loading Instagram posts
-    // In real implementation, you would:
-    // 1. Get Instagram Access Token
-    // 2. Fetch posts from Instagram API
-    // 3. Extract image URLs
     const loadInstagramPosts = async () => {
       try {
-        // Simulating API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log("Fetching Instagram posts...");
         
-        // For now, use fallback posts
-        // TODO: Replace with actual Instagram API integration
-        setPosts(fallbackPosts);
+        // Call our edge function to get Instagram posts
+        const { data, error } = await supabase.functions.invoke('instagram-feed');
+        
+        if (error) {
+          console.error("Error calling Instagram function:", error);
+          throw error;
+        }
+
+        if (data && data.posts) {
+          setPosts(data.posts);
+          console.log("Successfully loaded Instagram posts:", data.posts.length);
+        }
       } catch (error) {
         console.error("Error loading Instagram posts:", error);
+        
+        // Fallback posts in case of error
+        const fallbackPosts = [
+          {
+            id: 'fallback-1',
+            imageUrl: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Tech innovation content"
+          },
+          {
+            id: 'fallback-2',
+            imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Programming insights"
+          },
+          {
+            id: 'fallback-3',
+            imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Technology updates"
+          },
+          {
+            id: 'fallback-4',
+            imageUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Coding tutorials"
+          },
+          {
+            id: 'fallback-5',
+            imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Development tips"
+          },
+          {
+            id: 'fallback-6',
+            imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=500&fit=crop",
+            permalink: "https://instagram.com/luukumag1",
+            caption: "Tech news"
+          }
+        ];
         setPosts(fallbackPosts);
       } finally {
         setLoading(false);
@@ -72,17 +112,17 @@ const InstagramGrid = () => {
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-          {posts.map((image, index) => (
+          {posts.slice(0, 6).map((post) => (
             <a 
-              key={index} 
-              href="https://instagram.com/luukumag1" 
+              key={post.id} 
+              href={post.permalink} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative block aspect-square overflow-hidden"
             >
               <img 
-                src={image} 
-                alt={`Instagram post ${index + 1} from @luukumag1`}
+                src={post.imageUrl} 
+                alt={post.caption || `Instagram post from @luukumag1`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-center">
