@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface SearchResult {
-  id: number;
+  id: string;
   title: string;
   category: string;
   excerpt?: string;
@@ -32,7 +32,7 @@ const SearchResults = ({ results, onClose }: SearchResultsProps) => {
           key={result.id}
           className="w-full text-left p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           onClick={() => {
-            navigate(`/articles?category=${result.category.toLowerCase()}`);
+            navigate(`/articles/${result.id}`);
             onClose();
           }}
         >

@@ -1,6 +1,5 @@
 
 import { cn } from "@/lib/utils";
-import CommentSection from "../CommentSection";
 import LikeButton from "../LikeButton";
 
 export interface NewsArticle {
@@ -98,9 +97,6 @@ const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
         <div className="flex gap-3 mt-4 items-center">
           <LikeButton articleId={String(article.id)} />
         </div>
-        <div className="mt-2">
-          <CommentSection articleId={String(article.id)} />
-        </div>
       </div>
     </div>
   );
@@ -130,9 +126,6 @@ const ArticleCard = ({ article }: { article: NewsArticle }) => {
         <span className="text-xs text-gray-500">{article.date}</span>
         <div className="flex gap-3 mt-3 items-center">
           <LikeButton articleId={String(article.id)} size="sm" />
-        </div>
-        <div className="mt-2">
-          <CommentSection articleId={String(article.id)} />
         </div>
       </div>
     </div>
@@ -190,9 +183,6 @@ const ListArticleCard = ({ article }: { article: NewsArticle }) => {
         <span className="text-xs text-gray-500">{article.date}</span>
         <div className="flex gap-3 mt-2 items-center">
           <LikeButton articleId={String(article.id)} size="sm" />
-        </div>
-        <div className="mt-2">
-          <CommentSection articleId={String(article.id)} />
         </div>
       </div>
     </div>
