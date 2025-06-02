@@ -17,6 +17,7 @@ type Article = {
   published_at: string;
   our_pick: boolean | null;
   featured: boolean | null;
+  views: number | null;
 };
 
 function useQuery() {
@@ -150,7 +151,8 @@ export default function ArticlesPublic() {
     image: article.image_url || "https://placehold.co/600x400/e08b6c/white?text=LUUKU+MAG",
     category: article.category,
     date: formatDistanceToNow(new Date(article.published_at), { addSuffix: true }),
-    link: `/articles/${article.id}`
+    link: `/articles/${article.id}`,
+    views: article.views || 0 // Include views in the transformed article
   });
 
   // Get articles by category

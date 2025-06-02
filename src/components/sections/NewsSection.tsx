@@ -1,7 +1,9 @@
+
 import { cn } from "@/lib/utils";
 import LikeButton from "../LikeButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { EyeIcon } from "lucide-react";
 
 export interface NewsArticle {
   id: number | string; // Keep both for backward compatibility
@@ -11,6 +13,7 @@ export interface NewsArticle {
   category: string;
   date: string;
   link: string;
+  views?: number; // Add views to the interface
 }
 
 interface NewsSectionProps {
@@ -57,7 +60,8 @@ const NewsSection = ({
           image: article.image_url || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470",
           category: article.category,
           date: new Date(article.published_at).toLocaleDateString(),
-          link: `/articles/${article.id}`
+          link: `/articles/${article.id}`,
+          views: article.views || 0
         }));
         setSuggestedArticles(formattedArticles);
       }
@@ -147,7 +151,15 @@ const FeaturedArticleCard = ({ article }: { article: NewsArticle }) => {
           </a>
         </h3>
         <p className="text-sm text-gray-600 mb-2">{article.excerpt}</p>
-        <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">{article.date}</span>
+          {article.views !== undefined && (
+            <div className="flex items-center text-xs text-gray-500">
+              <EyeIcon className="h-3 w-3 mr-1" />
+              {article.views} reads
+            </div>
+          )}
+        </div>
         <div className="flex gap-3 mt-4 items-center">
           <LikeButton articleId={String(article.id)} />
         </div>
@@ -177,7 +189,15 @@ const ArticleCard = ({ article }: { article: NewsArticle }) => {
             {article.title}
           </a>
         </h3>
-        <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">{article.date}</span>
+          {article.views !== undefined && (
+            <div className="flex items-center text-xs text-gray-500">
+              <EyeIcon className="h-3 w-3 mr-1" />
+              {article.views} reads
+            </div>
+          )}
+        </div>
         <div className="flex gap-3 mt-3 items-center">
           <LikeButton articleId={String(article.id)} size="sm" />
         </div>
@@ -205,7 +225,15 @@ const SmallArticleCard = ({ article }: { article: NewsArticle }) => {
             {article.title}
           </a>
         </h3>
-        <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex items-center justify-between mt-1">
+          <span className="text-xs text-gray-500">{article.date}</span>
+          {article.views !== undefined && (
+            <div className="flex items-center text-xs text-gray-500">
+              <EyeIcon className="h-3 w-3 mr-1" />
+              {article.views}
+            </div>
+          )}
+        </div>
         <div className="flex gap-3 mt-2 items-center">
           <LikeButton articleId={String(article.id)} size="sm" />
         </div>
@@ -234,7 +262,15 @@ const ListArticleCard = ({ article }: { article: NewsArticle }) => {
           </a>
         </h3>
         <p className="text-sm text-gray-600 mb-1 hidden md:block">{article.excerpt}</p>
-        <span className="text-xs text-gray-500">{article.date}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">{article.date}</span>
+          {article.views !== undefined && (
+            <div className="flex items-center text-xs text-gray-500">
+              <EyeIcon className="h-3 w-3 mr-1" />
+              {article.views} reads
+            </div>
+          )}
+        </div>
         <div className="flex gap-3 mt-2 items-center">
           <LikeButton articleId={String(article.id)} size="sm" />
         </div>

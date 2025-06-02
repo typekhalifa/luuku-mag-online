@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import NewsTicker from "@/components/sections/NewsTicker";
@@ -97,7 +98,8 @@ export default function Index() {
       image: article.image_url || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470",
       category: article.category,
       date: formatDistanceToNow(new Date(article.published_at), { addSuffix: true }),
-      link: `/articles/${article.id}`
+      link: `/articles/${article.id}`,
+      views: article.views || 0 // Include views in the formatted article
     };
   };
 
