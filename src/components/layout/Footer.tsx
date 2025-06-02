@@ -81,21 +81,27 @@ const Footer = () => {
             </p>
             <div className="flex space-x-3">
               <a
-                href="#"
+                href="https://facebook.com/luukumag1"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-highlight"
               >
                 <Facebook size={16} />
               </a>
               <a
-                href="#"
+                href="https://twitter.com/luukumag1"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Twitter"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-highlight"
               >
                 <Twitter size={16} />
               </a>
               <a
-                href="#"
+                href="https://instagram.com/luukumag1"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-highlight"
               >

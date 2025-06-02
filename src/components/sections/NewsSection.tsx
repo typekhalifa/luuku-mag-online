@@ -1,6 +1,7 @@
-
 import { cn } from "@/lib/utils";
 import LikeButton from "../LikeButton";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export interface NewsArticle {
   id: number | string; // Keep both for backward compatibility
@@ -27,44 +28,97 @@ const NewsSection = ({
   layout = "grid", 
   className 
 }: NewsSectionProps) => {
+  const [suggestedArticles, setSuggestedArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch suggested articles if no articles in this category
+  useEffect(() => {
+    if (articles.length === 0) {
+      fetchSuggestedArticles();
+    }
+  }, [articles.length]);
+
+  const fetchSuggestedArticles = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('published_at', { ascending: false })
+        .limit(6);
+      
+      if (error) throw error;
+      
+      if (data) {
+        const formattedArticles = data.map(article => ({
+          id: article.id,
+          title: article.title,
+          excerpt: article.excerpt || "",
+          image: article.image_url || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470",
+          category: article.category,
+          date: new Date(article.published_at).toLocaleDateString(),
+          link: `/articles/${article.id}`
+        }));
+        setSuggestedArticles(formattedArticles);
+      }
+    } catch (error) {
+      console.error("Error fetching suggested articles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayArticles = articles.length > 0 ? articles : suggestedArticles;
+  const sectionTitle = articles.length > 0 ? title : `Suggested Articles - ${title}`;
   
-  if (articles.length === 0) return null;
+  if (displayArticles.length === 0 && !loading) return null;
   
   return (
     <section className={cn("py-10", className)}>
       <div className="container px-4">
         <div className="flex items-center mb-6">
           {icon && <span className="mr-2">{icon}</span>}
-          <h2 className="text-2xl font-bold font-heading">{title}</h2>
+          <h2 className="text-2xl font-bold font-heading">{sectionTitle}</h2>
+          {articles.length === 0 && !loading && (
+            <span className="ml-2 text-sm text-gray-500">(No {title.toLowerCase()} articles yet)</span>
+          )}
         </div>
         
-        {layout === "featured" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <FeaturedArticleCard article={articles[0]} />
-            </div>
-            <div className="space-y-6">
-              {articles.slice(1, 3).map(article => (
-                <SmallArticleCard key={article.id} article={article} />
-              ))}
-            </div>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="text-lg">Loading suggested articles...</div>
           </div>
-        )}
-        
-        {layout === "grid" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {articles.map(article => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        )}
-        
-        {layout === "list" && (
-          <div className="space-y-6">
-            {articles.map(article => (
-              <ListArticleCard key={article.id} article={article} />
-            ))}
-          </div>
+        ) : (
+          <>
+            {layout === "featured" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2">
+                  <FeaturedArticleCard article={displayArticles[0]} />
+                </div>
+                <div className="space-y-6">
+                  {displayArticles.slice(1, 3).map(article => (
+                    <SmallArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {layout === "grid" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {displayArticles.map(article => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+            )}
+            
+            {layout === "list" && (
+              <div className="space-y-6">
+                {displayArticles.map(article => (
+                  <ListArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>

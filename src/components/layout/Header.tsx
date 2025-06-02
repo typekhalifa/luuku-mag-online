@@ -140,21 +140,27 @@ const Header = () => {
           {/* Top Right: Social Media + Search + Theme Toggle */}
           <div className="items-center hidden space-x-2 md:flex">
             <a
-              href="#"
+              href="https://facebook.com/luukumag1"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Facebook"
               className="p-1 transition-colors hover:text-highlight"
             >
               <Facebook size={18} />
             </a>
             <a
-              href="#"
+              href="https://twitter.com/luukumag1"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Twitter"
               className="p-1 transition-colors hover:text-highlight"
             >
               <Twitter size={18} />
             </a>
             <a
-              href="#"
+              href="https://instagram.com/luukumag1"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Instagram"
               className="p-1 transition-colors hover:text-highlight"
             >
