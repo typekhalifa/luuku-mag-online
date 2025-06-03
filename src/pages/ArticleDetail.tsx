@@ -1,23 +1,16 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
-import LikeButton from "@/components/LikeButton";
-import CommentSection from "@/components/CommentSection";
-import { format, formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ClockIcon, BadgeIcon, EyeIcon } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 import ReadingProgress from "@/components/ReadingProgress";
-import EstimatedReadingTime from "@/components/EstimatedReadingTime";
-import SocialShare from "@/components/SocialShare";
-import TrendingArticles from "@/components/TrendingArticles";
-import RecommendedArticles from "@/components/RecommendedArticles";
-import CategoryFollow from "@/components/CategoryFollow";
+import ArticleHeader from "@/components/article/ArticleHeader";
+import ArticleContent from "@/components/article/ArticleContent";
+import ArticleFooter from "@/components/article/ArticleFooter";
+import ArticleSidebar from "@/components/article/ArticleSidebar";
+import ArticleSkeleton from "@/components/article/ArticleSkeleton";
 
-// Define an interface for the article with views
 interface ArticleWithViews {
   author: string | null;
   category: string;
@@ -54,21 +47,17 @@ const ArticleDetail = () => {
         return;
       }
 
-      // Cast data to our extended interface
       const articleData = data as ArticleWithViews;
       setArticle(articleData);
       
-      // Get view count, defaulting to 0 if undefined
       const currentViews = articleData.views || 0;
       setViewCount(currentViews + 1);
       
-      // Update view count in database
       await supabase
         .from("articles")
         .update({ views: currentViews + 1 })
         .eq("id", id);
       
-      // Fetch related articles in the same category
       const { data: related, error: relatedError } = await supabase
         .from("articles")
         .select("id, title, image_url, excerpt, category, published_at, views")
@@ -86,16 +75,6 @@ const ArticleDetail = () => {
 
     fetchArticle();
   }, [id]);
-
-  // Format date for display with relative time
-  const formatArticleDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return formatDistanceToNow(date, { addSuffix: true });
-    } catch {
-      return "";
-    }
-  };
 
   if (loading) {
     return (
@@ -125,16 +104,6 @@ const ArticleDetail = () => {
     );
   }
 
-  // Parse dates safely
-  const publishDate = new Date(article.published_at);
-  const isValidPublishDate = !isNaN(publishDate.getTime());
-  
-  const relativeDate = isValidPublishDate
-    ? formatDistanceToNow(publishDate, { addSuffix: true })
-    : "Unknown time ago";
-
-  const currentUrl = window.location.href;
-
   return (
     <Layout>
       <ReadingProgress />
@@ -142,240 +111,37 @@ const ArticleDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">
             <Card className="overflow-hidden">
-              {article.image_url && (
-                <div className="aspect-video w-full overflow-hidden">
-                  <img
-                    src={article.image_url}
-                    alt={article.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              <ArticleHeader
+                title={article.title}
+                category={article.category}
+                featured={article.featured}
+                publishedAt={article.published_at}
+                viewCount={viewCount}
+                content={article.content}
+                excerpt={article.excerpt}
+                imageUrl={article.image_url}
+              />
+              
+              {article.content && (
+                <ArticleContent content={article.content} />
               )}
-              <div className="p-6">
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-2 items-center mb-2">
-                    <Badge className="bg-highlight text-white">
-                      {article.category}
-                    </Badge>
-                    {article.featured && (
-                      <Badge variant="success" className="flex gap-1 items-center">
-                        <BadgeIcon className="h-3 w-3" />
-                        <span>Featured</span>
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <h1 className="text-3xl font-bold mt-2">{article.title}</h1>
-                  
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-3">
-                    <div className="flex items-center gap-1">
-                      <ClockIcon className="h-4 w-4" />
-                      <span>Published {relativeDate}</span>
-                    </div>
-                    <span className="mx-1">•</span>
-                    <div className="flex items-center gap-1">
-                      <EyeIcon className="h-4 w-4" />
-                      <span>{viewCount} views</span>
-                    </div>
-                    {article.content && (
-                      <>
-                        <span className="mx-1">•</span>
-                        <EstimatedReadingTime content={article.content} />
-                      </>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mt-4">
-                    <SocialShare title={article.title} url={currentUrl} />
-                  </div>
-                </div>
-                
-                {article.excerpt && (
-                  <p className="text-lg font-medium text-gray-600 mb-6 border-l-4 border-highlight pl-4 italic">
-                    {article.excerpt}
-                  </p>
-                )}
-                
-                <div className="space-y-6">
-                  {article.content && (
-                    <div className="prose prose-lg max-w-none">
-                      <ReactMarkdown 
-                        className="text-base leading-relaxed"
-                        components={{
-                          a: ({ href, children, ...props }) => (
-                            <a 
-                              href={href} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="text-highlight hover:underline font-medium"
-                              {...props}
-                            >
-                              {children}
-                            </a>
-                          ),
-                          p: ({ children }) => (
-                            <p className="mb-4 text-base leading-relaxed text-gray-700">
-                              {children}
-                            </p>
-                          ),
-                          h2: ({ children }) => (
-                            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900">
-                              {children}
-                            </h2>
-                          ),
-                          h3: ({ children }) => (
-                            <h3 className="text-xl font-semibold mt-6 mb-3 text-gray-900">
-                              {children}
-                            </h3>
-                          ),
-                          ul: ({ children }) => (
-                            <ul className="list-disc pl-6 mb-4 space-y-2">
-                              {children}
-                            </ul>
-                          ),
-                          ol: ({ children }) => (
-                            <ol className="list-decimal pl-6 mb-4 space-y-2">
-                              {children}
-                            </ol>
-                          ),
-                          li: ({ children }) => (
-                            <li className="text-gray-700 leading-relaxed">
-                              {children}
-                            </li>
-                          ),
-                          blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-highlight pl-4 italic text-gray-600 my-6">
-                              {children}
-                            </blockquote>
-                          ),
-                          code: ({ children }) => (
-                            <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
-                              {children}
-                            </code>
-                          ),
-                          pre: ({ children }) => (
-                            <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
-                              {children}
-                            </pre>
-                          ),
-                          img: ({ src, alt, ...props }) => (
-                            <div className="my-6">
-                              <img 
-                                src={src} 
-                                alt={alt} 
-                                className="w-full rounded-lg shadow-md"
-                                {...props}
-                              />
-                              {alt && (
-                                <p className="text-sm text-gray-500 italic mt-2 text-center">
-                                  {alt}
-                                </p>
-                              )}
-                            </div>
-                          )
-                        }}
-                      >
-                        {article.content}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-                </div>
 
-                <div className="mt-8 pt-6 border-t">
-                  <div className="flex items-center gap-4">
-                    <div className="text-sm">
-                      {article.author && <span>Written by <strong>{article.author}</strong></span>}
-                    </div>
-                    <LikeButton articleId={article.id} />
-                  </div>
-                  <div className="mt-6">
-                    <CommentSection articleId={article.id} />
-                  </div>
-                </div>
-              </div>
+              <ArticleFooter 
+                articleId={article.id} 
+                author={article.author} 
+              />
             </Card>
           </div>
           
-          <div className="lg:col-span-4">
-            <div className="sticky top-24 space-y-6">
-              {/* Category Follow */}
-              <CategoryFollow currentCategory={article.category} />
-              
-              {/* Trending Articles */}
-              <TrendingArticles />
-              
-              {/* Related Articles */}
-              {relatedArticles.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-bold mb-4">Related Articles</h2>
-                  <div className="space-y-4">
-                    {relatedArticles.map((related) => (
-                      <Link to={`/articles/${related.id}`} key={related.id}>
-                        <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                          {related.image_url && (
-                            <div className="aspect-video w-full overflow-hidden">
-                              <img
-                                src={related.image_url}
-                                alt={related.title}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          )}
-                          <div className="p-4">
-                            <Badge className="mb-2">{related.category}</Badge>
-                            <h3 className="font-medium line-clamp-2">{related.title}</h3>
-                            <div className="flex justify-between items-center mt-2">
-                              <p className="text-xs text-muted-foreground">
-                                {formatArticleDate(related.published_at)}
-                              </p>
-                              {related.views !== undefined && (
-                                <p className="text-xs flex items-center text-muted-foreground">
-                                  <EyeIcon className="h-3 w-3 mr-1" />
-                                  {related.views}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Recommended Articles */}
-              <RecommendedArticles 
-                currentArticleId={article.id} 
-                currentCategory={article.category} 
-              />
-            </div>
-          </div>
+          <ArticleSidebar
+            currentCategory={article.category}
+            currentArticleId={article.id}
+            relatedArticles={relatedArticles}
+          />
         </div>
       </div>
     </Layout>
   );
 };
-
-const ArticleSkeleton = () => (
-  <Card className="overflow-hidden">
-    <Skeleton className="aspect-video w-full" />
-    <div className="p-6 space-y-4">
-      <Skeleton className="h-4 w-20" />
-      <Skeleton className="h-8 w-4/5" />
-      <Skeleton className="h-4 w-40" />
-      <div className="space-y-2 pt-4">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/5" />
-      </div>
-      <div className="space-y-2 pt-6">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-    </div>
-  </Card>
-);
 
 export default ArticleDetail;
