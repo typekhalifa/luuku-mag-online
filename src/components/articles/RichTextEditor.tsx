@@ -53,7 +53,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
   
-  // Insert formatting at selection
+  // Insert formatting at selection with improved logic
   const insertFormatting = (prefix: string, suffix: string = prefix) => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
@@ -63,16 +63,25 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selectedText = value.substring(selStart, selEnd);
       const textAfter = value.substring(selEnd);
       
-      const newValue = `${textBefore}${prefix}${selectedText}${suffix}${textAfter}`;
+      // If no text is selected, add sample text
+      const textToFormat = selectedText || "text";
+      const newValue = `${textBefore}${prefix}${textToFormat}${suffix}${textAfter}`;
       onChange(newValue);
       
       // Reset focus and selection after state update
       setTimeout(() => {
         textarea.focus();
-        textarea.setSelectionRange(
-          selStart + prefix.length, 
-          selEnd + prefix.length
-        );
+        if (selectedText) {
+          textarea.setSelectionRange(
+            selStart + prefix.length, 
+            selEnd + prefix.length
+          );
+        } else {
+          textarea.setSelectionRange(
+            selStart + prefix.length,
+            selStart + prefix.length + textToFormat.length
+          );
+        }
       }, 0);
     }
   };
@@ -80,8 +89,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Insert link
   const insertLink = (url: string, text: string) => {
     if (!url) return;
-    
-    const linkMarkdown = text ? `[${text}](${url})` : `[${url}](${url})`;
     
     if (textareaRef.current) {
       const textarea = textareaRef.current;
@@ -91,7 +98,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const textAfter = value.substring(selEnd);
       
       const selectedText = value.substring(selStart, selEnd);
-      const finalLinkText = text || selectedText || url;
+      const finalLinkText = text || selectedText || "link text";
       const finalLinkMarkdown = `[${finalLinkText}](${url})`;
       
       const newValue = `${textBefore}${finalLinkMarkdown}${textAfter}`;
@@ -116,7 +123,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const textBefore = value.substring(0, selStart);
       const textAfter = value.substring(selStart);
       
-      const newValue = `${textBefore}${imgMarkdown}${textAfter}`;
+      const newValue = `${textBefore}\n${imgMarkdown}\n${textAfter}`;
       onChange(newValue);
       
       // Reset focus after state update
@@ -136,7 +143,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selectedText = value.substring(selStart, selEnd);
       const textAfter = value.substring(selEnd);
       
-      const newValue = `${textBefore}\n\`\`\`\n${selectedText}\n\`\`\`\n${textAfter}`;
+      const codeToFormat = selectedText || "code";
+      const newValue = `${textBefore}\n\`\`\`\n${codeToFormat}\n\`\`\`\n${textAfter}`;
       onChange(newValue);
       
       // Reset focus and selection after state update
@@ -189,7 +197,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               type="button"
               variant="ghost" 
               size="icon"
-              onClick={() => insertFormatting('## ')}
+              onClick={() => {
+                if (textareaRef.current) {
+                  const textarea = textareaRef.current;
+                  const selStart = textarea.selectionStart;
+                  const lineStart = value.lastIndexOf('\n', selStart - 1) + 1;
+                  const textBefore = value.substring(0, lineStart);
+                  const textAfterLineStart = value.substring(lineStart);
+                  onChange(`${textBefore}## ${textAfterLineStart}`);
+                }
+              }}
               title="Heading"
             >
               <Heading className="h-4 w-4" />
@@ -343,9 +360,28 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               placeholder={placeholder}
             />
           ) : (
-            <div className="p-4 min-h-[300px] max-h-[80vh] overflow-y-auto prose prose-sm">
+            <div className="p-4 min-h-[300px] max-h-[80vh] overflow-y-auto prose prose-sm max-w-none">
               {value ? (
-                <ReactMarkdown>{value}</ReactMarkdown>
+                <ReactMarkdown 
+                  components={{
+                    h1: ({children}) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+                    h2: ({children}) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
+                    h3: ({children}) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
+                    p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
+                    strong: ({children}) => <strong className="font-bold">{children}</strong>,
+                    em: ({children}) => <em className="italic">{children}</em>,
+                    ul: ({children}) => <ul className="list-disc pl-6 mb-3">{children}</ul>,
+                    ol: ({children}) => <ol className="list-decimal pl-6 mb-3">{children}</ol>,
+                    li: ({children}) => <li className="mb-1">{children}</li>,
+                    blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">{children}</blockquote>,
+                    code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">{children}</code>,
+                    pre: ({children}) => <pre className="bg-gray-100 p-4 rounded overflow-x-auto my-4">{children}</pre>,
+                    a: ({href, children}) => <a href={href} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                    img: ({src, alt}) => <img src={src} alt={alt} className="max-w-full h-auto rounded my-4" />
+                  }}
+                >
+                  {value}
+                </ReactMarkdown>
               ) : (
                 <p className="text-muted-foreground italic">No content to preview</p>
               )}

@@ -4,6 +4,7 @@ import LikeButton from '@/components/LikeButton';
 import CommentSection from '@/components/CommentSection';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ArticleFooterProps {
   articleId: string;
@@ -11,9 +12,10 @@ interface ArticleFooterProps {
 }
 
 const ArticleFooter = ({ articleId, author }: ArticleFooterProps) => {
+  const navigate = useNavigate();
+
   const handleDonate = () => {
-    // You can replace this with your actual donation link or payment integration
-    window.open('https://your-donation-link.com', '_blank');
+    navigate('/donate');
   };
 
   return (

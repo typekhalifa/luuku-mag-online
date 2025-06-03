@@ -16,6 +16,7 @@ import Users from "./pages/admin/Users";
 import ArticlesPublic from "./pages/ArticlesPublic";
 import ArticleDetail from "./pages/ArticleDetail";
 import BreakingNewsDetail from "./pages/BreakingNewsDetail";
+import Donate from "./pages/Donate";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/articles" element={<ArticlesPublic />} />
+                <Route path="/donate" element={<Donate />} />
                 <Route path="/admin/login" element={<Login />} />
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/articles" element={<Articles />} />
