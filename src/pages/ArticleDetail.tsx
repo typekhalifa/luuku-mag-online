@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClockIcon, BadgeIcon, EyeIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import ReadingProgress from "@/components/ReadingProgress";
+import EstimatedReadingTime from "@/components/EstimatedReadingTime";
+import SocialShare from "@/components/SocialShare";
+import TrendingArticles from "@/components/TrendingArticles";
+import RecommendedArticles from "@/components/RecommendedArticles";
+import CategoryFollow from "@/components/CategoryFollow";
 
 // Define an interface for the article with views
 interface ArticleWithViews {
@@ -128,8 +133,11 @@ const ArticleDetail = () => {
     ? formatDistanceToNow(publishDate, { addSuffix: true })
     : "Unknown time ago";
 
+  const currentUrl = window.location.href;
+
   return (
     <Layout>
+      <ReadingProgress />
       <div className="container py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">
@@ -169,6 +177,16 @@ const ArticleDetail = () => {
                       <EyeIcon className="h-4 w-4" />
                       <span>{viewCount} views</span>
                     </div>
+                    {article.content && (
+                      <>
+                        <span className="mx-1">•</span>
+                        <EstimatedReadingTime content={article.content} />
+                      </>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mt-4">
+                    <SocialShare title={article.title} url={currentUrl} />
                   </div>
                 </div>
                 
@@ -239,6 +257,21 @@ const ArticleDetail = () => {
                             <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
                               {children}
                             </pre>
+                          ),
+                          img: ({ src, alt, ...props }) => (
+                            <div className="my-6">
+                              <img 
+                                src={src} 
+                                alt={alt} 
+                                className="w-full rounded-lg shadow-md"
+                                {...props}
+                              />
+                              {alt && (
+                                <p className="text-sm text-gray-500 italic mt-2 text-center">
+                                  {alt}
+                                </p>
+                              )}
+                            </div>
                           )
                         }}
                       >
@@ -264,44 +297,57 @@ const ArticleDetail = () => {
           </div>
           
           <div className="lg:col-span-4">
-            <div className="sticky top-24">
-              <h2 className="text-xl font-bold mb-4">Related Articles</h2>
-              <div className="space-y-4">
-                {relatedArticles.length > 0 ? (
-                  relatedArticles.map((related) => (
-                    <Link to={`/articles/${related.id}`} key={related.id}>
-                      <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                        {related.image_url && (
-                          <div className="aspect-video w-full overflow-hidden">
-                            <img
-                              src={related.image_url}
-                              alt={related.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="p-4">
-                          <Badge className="mb-2">{related.category}</Badge>
-                          <h3 className="font-medium line-clamp-2">{related.title}</h3>
-                          <div className="flex justify-between items-center mt-2">
-                            <p className="text-xs text-muted-foreground">
-                              {formatArticleDate(related.published_at)}
-                            </p>
-                            {related.views !== undefined && (
-                              <p className="text-xs flex items-center text-muted-foreground">
-                                <EyeIcon className="h-3 w-3 mr-1" />
-                                {related.views}
+            <div className="sticky top-24 space-y-6">
+              {/* Category Follow */}
+              <CategoryFollow currentCategory={article.category} />
+              
+              {/* Trending Articles */}
+              <TrendingArticles />
+              
+              {/* Related Articles */}
+              {relatedArticles.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-bold mb-4">Related Articles</h2>
+                  <div className="space-y-4">
+                    {relatedArticles.map((related) => (
+                      <Link to={`/articles/${related.id}`} key={related.id}>
+                        <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                          {related.image_url && (
+                            <div className="aspect-video w-full overflow-hidden">
+                              <img
+                                src={related.image_url}
+                                alt={related.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <Badge className="mb-2">{related.category}</Badge>
+                            <h3 className="font-medium line-clamp-2">{related.title}</h3>
+                            <div className="flex justify-between items-center mt-2">
+                              <p className="text-xs text-muted-foreground">
+                                {formatArticleDate(related.published_at)}
                               </p>
-                            )}
+                              {related.views !== undefined && (
+                                <p className="text-xs flex items-center text-muted-foreground">
+                                  <EyeIcon className="h-3 w-3 mr-1" />
+                                  {related.views}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-sm">No related articles found</p>
-                )}
-              </div>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Recommended Articles */}
+              <RecommendedArticles 
+                currentArticleId={article.id} 
+                currentCategory={article.category} 
+              />
             </div>
           </div>
         </div>
