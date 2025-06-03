@@ -82,29 +82,6 @@ const ArticleDetail = () => {
     fetchArticle();
   }, [id]);
 
-  // Format content with proper paragraphs
-  const formatContent = (content: string | null) => {
-    if (!content) return null;
-    
-    // Split content by double line breaks to create paragraphs
-    const paragraphs = content.split(/\n\s*\n/);
-    
-    return paragraphs.map((paragraph, index) => {
-      // Handle single line breaks within paragraphs
-      const lines = paragraph.split('\n').filter(line => line.trim());
-      
-      return (
-        <div key={index} className="mb-6">
-          {lines.map((line, lineIndex) => (
-            <p key={lineIndex} className="mb-3 text-base leading-relaxed">
-              {line.trim()}
-            </p>
-          ))}
-        </div>
-      );
-    });
-  };
-
   // Format date for display with relative time
   const formatArticleDate = (dateString: string) => {
     try {
@@ -202,14 +179,72 @@ const ArticleDetail = () => {
                 )}
                 
                 <div className="space-y-6">
-                  {article.content ? (
-                    <div className="prose max-w-none">
-                      {formatContent(article.content)}
+                  {article.content && (
+                    <div className="prose prose-lg max-w-none">
+                      <ReactMarkdown 
+                        className="text-base leading-relaxed"
+                        components={{
+                          a: ({ href, children, ...props }) => (
+                            <a 
+                              href={href} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-highlight hover:underline font-medium"
+                              {...props}
+                            >
+                              {children}
+                            </a>
+                          ),
+                          p: ({ children }) => (
+                            <p className="mb-4 text-base leading-relaxed text-gray-700">
+                              {children}
+                            </p>
+                          ),
+                          h2: ({ children }) => (
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900">
+                              {children}
+                            </h2>
+                          ),
+                          h3: ({ children }) => (
+                            <h3 className="text-xl font-semibold mt-6 mb-3 text-gray-900">
+                              {children}
+                            </h3>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="list-disc pl-6 mb-4 space-y-2">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="list-decimal pl-6 mb-4 space-y-2">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="text-gray-700 leading-relaxed">
+                              {children}
+                            </li>
+                          ),
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-4 border-highlight pl-4 italic text-gray-600 my-6">
+                              {children}
+                            </blockquote>
+                          ),
+                          code: ({ children }) => (
+                            <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
+                              {children}
+                            </code>
+                          ),
+                          pre: ({ children }) => (
+                            <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                              {children}
+                            </pre>
+                          )
+                        }}
+                      >
+                        {article.content}
+                      </ReactMarkdown>
                     </div>
-                  ) : (
-                    <ReactMarkdown className="prose max-w-none text-base leading-relaxed">
-                      {article.content || ""}
-                    </ReactMarkdown>
                   )}
                 </div>
 
