@@ -13,6 +13,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import Articles from "./pages/admin/Articles";
 import Analytics from "./pages/admin/Analytics";
 import Users from "./pages/admin/Users";
+import Comments from "./pages/admin/Comments";
 import ArticlesPublic from "./pages/ArticlesPublic";
 import ArticleDetail from "./pages/ArticleDetail";
 import BreakingNewsDetail from "./pages/BreakingNewsDetail";
@@ -38,6 +39,7 @@ const App = () => {
                 <Route path="/admin/articles" element={<Articles />} />
                 <Route path="/admin/analytics" element={<Analytics />} />
                 <Route path="/admin/users" element={<Users />} />
+                <Route path="/admin/comments" element={<Comments />} />
                 <Route path="/articles/:id" element={<ArticleDetail />} />
                 <Route path="/breaking-news/:id" element={<BreakingNewsDetail />} />
                 <Route path="*" element={<NotFound />} />

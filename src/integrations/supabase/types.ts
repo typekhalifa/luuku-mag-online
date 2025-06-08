@@ -93,29 +93,131 @@ export type Database = {
         }
         Relationships: []
       }
+      comment_reactions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+          user_identifier: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          reaction_type: string
+          user_identifier: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_identifier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_reports: {
+        Row: {
+          comment_id: string
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reporter_email: string | null
+          reporter_name: string | null
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reporter_email?: string | null
+          reporter_name?: string | null
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reporter_email?: string | null
+          reporter_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reports_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           article_id: string
           author_name: string | null
           content: string
+          dislikes_count: number | null
+          flag_reason: string | null
           id: string
+          is_spam: boolean | null
+          likes_count: number | null
+          moderated_at: string | null
+          moderated_by: string | null
+          parent_comment_id: string | null
           posted_at: string | null
+          status: string | null
         }
         Insert: {
           article_id: string
           author_name?: string | null
           content: string
+          dislikes_count?: number | null
+          flag_reason?: string | null
           id?: string
+          is_spam?: boolean | null
+          likes_count?: number | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          parent_comment_id?: string | null
           posted_at?: string | null
+          status?: string | null
         }
         Update: {
           article_id?: string
           author_name?: string | null
           content?: string
+          dislikes_count?: number | null
+          flag_reason?: string | null
           id?: string
+          is_spam?: boolean | null
+          likes_count?: number | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          parent_comment_id?: string | null
           posted_at?: string | null
+          status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contacts: {
         Row: {
