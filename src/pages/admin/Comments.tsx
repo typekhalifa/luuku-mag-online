@@ -25,7 +25,9 @@ interface Comment {
   is_spam: boolean | null;
   likes_count: number | null;
   dislikes_count: number | null;
-  articles?: { title: string };
+  articles?: {
+    title: string;
+  } | null;
 }
 
 interface CommentReport {
@@ -36,7 +38,7 @@ interface CommentReport {
   reason: string;
   description: string | null;
   created_at: string;
-  comments?: Comment;
+  comments?: Comment | null;
 }
 
 const CommentsAdmin: React.FC = () => {
@@ -59,7 +61,7 @@ const CommentsAdmin: React.FC = () => {
         .from("comments")
         .select(`
           *,
-          articles (title)
+          articles!left (title)
         `)
         .order("posted_at", { ascending: false });
 
@@ -69,7 +71,14 @@ const CommentsAdmin: React.FC = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      setComments(data || []);
+      
+      // Transform the data to match our interface
+      const transformedData = (data || []).map(comment => ({
+        ...comment,
+        articles: comment.articles ? { title: comment.articles.title } : null
+      }));
+      
+      setComments(transformedData);
     } catch (error) {
       console.error("Error fetching comments:", error);
       toast({
@@ -434,13 +443,13 @@ const CommentsAdmin: React.FC = () => {
                         <p className="text-sm"><strong>Reported comment:</strong></p>
                         <p className="text-sm">{report.comments.content}</p>
                         <div className="flex gap-2 mt-2">
-                          <Button size="sm" onClick={() => moderateComment(report.comments.id, 'approved')}>
+                          <Button size="sm" onClick={() => moderateComment(report.comments!.id, 'approved')}>
                             Approve
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={() => moderateComment(report.comments.id, 'rejected')}>
+                          <Button size="sm" variant="destructive" onClick={() => moderateComment(report.comments!.id, 'rejected')}>
                             Remove
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => moderateComment(report.comments.id, 'flagged')}>
+                          <Button size="sm" variant="outline" onClick={() => moderateComment(report.comments!.id, 'flagged')}>
                             Flag for Review
                           </Button>
                         </div>
