@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -25,9 +24,7 @@ interface Comment {
   is_spam: boolean | null;
   likes_count: number | null;
   dislikes_count: number | null;
-  articles?: {
-    title: string;
-  } | null;
+  article_title?: string | null;
 }
 
 interface CommentReport {
@@ -57,28 +54,36 @@ const CommentsAdmin: React.FC = () => {
   const fetchComments = async () => {
     setLoading(true);
     try {
-      let query = supabase
+      // First get comments
+      let commentsQuery = supabase
         .from("comments")
-        .select(`
-          *,
-          articles!left (title)
-        `)
+        .select("*")
         .order("posted_at", { ascending: false });
 
       if (filter !== "all") {
-        query = query.eq("status", filter);
+        commentsQuery = commentsQuery.eq("status", filter);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
+      const { data: commentsData, error: commentsError } = await commentsQuery;
+      if (commentsError) throw commentsError;
+
+      // Then get articles to join manually
+      const { data: articlesData, error: articlesError } = await supabase
+        .from("articles")
+        .select("id, title");
       
-      // Transform the data to match our interface
-      const transformedData = (data || []).map(comment => ({
+      if (articlesError) throw articlesError;
+
+      // Create a map for quick lookup
+      const articlesMap = new Map(articlesData.map(article => [article.id, article.title]));
+
+      // Combine the data
+      const commentsWithArticles = (commentsData || []).map(comment => ({
         ...comment,
-        articles: comment.articles ? { title: comment.articles.title } : null
+        article_title: articlesMap.get(comment.article_id) || null
       }));
-      
-      setComments(transformedData);
+
+      setComments(commentsWithArticles);
     } catch (error) {
       console.error("Error fetching comments:", error);
       toast({
@@ -186,7 +191,7 @@ const CommentsAdmin: React.FC = () => {
   const filteredComments = comments.filter(comment =>
     comment.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     comment.author_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    comment.articles?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+    comment.article_title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const pendingCount = comments.filter(c => c.status === 'pending' || !c.status).length;
@@ -365,7 +370,7 @@ const CommentsAdmin: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            {comment.articles?.title || "Unknown Article"}
+                            {comment.article_title || "Unknown Article"}
                           </div>
                         </TableCell>
                         <TableCell>
