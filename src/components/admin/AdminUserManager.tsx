@@ -10,26 +10,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { PlusIcon, UserIcon, ShieldIcon, CrownIcon } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 
 interface UserRole {
   id: string;
   user_id: string;
-  role: "admin" | "moderator" | "user";
-}
-
-interface AuthUser {
-  id: string;
-  email: string;
-  created_at: string;
-  last_sign_in_at: string;
+  role: "admin" | "editor" | "user";
 }
 
 const AdminUserManager: React.FC = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<"admin" | "moderator">("moderator");
+  const [inviteRole, setInviteRole] = useState<"admin" | "editor">("editor");
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -87,7 +79,7 @@ const AdminUserManager: React.FC = () => {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: "admin" | "moderator" | "user") => {
+  const updateUserRole = async (userId: string, newRole: "admin" | "editor" | "user") => {
     try {
       const { error } = await supabase
         .from("user_roles")
@@ -142,7 +134,7 @@ const AdminUserManager: React.FC = () => {
     switch (role) {
       case "admin":
         return <CrownIcon className="h-4 w-4" />;
-      case "moderator":
+      case "editor":
         return <ShieldIcon className="h-4 w-4" />;
       default:
         return <UserIcon className="h-4 w-4" />;
@@ -153,7 +145,7 @@ const AdminUserManager: React.FC = () => {
     switch (role) {
       case "admin":
         return "destructive";
-      case "moderator":
+      case "editor":
         return "default";
       default:
         return "secondary";
@@ -161,7 +153,7 @@ const AdminUserManager: React.FC = () => {
   };
 
   const adminCount = userRoles.filter(ur => ur.role === "admin").length;
-  const moderatorCount = userRoles.filter(ur => ur.role === "moderator").length;
+  const editorCount = userRoles.filter(ur => ur.role === "editor").length;
   const userCount = userRoles.filter(ur => ur.role === "user").length;
 
   return (
@@ -182,11 +174,11 @@ const AdminUserManager: React.FC = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <ShieldIcon className="h-4 w-4" />
-              Moderators
+              Editors
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{moderatorCount}</div>
+            <div className="text-2xl font-bold">{editorCount}</div>
           </CardContent>
         </Card>
         <Card>
@@ -208,7 +200,7 @@ const AdminUserManager: React.FC = () => {
             <div>
               <CardTitle>Admin Users</CardTitle>
               <CardDescription>
-                Manage admin and moderator users
+                Manage admin and editor users
               </CardDescription>
             </div>
             <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
@@ -222,7 +214,7 @@ const AdminUserManager: React.FC = () => {
                 <DialogHeader>
                   <DialogTitle>Invite New Admin</DialogTitle>
                   <DialogDescription>
-                    Send an invitation to add a new admin or moderator
+                    Send an invitation to add a new admin or editor
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -236,12 +228,12 @@ const AdminUserManager: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Role</label>
-                    <Select value={inviteRole} onValueChange={(value: "admin" | "moderator") => setInviteRole(value)}>
+                    <Select value={inviteRole} onValueChange={(value: "admin" | "editor") => setInviteRole(value)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="moderator">Moderator</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
@@ -284,7 +276,7 @@ const AdminUserManager: React.FC = () => {
                       <div className="flex gap-2">
                         <Select
                           value={userRole.role}
-                          onValueChange={(value: "admin" | "moderator" | "user") => 
+                          onValueChange={(value: "admin" | "editor" | "user") => 
                             updateUserRole(userRole.user_id, value)
                           }
                         >
@@ -293,7 +285,7 @@ const AdminUserManager: React.FC = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="moderator">Moderator</SelectItem>
+                            <SelectItem value="editor">Editor</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
