@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon } from "lucide-react";
+import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -50,10 +50,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
+                <Link to="/admin">
+                  <SidebarMenuButton className="w-full">
+                    <LineChartIcon className="mr-2 h-5 w-5" />
+                    <span>Dashboard</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <Link to="/admin/articles">
                   <SidebarMenuButton className="w-full">
                     <FileTextIcon className="mr-2 h-5 w-5" />
                     <span>Articles</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/comments">
+                  <SidebarMenuButton className="w-full">
+                    <MessageSquareIcon className="mr-2 h-5 w-5" />
+                    <span>Comments</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>

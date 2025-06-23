@@ -10,6 +10,7 @@ import ArticleContent from "@/components/article/ArticleContent";
 import ArticleFooter from "@/components/article/ArticleFooter";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import ArticleSkeleton from "@/components/article/ArticleSkeleton";
+import { toast } from "@/components/ui/use-toast";
 
 interface ArticleWithViews {
   author: string | null;
@@ -32,45 +33,85 @@ const ArticleDetail = () => {
   const [article, setArticle] = useState<ArticleWithViews | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewCount, setViewCount] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
-      const { data, error } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching article:", error);
+      if (!id) {
+        setError("No article ID provided");
+        setLoading(false);
         return;
       }
 
-      const articleData = data as ArticleWithViews;
-      setArticle(articleData);
-      
-      const currentViews = articleData.views || 0;
-      setViewCount(currentViews + 1);
-      
-      await supabase
-        .from("articles")
-        .update({ views: currentViews + 1 })
-        .eq("id", id);
-      
-      const { data: related, error: relatedError } = await supabase
-        .from("articles")
-        .select("id, title, image_url, excerpt, category, published_at, views")
-        .eq("category", articleData.category)
-        .neq("id", id)
-        .order("published_at", { ascending: false })
-        .limit(4);
+      try {
+        console.log("Fetching article with ID:", id);
         
-      if (!relatedError && related) {
-        setRelatedArticles(related);
+        // First check if the article exists
+        const { data, error: fetchError } = await supabase
+          .from("articles")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle(); // Use maybeSingle to avoid errors when no data found
+
+        if (fetchError) {
+          console.error("Error fetching article:", fetchError);
+          setError(`Database error: ${fetchError.message}`);
+          toast({
+            title: "Error",
+            description: "Failed to load article",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!data) {
+          console.error("Article not found with ID:", id);
+          setError("Article not found");
+          return;
+        }
+
+        console.log("Article found:", data);
+        const articleData = data as ArticleWithViews;
+        setArticle(articleData);
+        
+        const currentViews = articleData.views || 0;
+        setViewCount(currentViews + 1);
+        
+        // Update view count
+        const { error: updateError } = await supabase
+          .from("articles")
+          .update({ views: currentViews + 1 })
+          .eq("id", id);
+          
+        if (updateError) {
+          console.error("Error updating views:", updateError);
+        }
+        
+        // Fetch related articles
+        const { data: related, error: relatedError } = await supabase
+          .from("articles")
+          .select("id, title, image_url, excerpt, category, published_at, views")
+          .eq("category", articleData.category)
+          .neq("id", id)
+          .order("published_at", { ascending: false })
+          .limit(4);
+          
+        if (!relatedError && related) {
+          setRelatedArticles(related);
+        }
+        
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        setError("An unexpected error occurred");
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while loading the article",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     fetchArticle();
@@ -86,17 +127,23 @@ const ArticleDetail = () => {
     );
   }
 
-  if (!article) {
+  if (error || !article) {
     return (
       <Layout>
         <div className="container py-8">
           <div className="text-center py-16">
-            <h2 className="text-2xl font-bold">Article not found</h2>
-            <p className="mt-2 text-muted-foreground">
-              The article you're looking for doesn't exist or has been removed.
+            <h2 className="text-2xl font-bold mb-4">Article Not Found</h2>
+            <p className="mt-2 text-muted-foreground mb-4">
+              {error || "The article you're looking for doesn't exist or has been removed."}
             </p>
-            <Link to="/articles" className="mt-4 inline-block text-highlight hover:underline">
-              Browse all articles
+            <div className="text-sm text-gray-500 mb-4">
+              Article ID: {id}
+            </div>
+            <Link 
+              to="/articles" 
+              className="inline-block bg-highlight text-white px-6 py-2 rounded hover:bg-highlight/90 transition-colors"
+            >
+              Browse All Articles
             </Link>
           </div>
         </div>
