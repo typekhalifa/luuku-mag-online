@@ -47,12 +47,27 @@ const ArticleDetail = () => {
       try {
         console.log("Fetching article with ID:", id);
         
-        // First check if the article exists
-        const { data, error: fetchError } = await supabase
-          .from("articles")
-          .select("*")
-          .eq("id", id)
-          .maybeSingle(); // Use maybeSingle to avoid errors when no data found
+        // First check if the article exists with proper UUID validation
+        let articleQuery;
+        
+        // Check if ID is a valid UUID format
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        
+        if (uuidRegex.test(id)) {
+          // Use UUID for exact match
+          articleQuery = supabase
+            .from("articles")
+            .select("*")
+            .eq("id", id);
+        } else {
+          // Fallback to slug-based lookup
+          articleQuery = supabase
+            .from("articles")
+            .select("*")
+            .eq("slug", id);
+        }
+
+        const { data, error: fetchError } = await articleQuery.maybeSingle();
 
         if (fetchError) {
           console.error("Error fetching article:", fetchError);
@@ -66,7 +81,7 @@ const ArticleDetail = () => {
         }
 
         if (!data) {
-          console.error("Article not found with ID:", id);
+          console.error("Article not found with ID/slug:", id);
           setError("Article not found");
           return;
         }
@@ -82,7 +97,7 @@ const ArticleDetail = () => {
         const { error: updateError } = await supabase
           .from("articles")
           .update({ views: currentViews + 1 })
-          .eq("id", id);
+          .eq("id", articleData.id);
           
         if (updateError) {
           console.error("Error updating views:", updateError);
@@ -93,7 +108,7 @@ const ArticleDetail = () => {
           .from("articles")
           .select("id, title, image_url, excerpt, category, published_at, views")
           .eq("category", articleData.category)
-          .neq("id", id)
+          .neq("id", articleData.id)
           .order("published_at", { ascending: false })
           .limit(4);
           

@@ -1,53 +1,100 @@
 
 import React from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableBody,
-  TableCaption,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import AdminUserManager from "@/components/admin/AdminUserManager";
+import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
+import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
+import EmailSettingsManager from "@/components/admin/EmailSettingsManager";
+import { Users2Icon, SettingsIcon, CreditCardIcon, MailIcon } from "lucide-react";
 
 const Users: React.FC = () => {
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Users</h1>
-        <Button>
-          <PlusIcon className="mr-2 h-4 w-4" /> Add User
-        </Button>
-      </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">User Management & Settings</h1>
+          <p className="text-muted-foreground">Manage users, site settings, payments, and more</p>
+        </div>
 
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-        <p className="text-yellow-700">
-          Note: This is a placeholder page. User management functionality will be implemented in a future update.
-        </p>
-      </div>
+        <Tabs defaultValue="users" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users2Icon className="h-4 w-4" />
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="site-settings" className="flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              Site Settings
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center gap-2">
+              <CreditCardIcon className="h-4 w-4" />
+              Payments
+            </TabsTrigger>
+            <TabsTrigger value="email" className="flex items-center gap-2">
+              <MailIcon className="h-4 w-4" />
+              Email
+            </TabsTrigger>
+          </TabsList>
 
-      <Table>
-        <TableCaption>User management (placeholder)</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Last Login</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-              User management will be implemented in a future update
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+          <TabsContent value="users">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>
+                  Manage admin users, editors, and their permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminUserManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="site-settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Site Settings</CardTitle>
+                <CardDescription>
+                  Configure your website's basic settings and preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SiteSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="payments">
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Settings</CardTitle>
+                <CardDescription>
+                  Configure payment gateways, donation settings, and subscription options
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PaymentSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="email">
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Settings</CardTitle>
+                <CardDescription>
+                  Configure SMTP settings, email templates, and notification preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EmailSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </AdminLayout>
   );
 };
