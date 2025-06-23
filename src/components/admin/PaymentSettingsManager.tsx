@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +42,7 @@ interface PaymentSettings {
 const PaymentSettingsManager: React.FC = () => {
   const [settings, setSettings] = useState<PaymentSettings>({
     donations: {
-      enabled: true,
+      enabled: true, // Enable donations by default
       minAmount: 5,
       currency: "USD",
       thankYouMessage: "Thank you for your generous donation! Your support helps us continue delivering quality news.",
@@ -56,7 +55,7 @@ const PaymentSettingsManager: React.FC = () => {
     paypal: {
       enabled: true,
       email: "jeandh023@gmail.com",
-      environment: "sandbox",
+      environment: "live", // Changed to live since this is for production
     },
     umvaPay: {
       enabled: true,
