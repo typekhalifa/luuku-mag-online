@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,6 +43,30 @@ interface PaymentSettings {
   };
 }
 
+// Default settings that match the admin panel
+const defaultPaymentSettings: PaymentSettings = {
+  donations: {
+    enabled: true,
+    minAmount: 5,
+    currency: "USD",
+    thankYouMessage: "Thank you for your generous donation! Your support helps us continue delivering quality news.",
+  },
+  umvaPay: {
+    enabled: true,
+    publicKey: "zxfk70rif9y4mxzw1cvthkd6refpwga9g4l4ps7tjppffxptvk",
+    environment: "live",
+  },
+  paypal: {
+    enabled: true,
+    email: "jeandh023@gmail.com",
+    environment: "live",
+  },
+  stripe: {
+    enabled: false,
+    publishableKey: "",
+  },
+};
+
 const Donate = () => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
@@ -54,20 +77,23 @@ const Donate = () => {
     message: ''
   });
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
-  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>(defaultPaymentSettings);
   const [processing, setProcessing] = useState(false);
 
   const predefinedAmounts = [10, 25, 50, 100, 250, 500];
 
   useEffect(() => {
-    // Load payment settings from localStorage (in production, this would come from API)
+    // Load payment settings from localStorage, but use defaults if not found
     try {
       const saved = localStorage.getItem('paymentSettings');
       if (saved) {
-        setPaymentSettings(JSON.parse(saved));
+        const savedSettings = JSON.parse(saved);
+        setPaymentSettings(savedSettings);
       }
+      // If no saved settings, we already have defaults loaded
     } catch (error) {
       console.error("Error loading payment settings:", error);
+      // Use default settings on error
     }
   }, []);
 
@@ -296,6 +322,7 @@ const Donate = () => {
 
   const finalAmount = selectedAmount || parseFloat(customAmount) || 0;
 
+  // Check if donations are enabled - now uses default settings as fallback
   if (!paymentSettings?.donations?.enabled) {
     return (
       <Layout>
