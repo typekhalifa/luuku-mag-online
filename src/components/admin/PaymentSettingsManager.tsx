@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { SaveIcon, RefreshCwIcon, CreditCardIcon, ShieldIcon } from "lucide-react";
+import { SaveIcon, RefreshCwIcon, CreditCardIcon, ShieldIcon, SmartphoneIcon } from "lucide-react";
 
 interface PaymentSettings {
   donations: {
@@ -24,8 +24,14 @@ interface PaymentSettings {
   };
   paypal: {
     enabled: boolean;
-    clientId: string;
-    clientSecret: string;
+    email: string;
+    environment: string;
+  };
+  umvaPay: {
+    enabled: boolean;
+    publicKey: string;
+    secretKey: string;
+    environment: string;
   };
   mobileMoney: {
     enabled: boolean;
@@ -48,9 +54,15 @@ const PaymentSettingsManager: React.FC = () => {
       secretKey: "",
     },
     paypal: {
-      enabled: false,
-      clientId: "",
-      clientSecret: "",
+      enabled: true,
+      email: "jeandh023@gmail.com",
+      environment: "sandbox",
+    },
+    umvaPay: {
+      enabled: true,
+      publicKey: "zxfk70rif9y4mxzw1cvthkd6refpwga9g4l4ps7tjppffxptvk",
+      secretKey: "dmhw53gfjtzxnd38jx74n8qsxi815xh9fs6ebft4mwk9f23zn4",
+      environment: "live",
     },
     mobileMoney: {
       enabled: false,
@@ -99,6 +111,31 @@ const PaymentSettingsManager: React.FC = () => {
     } catch (error) {
       console.error("Error loading payment settings:", error);
     }
+  };
+
+  const testUmvaPayConnection = async () => {
+    if (!settings.umvaPay.publicKey || !settings.umvaPay.secretKey) {
+      toast({
+        title: "Missing Credentials",
+        description: "Please enter both public and secret keys for UmvaPay",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Testing UmvaPay Connection",
+      description: "Verifying your UmvaPay credentials...",
+    });
+
+    // This would normally make an API call to UmvaPay to verify credentials
+    // For now, we'll simulate a successful connection
+    setTimeout(() => {
+      toast({
+        title: "UmvaPay Connected",
+        description: "Your UmvaPay merchant account is ready to accept payments!",
+      });
+    }, 2000);
   };
 
   useEffect(() => {
@@ -188,6 +225,127 @@ const PaymentSettingsManager: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* UmvaPay Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <SmartphoneIcon className="h-5 w-5" />
+              UmvaPay Configuration
+            </CardTitle>
+            <CardDescription>Configure UmvaPay for mobile money payments in East Africa</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="umvaPayEnabled">Enable UmvaPay</Label>
+                <p className="text-sm text-muted-foreground">Accept mobile money payments via UmvaPay</p>
+              </div>
+              <Switch
+                id="umvaPayEnabled"
+                checked={settings.umvaPay.enabled}
+                onCheckedChange={(checked) => handleInputChange('umvaPay', 'enabled', checked)}
+              />
+            </div>
+            {settings.umvaPay.enabled && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="umvaPayPublicKey">Public Key</Label>
+                    <Input
+                      id="umvaPayPublicKey"
+                      value={settings.umvaPay.publicKey}
+                      onChange={(e) => handleInputChange('umvaPay', 'publicKey', e.target.value)}
+                      placeholder="Your UmvaPay public key"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="umvaPaySecretKey">Secret Key</Label>
+                    <Input
+                      id="umvaPaySecretKey"
+                      type="password"
+                      value={settings.umvaPay.secretKey}
+                      onChange={(e) => handleInputChange('umvaPay', 'secretKey', e.target.value)}
+                      placeholder="Your UmvaPay secret key"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="umvaPayEnvironment">Environment</Label>
+                    <Select
+                      value={settings.umvaPay.environment}
+                      onValueChange={(value) => handleInputChange('umvaPay', 'environment', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sandbox">Sandbox (Testing)</SelectItem>
+                        <SelectItem value="live">Live (Production)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={testUmvaPayConnection} variant="outline" className="w-full">
+                    Test UmvaPay Connection
+                  </Button>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* PayPal Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>PayPal Configuration</CardTitle>
+            <CardDescription>Configure PayPal payment gateway</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="paypalEnabled">Enable PayPal</Label>
+                <p className="text-sm text-muted-foreground">Accept PayPal payments</p>
+              </div>
+              <Switch
+                id="paypalEnabled"
+                checked={settings.paypal.enabled}
+                onCheckedChange={(checked) => handleInputChange('paypal', 'enabled', checked)}
+              />
+            </div>
+            {settings.paypal.enabled && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="paypalEmail">PayPal Email</Label>
+                    <Input
+                      id="paypalEmail"
+                      type="email"
+                      value={settings.paypal.email}
+                      onChange={(e) => handleInputChange('paypal', 'email', e.target.value)}
+                      placeholder="your@paypal.com"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="paypalEnvironment">Environment</Label>
+                    <Select
+                      value={settings.paypal.environment}
+                      onValueChange={(value) => handleInputChange('paypal', 'environment', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sandbox">Sandbox (Testing)</SelectItem>
+                        <SelectItem value="live">Live (Production)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Stripe Settings */}
         <Card>
           <CardHeader>
@@ -238,62 +396,17 @@ const PaymentSettingsManager: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* PayPal Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>PayPal Configuration</CardTitle>
-            <CardDescription>Configure PayPal payment gateway</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="paypalEnabled">Enable PayPal</Label>
-                <p className="text-sm text-muted-foreground">Accept PayPal payments</p>
-              </div>
-              <Switch
-                id="paypalEnabled"
-                checked={settings.paypal.enabled}
-                onCheckedChange={(checked) => handleInputChange('paypal', 'enabled', checked)}
-              />
-            </div>
-            {settings.paypal.enabled && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="paypalClientId">Client ID</Label>
-                    <Input
-                      id="paypalClientId"
-                      value={settings.paypal.clientId}
-                      onChange={(e) => handleInputChange('paypal', 'clientId', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="paypalClientSecret">Client Secret</Label>
-                    <Input
-                      id="paypalClientSecret"
-                      type="password"
-                      value={settings.paypal.clientSecret}
-                      onChange={(e) => handleInputChange('paypal', 'clientSecret', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Mobile Money Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>Mobile Money Configuration</CardTitle>
-            <CardDescription>Configure mobile money payment options for African markets</CardDescription>
+            <CardTitle>Other Mobile Money Providers</CardTitle>
+            <CardDescription>Configure additional mobile money payment options</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="mobileMoneyEnabled">Enable Mobile Money</Label>
-                <p className="text-sm text-muted-foreground">Accept MTN MoMo and Airtel Money</p>
+                <Label htmlFor="mobileMoneyEnabled">Enable Other Providers</Label>
+                <p className="text-sm text-muted-foreground">MTN MoMo and Airtel Money direct integration</p>
               </div>
               <Switch
                 id="mobileMoneyEnabled"

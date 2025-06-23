@@ -7,19 +7,20 @@ import AdminUserManager from "@/components/admin/AdminUserManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
 import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
 import EmailSettingsManager from "@/components/admin/EmailSettingsManager";
-import { Users2Icon, SettingsIcon, CreditCardIcon, MailIcon } from "lucide-react";
+import SEOManager from "@/components/admin/SEOManager";
+import { Users2Icon, SettingsIcon, CreditCardIcon, MailIcon, SearchIcon } from "lucide-react";
 
 const Users: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">User Management & Settings</h1>
+          <h1 className="text-3xl font-bold">Admin Settings & Management</h1>
           <p className="text-muted-foreground">Manage users, site settings, payments, and more</p>
         </div>
 
         <Tabs defaultValue="users" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users2Icon className="h-4 w-4" />
               Users
@@ -35,6 +36,10 @@ const Users: React.FC = () => {
             <TabsTrigger value="email" className="flex items-center gap-2">
               <MailIcon className="h-4 w-4" />
               Email
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="flex items-center gap-2">
+              <SearchIcon className="h-4 w-4" />
+              SEO & Performance
             </TabsTrigger>
           </TabsList>
 
@@ -90,6 +95,20 @@ const Users: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <EmailSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="seo">
+            <Card>
+              <CardHeader>
+                <CardTitle>SEO & Performance</CardTitle>
+                <CardDescription>
+                  Optimize your site for search engines and improve performance
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SEOManager />
               </CardContent>
             </Card>
           </TabsContent>

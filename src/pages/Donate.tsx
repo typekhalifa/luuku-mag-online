@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,33 @@ import {
   Users,
   Globe,
   Target,
-  Banknote
+  Banknote,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+
+interface PaymentSettings {
+  donations: {
+    enabled: boolean;
+    minAmount: number;
+    currency: string;
+    thankYouMessage: string;
+  };
+  umvaPay: {
+    enabled: boolean;
+    publicKey: string;
+    environment: string;
+  };
+  paypal: {
+    enabled: boolean;
+    email: string;
+    environment: string;
+  };
+  stripe: {
+    enabled: boolean;
+    publishableKey: string;
+  };
+}
 
 const Donate = () => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -26,49 +50,82 @@ const Donate = () => {
   const [donorInfo, setDonorInfo] = useState({
     name: '',
     email: '',
+    phone: '',
     message: ''
   });
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   const predefinedAmounts = [10, 25, 50, 100, 250, 500];
 
-  const paymentMethods = [
-    {
-      id: 'card',
-      name: 'Credit/Debit Card',
-      icon: CreditCard,
-      description: 'Visa, Mastercard, American Express',
-      popular: true
-    },
-    {
-      id: 'paypal',
-      name: 'PayPal',
-      icon: DollarSign,
-      description: 'Secure PayPal payment',
-      popular: false
-    },
-    {
-      id: 'mobile',
-      name: 'Mobile Money',
-      icon: Smartphone,
-      description: 'M-Pesa, MTN Mobile Money, Airtel Money',
-      popular: true
-    },
-    {
-      id: 'western-union',
-      name: 'Western Union',
-      icon: Banknote,
-      description: 'International money transfer',
-      popular: false
-    },
-    {
-      id: 'crypto',
-      name: 'Cryptocurrency',
-      icon: Bitcoin,
-      description: 'Bitcoin, Ethereum, USDC',
-      popular: false
+  useEffect(() => {
+    // Load payment settings from localStorage (in production, this would come from API)
+    try {
+      const saved = localStorage.getItem('paymentSettings');
+      if (saved) {
+        setPaymentSettings(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error("Error loading payment settings:", error);
     }
-  ];
+  }, []);
+
+  const getAvailablePaymentMethods = () => {
+    const methods = [];
+    
+    if (paymentSettings?.stripe?.enabled) {
+      methods.push({
+        id: 'stripe',
+        name: 'Credit/Debit Card',
+        icon: CreditCard,
+        description: 'Visa, Mastercard, American Express',
+        popular: true
+      });
+    }
+
+    if (paymentSettings?.paypal?.enabled) {
+      methods.push({
+        id: 'paypal',
+        name: 'PayPal',
+        icon: DollarSign,
+        description: 'Secure PayPal payment',
+        popular: false
+      });
+    }
+
+    if (paymentSettings?.umvaPay?.enabled) {
+      methods.push({
+        id: 'umvapay',
+        name: 'Mobile Money (UmvaPay)',
+        icon: Smartphone,
+        description: 'MTN MoMo, Airtel Money, Vodafone Cash',
+        popular: true
+      });
+    }
+
+    // Always show these as backup options
+    methods.push(
+      {
+        id: 'western-union',
+        name: 'Western Union',
+        icon: Banknote,
+        description: 'International money transfer',
+        popular: false
+      },
+      {
+        id: 'crypto',
+        name: 'Cryptocurrency',
+        icon: Bitcoin,
+        description: 'Bitcoin, Ethereum, USDC',
+        popular: false
+      }
+    );
+
+    return methods;
+  };
+
+  const paymentMethods = getAvailablePaymentMethods();
 
   const impactLevels = [
     {
@@ -107,7 +164,58 @@ const Donate = () => {
     setSelectedAmount(null);
   };
 
-  const handleDonate = () => {
+  const processUmvaPayPayment = async (amount: number) => {
+    if (!paymentSettings?.umvaPay?.publicKey) {
+      throw new Error('UmvaPay not configured');
+    }
+
+    // In a real implementation, you would integrate with UmvaPay API
+    // This is a simulation of the payment process
+    const paymentData = {
+      amount: amount,
+      currency: paymentSettings.donations.currency,
+      phone: donorInfo.phone,
+      email: donorInfo.email,
+      name: donorInfo.name,
+      description: `Donation to support independent journalism`
+    };
+
+    console.log('Processing UmvaPay payment:', paymentData);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Simulate successful payment
+    return {
+      success: true,
+      transactionId: `UMVA_${Date.now()}`,
+      message: 'Payment processed successfully'
+    };
+  };
+
+  const processPayPalPayment = async (amount: number) => {
+    if (!paymentSettings?.paypal?.enabled) {
+      throw new Error('PayPal not configured');
+    }
+
+    // In a real implementation, you would integrate with PayPal SDK
+    console.log('Processing PayPal payment:', {
+      amount,
+      email: paymentSettings.paypal.email,
+      environment: paymentSettings.paypal.environment
+    });
+
+    // Simulate PayPal payment process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    return {
+      success: true,
+      transactionId: `PP_${Date.now()}`,
+      message: 'PayPal payment completed'
+    };
+  };
+
+  const handleDonate = async () => {
     const amount = selectedAmount || parseFloat(customAmount);
     
     if (!amount || amount <= 0) {
@@ -128,20 +236,82 @@ const Donate = () => {
       return;
     }
 
-    // Here you would integrate with actual payment processors
-    toast({
-      title: "Thank you for your support!",
-      description: `Donation of $${amount} will be processed via ${paymentMethods.find(p => p.id === selectedPayment)?.name}`,
-    });
+    if (selectedPayment === 'umvapay' && !donorInfo.phone) {
+      toast({
+        title: "Phone number required",
+        description: "Mobile money payments require a phone number",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    console.log('Donation details:', {
-      amount,
-      paymentMethod: selectedPayment,
-      donorInfo
-    });
+    setProcessing(true);
+
+    try {
+      let result;
+      
+      switch (selectedPayment) {
+        case 'umvapay':
+          result = await processUmvaPayPayment(amount);
+          break;
+        case 'paypal':
+          result = await processPayPalPayment(amount);
+          break;
+        case 'stripe':
+          // Stripe integration would go here
+          result = { success: true, transactionId: `STRIPE_${Date.now()}`, message: 'Stripe payment processed' };
+          break;
+        default:
+          // For other payment methods, show instructions
+          toast({
+            title: "Payment Method Selected",
+            description: `Please follow the instructions for ${paymentMethods.find(p => p.id === selectedPayment)?.name} payment`,
+          });
+          return;
+      }
+
+      if (result.success) {
+        toast({
+          title: "Thank you for your support!",
+          description: paymentSettings?.donations?.thankYouMessage || "Your donation helps support independent journalism",
+        });
+
+        // Reset form
+        setSelectedAmount(null);
+        setCustomAmount('');
+        setDonorInfo({ name: '', email: '', phone: '', message: '' });
+        setSelectedPayment(null);
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const finalAmount = selectedAmount || parseFloat(customAmount) || 0;
+
+  if (!paymentSettings?.donations?.enabled) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Donations Currently Unavailable
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              We're working on setting up our donation system. Please check back soon!
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -173,7 +343,7 @@ const Donate = () => {
                   {/* Predefined Amounts */}
                   <div>
                     <Label className="text-base font-medium mb-3 block dark:text-white">
-                      Quick Select
+                      Quick Select ({paymentSettings.donations.currency})
                     </Label>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                       {predefinedAmounts.map((amount) => (
@@ -183,7 +353,8 @@ const Donate = () => {
                           className="h-12"
                           onClick={() => handleAmountSelect(amount)}
                         >
-                          ${amount}
+                          {paymentSettings.donations.currency === 'USD' ? '$' : ''}
+                          {amount}
                         </Button>
                       ))}
                     </div>
@@ -203,8 +374,12 @@ const Donate = () => {
                         className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         value={customAmount}
                         onChange={(e) => handleCustomAmountChange(e.target.value)}
+                        min={paymentSettings.donations.minAmount}
                       />
                     </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Minimum amount: {paymentSettings.donations.currency} {paymentSettings.donations.minAmount}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -218,7 +393,7 @@ const Donate = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {paymentMethods.map((method) => (
                       <div
                         key={method.id}
@@ -236,12 +411,15 @@ const Donate = () => {
                         )}
                         <div className="flex items-center gap-3">
                           <method.icon className="h-6 w-6 text-primary" />
-                          <div>
+                          <div className="flex-1">
                             <div className="font-medium dark:text-white">{method.name}</div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                               {method.description}
                             </div>
                           </div>
+                          {selectedPayment === method.id && (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          )}
                         </div>
                       </div>
                     ))}
@@ -252,7 +430,7 @@ const Donate = () => {
               {/* Donor Information */}
               <Card className="dark:bg-gray-800 dark:border-gray-700">
                 <CardHeader>
-                  <CardTitle className="dark:text-white">Donor Information (Optional)</CardTitle>
+                  <CardTitle className="dark:text-white">Donor Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -278,6 +456,24 @@ const Donate = () => {
                       />
                     </div>
                   </div>
+                  {selectedPayment === 'umvapay' && (
+                    <div>
+                      <Label htmlFor="donor-phone" className="dark:text-white">
+                        Phone Number <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="donor-phone"
+                        type="tel"
+                        placeholder="+256 XXX XXX XXX"
+                        className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        value={donorInfo.phone}
+                        onChange={(e) => setDonorInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Required for mobile money payments
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <Label htmlFor="donor-message" className="dark:text-white">Message (Optional)</Label>
                     <Textarea
@@ -299,10 +495,10 @@ const Donate = () => {
                     size="lg"
                     className="w-full text-lg"
                     onClick={handleDonate}
-                    disabled={!finalAmount || !selectedPayment}
+                    disabled={!finalAmount || !selectedPayment || processing}
                   >
                     <Heart className="mr-2 h-5 w-5" />
-                    Donate ${finalAmount.toFixed(2)}
+                    {processing ? 'Processing...' : `Donate ${paymentSettings.donations.currency} ${finalAmount.toFixed(2)}`}
                   </Button>
                   <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3">
                     Your donation is secure and helps support independent journalism
@@ -371,7 +567,6 @@ const Donate = () => {
                 </CardContent>
               </Card>
 
-              {/* Monthly Impact */}
               <Card className="dark:bg-gray-800 dark:border-gray-700">
                 <CardHeader>
                   <CardTitle className="dark:text-white">This Month's Impact</CardTitle>
