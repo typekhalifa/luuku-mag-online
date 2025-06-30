@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import AmountSelector from '@/components/donate/AmountSelector';
@@ -14,6 +13,7 @@ import {
   Banknote
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentSettings {
   donations: {
@@ -187,37 +187,33 @@ const Donate = () => {
 
     console.log('Processing UmvaPay payment:', paymentData);
 
-    // Create Supabase client
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase configuration missing');
-    }
+    try {
+      // Use Supabase client to invoke the edge function
+      const { data, error } = await supabase.functions.invoke('umvapay-payment', {
+        body: paymentData
+      });
 
-    // Call the edge function
-    const response = await fetch(`${supabaseUrl}/functions/v1/umvapay-payment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseKey}`,
-      },
-      body: JSON.stringify(paymentData)
-    });
+      console.log('UmvaPay response:', data);
 
-    const result = await response.json();
-    console.log('UmvaPay response:', result);
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Payment initialization failed');
+      }
 
-    if (result.success && result.checkout_url) {
-      // Redirect to UmvaPay portal
-      window.location.href = result.checkout_url;
-      return {
-        success: true,
-        transactionId: result.transaction_id,
-        message: 'Redirecting to UmvaPay...'
-      };
-    } else {
-      throw new Error(result.error || 'Payment initialization failed');
+      if (data.success && data.checkout_url) {
+        // Redirect to UmvaPay portal
+        window.location.href = data.checkout_url;
+        return {
+          success: true,
+          transactionId: data.transaction_id,
+          message: 'Redirecting to UmvaPay...'
+        };
+      } else {
+        throw new Error(data.error || 'Payment initialization failed');
+      }
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      throw error;
     }
   };
 
