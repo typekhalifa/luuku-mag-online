@@ -195,8 +195,10 @@ const Donate = () => {
       throw new Error('UmvaPay not configured');
     }
 
-    // In a real implementation, you would integrate with UmvaPay API
-    // This is a simulation of the payment process
+    if (!donorInfo.phone) {
+      throw new Error('Phone number is required for mobile money payments');
+    }
+
     const paymentData = {
       amount: amount,
       currency: paymentSettings.donations.currency,
@@ -207,16 +209,39 @@ const Donate = () => {
     };
 
     console.log('Processing UmvaPay payment:', paymentData);
+
+    // Create Supabase client
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Simulate successful payment
-    return {
-      success: true,
-      transactionId: `UMVA_${Date.now()}`,
-      message: 'Payment processed successfully'
-    };
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration missing');
+    }
+
+    // Call the edge function
+    const response = await fetch(`${supabaseUrl}/functions/v1/umvapay-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify(paymentData)
+    });
+
+    const result = await response.json();
+    console.log('UmvaPay response:', result);
+
+    if (result.success && result.checkout_url) {
+      // Redirect to UmvaPay portal
+      window.location.href = result.checkout_url;
+      return {
+        success: true,
+        transactionId: result.transaction_id,
+        message: 'Redirecting to UmvaPay...'
+      };
+    } else {
+      throw new Error(result.error || 'Payment initialization failed');
+    }
   };
 
   const processPayPalPayment = async (amount: number) => {
@@ -248,6 +273,15 @@ const Donate = () => {
       toast({
         title: "Please select an amount",
         description: "Choose a predefined amount or enter a custom amount",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (amount < paymentSettings.donations.minAmount) {
+      toast({
+        title: "Amount too low",
+        description: `Minimum donation amount is ${paymentSettings.donations.currency} ${paymentSettings.donations.minAmount}`,
         variant: "destructive"
       });
       return;
@@ -296,7 +330,7 @@ const Donate = () => {
           return;
       }
 
-      if (result.success) {
+      if (result.success && selectedPayment !== 'umvapay') {
         toast({
           title: "Thank you for your support!",
           description: paymentSettings?.donations?.thankYouMessage || "Your donation helps support independent journalism",
@@ -312,7 +346,7 @@ const Donate = () => {
       console.error('Payment error:', error);
       toast({
         title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -339,6 +373,29 @@ const Donate = () => {
       </Layout>
     );
   }
+
+  // Check for payment status in URL (for return from UmvaPay)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    
+    if (status === 'success') {
+      toast({
+        title: "Payment Successful!",
+        description: paymentSettings?.donations?.thankYouMessage || "Thank you for your generous donation! Your support helps us continue delivering quality news.",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, "/donate");
+    } else if (status === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your payment was cancelled. You can try again anytime.",
+        variant: "destructive"
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, "/donate");
+    }
+  }, [paymentSettings]);
 
   return (
     <Layout>
