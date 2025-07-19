@@ -19,7 +19,7 @@ serve(async (req) => {
     console.log('Processing UmvaPay payment request:', { amount, currency, phone, email, name });
 
     // UmvaPay API configuration
-    const UMVAPAY_BASE_URL = 'https://api.umvapay.com/v1';
+    const UMVAPAY_BASE_URL = 'https://umvapay.com/api/v1';
     const PUBLIC_KEY = 'zxfk70rif9y4mxzw1cvthkd6refpwga9g4l4ps7tjppffxptvk';
     const SECRET_KEY = 'dmhw53gfjtzxnd38jx74n8qsxi815xh9fs6ebft4mwk9f23zn4';
 

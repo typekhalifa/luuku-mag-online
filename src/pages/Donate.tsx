@@ -49,7 +49,7 @@ interface DonorInfo {
 const defaultPaymentSettings: PaymentSettings = {
   donations: {
     enabled: true,
-    minAmount: 5,
+    minAmount: 1,
     currency: "USD",
     thankYouMessage: "Thank you for your generous donation! Your support helps us continue delivering quality news.",
   },
