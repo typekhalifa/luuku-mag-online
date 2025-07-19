@@ -40,7 +40,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ articleId, className })
       .from("comments")
       .select("*")
       .eq("article_id", articleId)
-      .or("status.eq.approved,status.is.null") // Only show approved comments
+      .eq("status", "approved") // Only show approved comments
       .order("posted_at", { ascending: false });
     
     if (!error && data) {
@@ -76,8 +76,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ articleId, className })
     const channel = supabase
       .channel("schema-db-changes")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "comments" }, (payload) => {
-        if (payload.new.article_id === articleId && (payload.new.status === 'approved' || !payload.new.status)) {
+        if (payload.new.article_id === articleId && payload.new.status === 'approved') {
           fetchComments(); // Refresh to maintain thread structure
+        }
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "comments" }, (payload) => {
+        if (payload.new.article_id === articleId && payload.new.status === 'approved') {
+          fetchComments(); // Refresh when comments are approved
         }
       })
       .subscribe();
