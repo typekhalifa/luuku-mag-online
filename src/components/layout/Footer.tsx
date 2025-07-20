@@ -29,7 +29,7 @@ const Footer = () => {
     setSubLoading(true);
     const { error } = await supabase.from("subscriptions").insert({ email: subEmail.trim() });
     if (!error) {
-      toast.success("Subscribed!", { description: "Thanks for subscribing to LUUKU MAG!" });
+      navigate(`/newsletter/confirmation?email=${encodeURIComponent(subEmail.trim())}`);
       setSubEmail("");
     } else if (error.code === "23505") {
       toast.error("Already subscribed", { description: "This email is already signed up." });

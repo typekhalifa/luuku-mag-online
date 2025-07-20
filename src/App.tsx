@@ -18,6 +18,7 @@ import ArticlesPublic from "./pages/ArticlesPublic";
 import ArticleDetail from "./pages/ArticleDetail";
 import BreakingNewsDetail from "./pages/BreakingNewsDetail";
 import Donate from "./pages/Donate";
+import NewsletterConfirmation from "./pages/NewsletterConfirmation";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/articles" element={<ArticlesPublic />} />
                 <Route path="/donate" element={<Donate />} />
+                <Route path="/newsletter/confirmation" element={<NewsletterConfirmation />} />
                 <Route path="/admin/login" element={<Login />} />
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/articles" element={<Articles />} />
