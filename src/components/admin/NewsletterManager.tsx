@@ -24,6 +24,7 @@ const NewsletterManager: React.FC = () => {
   const [sending, setSending] = useState(false);
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
+  const [newEmail, setNewEmail] = useState("");
 
   useEffect(() => {
     fetchSubscriptions();
@@ -66,7 +67,10 @@ const NewsletterManager: React.FC = () => {
   };
 
   const sendNewsletter = async () => {
-    if (!subject.trim() || !content.trim()) {
+    const sanitizedSubject = sanitizeInput(subject);
+    const sanitizedContent = sanitizeInput(content);
+
+    if (!sanitizedSubject.trim() || !sanitizedContent.trim()) {
       toast({
         title: "Error",
         description: "Please enter both subject and content",
@@ -74,6 +78,17 @@ const NewsletterManager: React.FC = () => {
       });
       return;
     }
+
+    if (sanitizedSubject.length > 255) {
+      toast({
+        title: "Error",
+        description: "Subject line is too long (max 255 characters)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!confirm(`Send newsletter to ${subscriptions.length} subscribers?`)) return;
 
     setSending(true);
     try {
@@ -98,7 +113,18 @@ const NewsletterManager: React.FC = () => {
     }
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email) && email.length <= 254;
+  };
+
+  const sanitizeInput = (input: string): string => {
+    return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  };
+
   const removeSubscription = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this subscription?")) return;
+    
     try {
       const { error } = await supabase
         .from("subscriptions")
@@ -117,6 +143,54 @@ const NewsletterManager: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to remove subscription",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const addManualSubscription = async (email: string) => {
+    if (!validateEmail(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Check if email already exists
+      const { data: existing } = await supabase
+        .from("subscriptions")
+        .select("id")
+        .eq("email", email.toLowerCase())
+        .single();
+
+      if (existing) {
+        toast({
+          title: "Already Subscribed",
+          description: "This email is already subscribed",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("subscriptions")
+        .insert([{ email: email.toLowerCase() }]);
+
+      if (error) throw error;
+
+      fetchSubscriptions();
+      toast({
+        title: "Success",
+        description: "Subscription added successfully",
+      });
+    } catch (error) {
+      console.error("Error adding subscription:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add subscription",
         variant: "destructive",
       });
     }
@@ -220,6 +294,27 @@ const NewsletterManager: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Add Manual Subscription */}
+              <div className="mb-6 p-4 border rounded-lg bg-muted/50">
+                <h3 className="font-medium mb-2">Add Manual Subscription</h3>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter email address..."
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addManualSubscription(newEmail)}
+                  />
+                  <Button 
+                    onClick={() => {
+                      addManualSubscription(newEmail);
+                      setNewEmail("");
+                    }}
+                    disabled={!newEmail.trim()}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
               {loading ? (
                 <div className="text-center py-8">Loading subscribers...</div>
               ) : subscriptions.length === 0 ? (
