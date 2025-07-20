@@ -269,6 +269,27 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_attempts: {
+        Row: {
+          attempted_at: string | null
+          email: string
+          id: string
+          ip_address: unknown
+        }
+        Insert: {
+          attempted_at?: string | null
+          email: string
+          id?: string
+          ip_address: unknown
+        }
+        Update: {
+          attempted_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: unknown
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           email: string
