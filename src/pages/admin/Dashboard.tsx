@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BreakingNewsManager from "@/components/admin/BreakingNewsManager";
 import NewsletterManager from "@/components/admin/NewsletterManager";
 import AdminUserManager from "@/components/admin/AdminUserManager";
+import ContactMessagesManager from "@/components/admin/ContactMessagesManager";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = React.useState({
@@ -136,9 +137,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="breaking-news" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="breaking-news">Breaking News</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
+            <TabsTrigger value="contacts">Contact Messages</TabsTrigger>
             <TabsTrigger value="admin-users">Admin Users</TabsTrigger>
             <TabsTrigger value="overview">Overview</TabsTrigger>
           </TabsList>
@@ -169,6 +171,10 @@ const Dashboard: React.FC = () => {
                 <NewsletterManager />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="contacts">
+            <ContactMessagesManager />
           </TabsContent>
 
           <TabsContent value="admin-users">
