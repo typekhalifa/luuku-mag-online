@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import EditArticleDialog from "./EditArticleDialog";
+import ArticleScheduler from "./ArticleScheduler";
 import { Badge } from "@/components/ui/badge";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Link } from "react-router-dom";
@@ -183,6 +184,11 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          
+          <ArticleScheduler 
+            articleId={article.id} 
+            onScheduled={onUpdate}
+          />
           
           <EditArticleDialog 
             article={article} 
