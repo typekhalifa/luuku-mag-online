@@ -4,10 +4,10 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminUserManager from "@/components/admin/AdminUserManager";
-import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
+import EnhancedSiteSettingsManager from "@/components/admin/EnhancedSiteSettingsManager";
 import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
 import EmailSettingsManager from "@/components/admin/EmailSettingsManager";
-import SEOManager from "@/components/admin/SEOManager";
+import EnhancedSEOManager from "@/components/admin/EnhancedSEOManager";
 import { Users2Icon, SettingsIcon, CreditCardIcon, MailIcon, SearchIcon } from "lucide-react";
 
 const Users: React.FC = () => {
@@ -66,7 +66,7 @@ const Users: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <SiteSettingsManager />
+                <EnhancedSiteSettingsManager />
               </CardContent>
             </Card>
           </TabsContent>
@@ -108,7 +108,7 @@ const Users: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <SEOManager />
+                <EnhancedSEOManager />
               </CardContent>
             </Card>
           </TabsContent>

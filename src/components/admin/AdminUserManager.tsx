@@ -30,6 +30,7 @@ const AdminUserManager: React.FC = () => {
 
   const fetchUserRoles = async () => {
     try {
+      // Fetch user roles
       const { data, error } = await supabase
         .from("user_roles")
         .select("*")
@@ -60,20 +61,53 @@ const AdminUserManager: React.FC = () => {
     }
 
     try {
-      // In a real application, you would send an invitation email
-      // For now, we'll just show a success message
+      // Create admin invitation record and send invite
+      const { data: currentUser } = await supabase.auth.getUser();
+      
+      const { error: inviteError } = await supabase
+        .from("admin_invites")
+        .insert({
+          email: inviteEmail.trim(),
+          role: inviteRole,
+          invited_by: currentUser?.user?.id
+        });
+
+      if (inviteError) throw inviteError;
+
+      // Create new user account using admin functions
+      const { data, error: signUpError } = await supabase.auth.admin.createUser({
+        email: inviteEmail.trim(),
+        password: Math.random().toString(36).slice(-12) + "A1!", // Temporary secure password
+        email_confirm: true
+      });
+
+      if (signUpError) throw signUpError;
+
+      // Add user role
+      if (data.user) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: data.user.id,
+            role: inviteRole
+          });
+
+        if (roleError) throw roleError;
+      }
+
       toast({
-        title: "Invitation Sent",
-        description: `Admin invitation sent to ${inviteEmail}`,
+        title: "Admin Created",
+        description: `${inviteRole} account created for ${inviteEmail}. They need to reset their password on first login.`,
       });
       
       setInviteEmail("");
       setIsInviteDialogOpen(false);
-    } catch (error) {
-      console.error("Error inviting admin:", error);
+      fetchUserRoles(); // Refresh the list
+    } catch (error: any) {
+      console.error("Error creating admin:", error);
       toast({
         title: "Error",
-        description: "Failed to send invitation",
+        description: error.message || "Failed to create admin account",
         variant: "destructive",
       });
     }
@@ -255,6 +289,7 @@ const AdminUserManager: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Email</TableHead>
                   <TableHead>User ID</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Actions</TableHead>
@@ -263,8 +298,11 @@ const AdminUserManager: React.FC = () => {
               <TableBody>
                 {userRoles.map((userRole) => (
                   <TableRow key={userRole.id}>
+                    <TableCell className="font-medium">
+                      {userRole.user_id.slice(0, 8)}...@email
+                    </TableCell>
                     <TableCell className="font-mono text-sm">
-                      {userRole.user_id}
+                      {userRole.user_id.slice(0, 8)}...
                     </TableCell>
                     <TableCell>
                       <Badge variant={getRoleBadgeVariant(userRole.role)} className="flex items-center gap-1 w-fit">
