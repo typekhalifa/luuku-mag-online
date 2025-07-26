@@ -70,70 +70,70 @@ const Dashboard: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 dark:from-blue-950 dark:to-blue-900 dark:border-blue-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Articles</CardTitle>
-              <FileTextIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Articles</CardTitle>
+              <FileTextIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
                 {loading ? "Loading..." : stats.totalArticles}
               </div>
-              <p className="text-xs text-muted-foreground">Published content</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">Published content</p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950 dark:to-green-900 dark:border-green-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Comments</CardTitle>
-              <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Total Comments</CardTitle>
+              <MessageSquareIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-green-900 dark:text-green-100">
                 {loading ? "Loading..." : stats.totalComments}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-green-600 dark:text-green-400">
                 {stats.pendingComments} pending review
               </p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 dark:from-purple-950 dark:to-purple-900 dark:border-purple-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Newsletter Subscribers</CardTitle>
-              <MailIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Newsletter Subscribers</CardTitle>
+              <MailIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
                 {loading ? "Loading..." : stats.totalSubscriptions}
               </div>
-              <p className="text-xs text-muted-foreground">Active subscribers</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400">Active subscribers</p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 dark:from-red-950 dark:to-red-900 dark:border-red-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
-              <LineChartIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300">Total Likes</CardTitle>
+              <LineChartIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-red-900 dark:text-red-100">
                 {loading ? "Loading..." : stats.totalLikes}
               </div>
-              <p className="text-xs text-muted-foreground">Content engagement</p>
+              <p className="text-xs text-red-600 dark:text-red-400">Content engagement</p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 dark:from-orange-950 dark:to-orange-900 dark:border-orange-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Contact Messages</CardTitle>
-              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Contact Messages</CardTitle>
+              <UsersIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
                 {loading ? "Loading..." : stats.totalContacts}
               </div>
-              <p className="text-xs text-muted-foreground">User inquiries</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400">User inquiries</p>
             </CardContent>
           </Card>
         </div>
