@@ -302,6 +302,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempt_count: number | null
+          id: string
+          ip_address: unknown
+          last_attempt: string | null
+          reset_after: string | null
+        }
+        Insert: {
+          action_type: string
+          attempt_count?: number | null
+          id?: string
+          ip_address: unknown
+          last_attempt?: string | null
+          reset_after?: string | null
+        }
+        Update: {
+          action_type?: string
+          attempt_count?: number | null
+          id?: string
+          ip_address?: unknown
+          last_attempt?: string | null
+          reset_after?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -391,7 +418,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_rate_limit: {
+        Args: {
+          _ip_address: unknown
+          _action_type: string
+          _max_attempts?: number
+          _window_minutes?: number
+        }
+        Returns: boolean
+      }
+      sanitize_content: {
+        Args: { _content: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "editor" | "user"

@@ -11,6 +11,7 @@ import AdminUserManager from "@/components/admin/AdminUserManager";
 import ContactMessagesManager from "@/components/admin/ContactMessagesManager";
 import UserRolesManager from "@/components/admin/UserRolesManager";
 import AnalyticsGrowth from "@/components/admin/AnalyticsGrowth";
+import { SecurityMonitor } from "@/components/admin/SecurityMonitor";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = React.useState({
@@ -138,8 +139,9 @@ const Dashboard: React.FC = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="breaking-news" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7">
+        <Tabs defaultValue="security" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-8">
+            <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="breaking-news">Breaking News</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
             <TabsTrigger value="contacts">Contact Messages</TabsTrigger>
@@ -148,6 +150,23 @@ const Dashboard: React.FC = () => {
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="overview">Overview</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CrownIcon className="h-5 w-5" />
+                  Security Monitor
+                </CardTitle>
+                <CardDescription>
+                  Monitor security threats, blocked attacks, and system health
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SecurityMonitor />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="breaking-news">
             <Card>
