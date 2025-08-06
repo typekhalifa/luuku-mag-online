@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface DDoSProtectionOptions {
   maxRequestsPerMinute?: number;
@@ -31,31 +30,24 @@ export const useDDoSProtection = (options: DDoSProtectionOptions = {}) => {
     return () => clearInterval(interval);
   }, []);
 
-  const checkBlockStatus = async () => {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const { ip } = await response.json();
-
-      const { data } = await supabase
-        .from('ddos_blocks')
-        .select('*')
-        .eq('ip_address', ip)
-        .gt('blocked_until', new Date().toISOString())
-        .single();
-
-      if (data) {
+  const checkBlockStatus = () => {
+    // Check localStorage for block status
+    const blockData = localStorage.getItem('ddos_block');
+    if (blockData) {
+      const { blockedUntil } = JSON.parse(blockData);
+      const now = Date.now();
+      
+      if (now < blockedUntil) {
         setIsBlocked(true);
         // Auto-unblock when time expires
-        const unblockTime = new Date(data.blocked_until).getTime();
-        const now = Date.now();
-        if (unblockTime > now) {
-          setTimeout(() => {
-            setIsBlocked(false);
-          }, unblockTime - now);
-        }
+        setTimeout(() => {
+          setIsBlocked(false);
+          localStorage.removeItem('ddos_block');
+        }, blockedUntil - now);
+      } else {
+        // Block has expired
+        localStorage.removeItem('ddos_block');
       }
-    } catch (error) {
-      // User not blocked or error checking
     }
   };
 
@@ -103,51 +95,35 @@ export const useDDoSProtection = (options: DDoSProtectionOptions = {}) => {
     return true;
   };
 
-  const blockIP = async () => {
+  const blockIP = () => {
     try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const { ip } = await response.json();
-
-      const blockedUntil = new Date(Date.now() + blockDuration * 60000).toISOString();
-
-      await supabase
-        .from('ddos_blocks')
-        .upsert({
-          ip_address: ip,
-          blocked_until: blockedUntil,
-          reason: 'Rate limit exceeded',
-          created_at: new Date().toISOString()
-        });
+      const blockedUntil = Date.now() + blockDuration * 60000;
+      
+      // Store block status in localStorage
+      localStorage.setItem('ddos_block', JSON.stringify({
+        blockedUntil,
+        reason: 'Rate limit exceeded'
+      }));
 
       setIsBlocked(true);
       
       // Auto-unblock after duration
       setTimeout(() => {
         setIsBlocked(false);
+        localStorage.removeItem('ddos_block');
       }, blockDuration * 60000);
 
     } catch (error) {
-      console.error('Failed to block IP:', error);
+      console.error('Failed to block user:', error);
     }
   };
 
-  const reportSuspiciousActivity = async () => {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const { ip } = await response.json();
-
-      await supabase
-        .from('security_alerts')
-        .insert({
-          type: 'DDoS_ATTEMPT',
-          severity: 'high',
-          ip_address: ip,
-          details: { requests_per_minute: requestCount },
-          created_at: new Date().toISOString()
-        });
-    } catch (error) {
-      console.error('Failed to report suspicious activity:', error);
-    }
+  const reportSuspiciousActivity = () => {
+    // Log suspicious activity to console for now
+    console.warn('Suspicious activity detected:', {
+      requests_per_minute: requestCount,
+      timestamp: new Date().toISOString()
+    });
   };
 
   return {
