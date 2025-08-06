@@ -281,6 +281,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ddos_blocks: {
+        Row: {
+          blocked_until: string
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          reason: string | null
+        }
+        Insert: {
+          blocked_until: string
+          created_at?: string | null
+          id?: string
+          ip_address: unknown
+          reason?: string | null
+        }
+        Update: {
+          blocked_until?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           article_id: string
@@ -326,6 +350,36 @@ export type Database = {
           ip_address?: unknown
           last_attempt?: string | null
           reset_after?: string | null
+        }
+        Relationships: []
+      }
+      security_alerts: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resolved: boolean | null
+          severity: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          severity: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resolved?: boolean | null
+          severity?: string
+          type?: string
         }
         Relationships: []
       }
@@ -425,6 +479,14 @@ export type Database = {
           _max_attempts?: number
           _window_minutes?: number
         }
+        Returns: boolean
+      }
+      cleanup_expired_blocks: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      is_ip_blocked: {
+        Args: { check_ip: unknown }
         Returns: boolean
       }
       sanitize_content: {
