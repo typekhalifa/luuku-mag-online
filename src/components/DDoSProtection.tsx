@@ -10,9 +10,7 @@ interface DDoSProtectionProps {
 export const DDoSProtection = ({ children }: DDoSProtectionProps) => {
   const { isBlocked, requestCount, logRequest } = useDDoSProtection({
     maxRequestsPerMinute: 60,
-    maxRequestsPerHour: 1000,
-    suspiciousThreshold: 40,
-    blockDuration: 30
+    suspiciousThreshold: 40
   });
 
   useEffect(() => {
