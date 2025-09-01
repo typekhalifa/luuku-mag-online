@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -383,6 +383,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -474,8 +504,8 @@ export type Database = {
     Functions: {
       check_rate_limit: {
         Args: {
-          _ip_address: unknown
           _action_type: string
+          _ip_address: unknown
           _max_attempts?: number
           _window_minutes?: number
         }
@@ -485,9 +515,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       is_ip_blocked: {
         Args: { check_ip: unknown }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: {
+          _details?: Json
+          _event_type: string
+          _ip_address?: unknown
+          _user_agent?: string
+          _user_id?: string
+        }
+        Returns: undefined
       }
       sanitize_content: {
         Args: { _content: string }

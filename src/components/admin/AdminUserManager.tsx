@@ -1,5 +1,8 @@
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useAdminRole } from "@/hooks/useAdminRole";
+import { SecurityEventLogger } from "@/components/security/SecurityEventLogger";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +21,8 @@ interface UserRole {
 }
 
 const AdminUserManager: React.FC = () => {
+  const { user } = useAuth();
+  const { isAdmin, isLoading: roleLoading } = useAdminRole();
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -61,6 +66,12 @@ const AdminUserManager: React.FC = () => {
     }
 
     try {
+      // Log admin action
+      await SecurityEventLogger.logAdminAction('invite_user', {
+        invitedEmail: inviteEmail.trim(),
+        assignedRole: inviteRole
+      });
+
       // Create admin invitation record and send invite
       const { data: currentUser } = await supabase.auth.getUser();
       
@@ -115,6 +126,13 @@ const AdminUserManager: React.FC = () => {
 
   const updateUserRole = async (userId: string, newRole: "admin" | "editor" | "user") => {
     try {
+      // Log admin action
+      await SecurityEventLogger.logAdminAction('update_user_role', {
+        targetUserId: userId,
+        newRole,
+        previousRole: userRoles.find(ur => ur.user_id === userId)?.role
+      });
+
       const { error } = await supabase
         .from("user_roles")
         .update({ role: newRole })
@@ -142,6 +160,12 @@ const AdminUserManager: React.FC = () => {
 
   const removeUser = async (userId: string) => {
     try {
+      // Log admin action
+      await SecurityEventLogger.logAdminAction('remove_user', {
+        targetUserId: userId,
+        removedRole: userRoles.find(ur => ur.user_id === userId)?.role
+      });
+
       const { error } = await supabase
         .from("user_roles")
         .delete()
@@ -189,6 +213,40 @@ const AdminUserManager: React.FC = () => {
   const adminCount = userRoles.filter(ur => ur.role === "admin").length;
   const editorCount = userRoles.filter(ur => ur.role === "editor").length;
   const userCount = userRoles.filter(ur => ur.role === "user").length;
+
+  if (loading || roleLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center">Loading users...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isAdmin) {
+    // Log unauthorized access attempt
+    SecurityEventLogger.logUnauthorizedAccess('user_management', {
+      userId: user?.id,
+      email: user?.email
+    });
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Access Denied</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-muted-foreground">
+            You don't have permission to manage users.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
