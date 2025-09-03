@@ -7,6 +7,7 @@ import { UnauthorizedAccess } from "./UnauthorizedAccess";
 import { SecurityEventLogger } from "@/components/security/SecurityEventLogger";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import {
   SidebarProvider,
   Sidebar,
@@ -18,7 +19,8 @@ import {
   SidebarTrigger,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon } from "lucide-react";
+import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon, SunIcon, MoonIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -27,6 +29,7 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { user, signOut, isLoading: authLoading } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useAdminRole();
+  const { theme, setTheme } = useTheme();
 
   // If authentication or role check is still being processed, show loading
   if (authLoading || roleLoading) {
@@ -64,9 +67,23 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <SidebarHeader className="flex flex-col gap-2 px-4 pt-4">
             <div className="flex items-center justify-between">
               <h1 className="text-xl font-bold">Admin Portal</h1>
-              <SidebarTrigger />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="h-8 w-8 p-0"
+                >
+                  {theme === "dark" ? (
+                    <SunIcon className="h-4 w-4" />
+                  ) : (
+                    <MoonIcon className="h-4 w-4" />
+                  )}
+                </Button>
+                <SidebarTrigger />
+              </div>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               Logged in as: {user.email}
             </div>
             <Separator />
