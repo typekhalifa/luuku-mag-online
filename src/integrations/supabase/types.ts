@@ -261,22 +261,31 @@ export type Database = {
         Row: {
           email: string
           id: string
+          is_read: boolean | null
           message: string
           name: string | null
+          read_at: string | null
+          read_by: string | null
           sent_at: string
         }
         Insert: {
           email: string
           id?: string
+          is_read?: boolean | null
           message: string
           name?: string | null
+          read_at?: string | null
+          read_by?: string | null
           sent_at?: string
         }
         Update: {
           email?: string
           id?: string
+          is_read?: boolean | null
           message?: string
           name?: string | null
+          read_at?: string | null
+          read_by?: string | null
           sent_at?: string
         }
         Relationships: []
