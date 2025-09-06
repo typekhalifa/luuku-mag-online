@@ -1,0 +1,17 @@
+name: Keep Supabase Project Active
+
+on:
+  schedule:
+    # Run every 14 minutes to keep the project active
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Project
+        run: |
+          curl -f https://nzdtjhnwkrsyerghdppm.supabase.co/rest/v1/ \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZHRqaG53a3JzeWVyZ2hkcHBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxOTg1MjUsImV4cCI6MjA2MDc3NDUyNX0.JC-mU_B_kQvi7Pm0zZgbE4OjE5utbm2ObFHRG1axY1M" \
+            || echo "Ping failed, but that's okay"
