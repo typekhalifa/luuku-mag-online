@@ -44,6 +44,7 @@ const ArticleHeader = ({
             src={imageUrl}
             alt={title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </div>
       )}

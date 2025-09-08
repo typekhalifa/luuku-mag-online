@@ -377,7 +377,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm">{children}</code>,
                     pre: ({children}) => <pre className="bg-gray-100 p-4 rounded overflow-x-auto my-4">{children}</pre>,
                     a: ({href, children}) => <a href={href} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
-                    img: ({src, alt}) => <img src={src} alt={alt} className="max-w-full h-auto rounded my-4" />
+                    img: ({src, alt}) => <img src={src} alt={alt} className="max-w-full h-auto rounded my-4" loading="lazy" />
                   }}
                 >
                   {value}

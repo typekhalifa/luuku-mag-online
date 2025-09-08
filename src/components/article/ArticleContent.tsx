@@ -76,6 +76,7 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
                     src={src} 
                     alt={alt} 
                     className="w-full rounded-lg shadow-md"
+                    loading="lazy"
                     {...props}
                   />
                   {alt && (

@@ -57,6 +57,7 @@ const ArticleSidebar = ({ currentCategory, currentArticleId, relatedArticles }: 
                           src={related.image_url}
                           alt={related.title}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
                     )}

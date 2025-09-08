@@ -109,6 +109,7 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
               src={article.image_url}
               alt={article.title}
               className="h-16 w-16 rounded-md object-cover"
+              loading="lazy"
             />
           ) : (
             <div className="h-16 w-16 bg-muted rounded-md flex items-center justify-center text-muted-foreground">

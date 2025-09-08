@@ -113,6 +113,7 @@ const RecommendedArticles = ({ currentArticleId, currentCategory }: RecommendedA
                   src={article.image_url}
                   alt={article.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             )}
