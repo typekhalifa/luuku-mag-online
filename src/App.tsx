@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DDoSProtection } from "@/components/DDoSProtection";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/admin/Login";
@@ -20,6 +21,7 @@ import ArticlesPublic from "./pages/ArticlesPublic";
 import ArticleDetail from "./pages/ArticleDetail";
 import BreakingNewsDetail from "./pages/BreakingNewsDetail";
 import Donate from "./pages/Donate";
+import Checkout from "./pages/Checkout";
 import NewsletterConfirmation from "./pages/NewsletterConfirmation";
 
 const queryClient = new QueryClient();
@@ -35,10 +37,12 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <ScrollToTop />
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/articles" element={<ArticlesPublic />} />
                     <Route path="/donate" element={<Donate />} />
+                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="/newsletter/confirmation" element={<NewsletterConfirmation />} />
                     <Route path="/admin/login" element={<Login />} />
                     <Route path="/admin" element={<Dashboard />} />

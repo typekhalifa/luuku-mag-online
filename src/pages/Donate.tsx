@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import AmountSelector from '@/components/donate/AmountSelector';
 import PaymentMethodSelector from '@/components/donate/PaymentMethodSelector';
@@ -70,6 +71,7 @@ const defaultPaymentSettings: PaymentSettings = {
 };
 
 const Donate = () => {
+  const navigate = useNavigate();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [donorInfo, setDonorInfo] = useState<DonorInfo>({
@@ -269,6 +271,15 @@ const Donate = () => {
       return;
     }
 
+    if (!donorInfo.name || !donorInfo.email) {
+      toast({
+        title: "Please provide your information",
+        description: "Name and email are required for all donations",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (selectedPayment === 'umvapay' && !donorInfo.phone) {
       toast({
         title: "Phone number required",
@@ -278,53 +289,17 @@ const Donate = () => {
       return;
     }
 
-    setProcessing(true);
-
-    try {
-      let result;
-      
-      switch (selectedPayment) {
-        case 'umvapay':
-          result = await processUmvaPayPayment(amount);
-          break;
-        case 'paypal':
-          result = await processPayPalPayment(amount);
-          break;
-        case 'stripe':
-          // Stripe integration would go here
-          result = { success: true, transactionId: `STRIPE_${Date.now()}`, message: 'Stripe payment processed' };
-          break;
-        default:
-          // For other payment methods, show instructions
-          toast({
-            title: "Payment Method Selected",
-            description: `Please follow the instructions for ${paymentMethods.find(p => p.id === selectedPayment)?.name} payment`,
-          });
-          return;
+    // Navigate to checkout page with donation data
+    navigate('/checkout', {
+      state: {
+        checkoutData: {
+          amount: amount,
+          currency: paymentSettings.donations.currency,
+          paymentMethod: selectedPayment,
+          donorInfo
+        }
       }
-
-      if (result.success && selectedPayment !== 'umvapay') {
-        toast({
-          title: "Thank you for your support!",
-          description: paymentSettings?.donations?.thankYouMessage || "Your donation helps support independent journalism",
-        });
-
-        // Reset form
-        setSelectedAmount(null);
-        setCustomAmount('');
-        setDonorInfo({ name: '', email: '', phone: '', message: '' });
-        setSelectedPayment(null);
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast({
-        title: "Payment Failed",
-        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setProcessing(false);
-    }
+    });
   };
 
   const finalAmount = selectedAmount || parseFloat(customAmount) || 0;
