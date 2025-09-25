@@ -165,17 +165,17 @@ const Dashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="security" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-10">
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="breaking-news">Breaking News</TabsTrigger>
-            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-            <TabsTrigger value="contacts">Contact Messages</TabsTrigger>
-            <TabsTrigger value="admin-users">Admin Users</TabsTrigger>
-            <TabsTrigger value="user-roles">User Roles</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="donations">Donations</TabsTrigger>
-            <TabsTrigger value="payment-settings">Payment Settings</TabsTrigger>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsList className="flex flex-wrap justify-start gap-1 h-auto p-2 bg-muted rounded-lg">
+            <TabsTrigger value="security" className="shrink-0">Security</TabsTrigger>
+            <TabsTrigger value="breaking-news" className="shrink-0">Breaking News</TabsTrigger>
+            <TabsTrigger value="newsletter" className="shrink-0">Newsletter</TabsTrigger>
+            <TabsTrigger value="contacts" className="shrink-0">Contact Messages</TabsTrigger>
+            <TabsTrigger value="admin-users" className="shrink-0">Admin Users</TabsTrigger>
+            <TabsTrigger value="user-roles" className="shrink-0">User Roles</TabsTrigger>
+            <TabsTrigger value="analytics" className="shrink-0">Analytics</TabsTrigger>
+            <TabsTrigger value="donations" className="shrink-0">Donations</TabsTrigger>
+            <TabsTrigger value="payment-settings" className="shrink-0">Payment Settings</TabsTrigger>
+            <TabsTrigger value="overview" className="shrink-0">Overview</TabsTrigger>
           </TabsList>
 
           <TabsContent value="security">
