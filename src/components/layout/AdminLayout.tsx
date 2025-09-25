@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon, SunIcon, MoonIcon } from "lucide-react";
+import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon, SunIcon, MoonIcon, CreditCardIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 interface AdminLayoutProps {
@@ -129,6 +129,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <span>Users</span>
                   </SidebarMenuButton>
                 </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton className="w-full" onClick={() => {
+                  // Navigate to donations tab in dashboard
+                  const dashboardUrl = '/admin?tab=donations';
+                  window.location.href = dashboardUrl;
+                }}>
+                  <CreditCardIcon className="mr-2 h-5 w-5" />
+                  <span>Donations</span>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="w-full" onClick={signOut}>

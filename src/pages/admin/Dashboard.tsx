@@ -12,6 +12,8 @@ import ContactMessagesManager from "@/components/admin/ContactMessagesManager";
 import UserRolesManager from "@/components/admin/UserRolesManager";
 import AnalyticsGrowth from "@/components/admin/AnalyticsGrowth";
 import { SecurityMonitor } from "@/components/admin/SecurityMonitor";
+import DonationAnalytics from "@/components/admin/DonationAnalytics";
+import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = React.useState({
@@ -20,7 +22,9 @@ const Dashboard: React.FC = () => {
     totalLikes: 0,
     totalContacts: 0,
     totalSubscriptions: 0,
-    pendingComments: 0
+    pendingComments: 0,
+    totalDonations: 0,
+    totalDonationAmount: 0
   });
   const [loading, setLoading] = React.useState(true);
 
@@ -34,15 +38,21 @@ const Dashboard: React.FC = () => {
           likesResponse,
           contactsResponse,
           subscriptionsResponse,
-          pendingCommentsResponse
+          pendingCommentsResponse,
+          donationsResponse,
+          donationsAmountResponse
         ] = await Promise.all([
           supabase.from('articles').select('id', { count: 'exact' }),
           supabase.from('comments').select('id', { count: 'exact' }),
           supabase.from('likes').select('id', { count: 'exact' }),
           supabase.from('contacts').select('id', { count: 'exact' }),
           supabase.from('subscriptions').select('id', { count: 'exact' }),
-          supabase.from('comments').select('id', { count: 'exact' }).eq('status', 'pending')
+          supabase.from('comments').select('id', { count: 'exact' }).eq('status', 'pending'),
+          supabase.from('donations').select('id', { count: 'exact' }),
+          supabase.from('donations').select('amount')
         ]);
+
+        const totalDonationAmount = donationsAmountResponse.data?.reduce((sum, d) => sum + Number(d.amount), 0) || 0;
 
         setStats({
           totalArticles: articlesResponse.count || 0,
@@ -50,7 +60,9 @@ const Dashboard: React.FC = () => {
           totalLikes: likesResponse.count || 0,
           totalContacts: contactsResponse.count || 0,
           totalSubscriptions: subscriptionsResponse.count || 0,
-          pendingComments: pendingCommentsResponse.count || 0
+          pendingComments: pendingCommentsResponse.count || 0,
+          totalDonations: donationsResponse.count || 0,
+          totalDonationAmount
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -137,10 +149,23 @@ const Dashboard: React.FC = () => {
               <p className="text-xs text-orange-600 dark:text-orange-400">User inquiries</p>
             </CardContent>
           </Card>
+          
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 dark:from-emerald-950 dark:to-emerald-900 dark:border-emerald-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Donations</CardTitle>
+              <LineChartIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+                {loading ? "Loading..." : `$${stats.totalDonationAmount.toLocaleString()}`}
+              </div>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">{stats.totalDonations} donations</p>
+            </CardContent>
+          </Card>
         </div>
 
         <Tabs defaultValue="security" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="breaking-news">Breaking News</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
@@ -148,6 +173,8 @@ const Dashboard: React.FC = () => {
             <TabsTrigger value="admin-users">Admin Users</TabsTrigger>
             <TabsTrigger value="user-roles">User Roles</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="donations">Donations</TabsTrigger>
+            <TabsTrigger value="payment-settings">Payment Settings</TabsTrigger>
             <TabsTrigger value="overview">Overview</TabsTrigger>
           </TabsList>
 
@@ -222,6 +249,34 @@ const Dashboard: React.FC = () => {
             <AnalyticsGrowth />
           </TabsContent>
 
+          <TabsContent value="donations">
+            <Card>
+              <CardHeader>
+                <CardTitle>Donation Management</CardTitle>
+                <CardDescription>
+                  View donation analytics and track fundraising progress
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DonationAnalytics />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="payment-settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Settings</CardTitle>
+                <CardDescription>
+                  Configure donation and payment method settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PaymentSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="overview">
             <Card>
               <CardHeader>
@@ -238,12 +293,14 @@ const Dashboard: React.FC = () => {
                     <li><strong>Comments</strong> - Moderate user comments and handle reports</li>
                     <li><strong>Analytics</strong> - View performance metrics and user engagement</li>
                     <li><strong>Users</strong> - Manage user accounts and permissions</li>
+                    <li><strong>Donations</strong> - Track fundraising and donation analytics</li>
+                    <li><strong>Payment Settings</strong> - Configure payment methods and donation settings</li>
                   </ul>
                   
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                     <h4 className="font-semibold text-blue-900">Quick Actions</h4>
                     <p className="text-blue-700 text-sm mt-1">
-                      Use the tabs above to quickly manage breaking news, newsletters, and admin users without navigating away from the dashboard.
+                      Use the tabs above to quickly manage breaking news, newsletters, donations, and payment settings without navigating away from the dashboard.
                     </p>
                   </div>
                 </div>

@@ -314,6 +314,57 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          donor_email: string | null
+          donor_name: string | null
+          id: string
+          ip_address: unknown | null
+          is_anonymous: boolean | null
+          message: string | null
+          payment_method: string
+          payment_status: string
+          transaction_id: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_anonymous?: boolean | null
+          message?: string | null
+          payment_method: string
+          payment_status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_anonymous?: boolean | null
+          message?: string | null
+          payment_method?: string
+          payment_status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           article_id: string
