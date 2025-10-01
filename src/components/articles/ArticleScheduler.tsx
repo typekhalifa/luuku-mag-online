@@ -38,6 +38,17 @@ const ArticleScheduler: React.FC<ArticleSchedulerProps> = ({ articleId, onSchedu
       const scheduledDateTime = new Date(date);
       scheduledDateTime.setHours(hours, minutes, 0, 0);
 
+      // Check if scheduled time is in the past
+      if (scheduledDateTime <= new Date()) {
+        toast({
+          title: "Invalid Time",
+          description: "Please select a future time",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       // Update article with scheduled publish time
       const { error } = await supabase
         .from("articles")
@@ -87,7 +98,11 @@ const ArticleScheduler: React.FC<ArticleSchedulerProps> = ({ articleId, onSchedu
               mode="single"
               selected={date}
               onSelect={setDate}
-              disabled={(date) => date < new Date()}
+              disabled={(date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return date < today;
+              }}
               className="rounded-md border"
             />
           </div>
