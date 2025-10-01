@@ -11,10 +11,18 @@ import { toast } from "@/hooks/use-toast";
 
 interface ArticleSchedulerProps {
   articleId: string;
+  currentPublishedAt?: string;
   onScheduled?: () => void;
 }
 
-const ArticleScheduler: React.FC<ArticleSchedulerProps> = ({ articleId, onScheduled }) => {
+const ArticleScheduler: React.FC<ArticleSchedulerProps> = ({ articleId, currentPublishedAt, onScheduled }) => {
+  // Check if article is already published (published_at is in the past)
+  const isAlreadyPublished = currentPublishedAt && new Date(currentPublishedAt) <= new Date();
+  
+  // Don't show schedule button for already published articles
+  if (isAlreadyPublished) {
+    return null;
+  }
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState("");

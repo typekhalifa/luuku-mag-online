@@ -47,6 +47,7 @@ const NewsSection = ({
       const { data, error } = await supabase
         .from('articles')
         .select('*')
+        .lte('published_at', new Date().toISOString())
         .order('published_at', { ascending: false })
         .limit(6);
       

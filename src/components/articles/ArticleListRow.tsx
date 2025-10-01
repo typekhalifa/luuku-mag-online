@@ -187,7 +187,8 @@ const ArticleListRow = ({ article, onDelete, onUpdate }: ArticleListRowProps) =>
           </TooltipProvider>
           
           <ArticleScheduler 
-            articleId={article.id} 
+            articleId={article.id}
+            currentPublishedAt={article.published_at}
             onScheduled={onUpdate}
           />
           

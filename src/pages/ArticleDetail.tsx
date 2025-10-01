@@ -109,6 +109,7 @@ const ArticleDetail = () => {
           .select("id, title, image_url, excerpt, category, published_at, views")
           .eq("category", articleData.category)
           .neq("id", articleData.id)
+          .lte('published_at', new Date().toISOString())
           .order("published_at", { ascending: false })
           .limit(4);
           

@@ -33,6 +33,7 @@ const RecommendedArticles = ({ currentArticleId, currentCategory }: RecommendedA
         let query = supabase
           .from('articles')
           .select('id, title, category, views, published_at, image_url, excerpt')
+          .lte('published_at', new Date().toISOString())
           .order('published_at', { ascending: false })
           .limit(6);
 
@@ -52,6 +53,7 @@ const RecommendedArticles = ({ currentArticleId, currentCategory }: RecommendedA
             .select('id, title, category, views, published_at, image_url, excerpt')
             .neq('category', currentCategory)
             .neq('id', currentArticleId || '')
+            .lte('published_at', new Date().toISOString())
             .order('views', { ascending: false })
             .limit(3);
 

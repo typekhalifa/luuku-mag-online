@@ -27,6 +27,7 @@ const TrendingArticles = () => {
         const { data, error } = await supabase
           .from('articles')
           .select('id, title, category, views, published_at, image_url')
+          .lte('published_at', new Date().toISOString())
           .order('views', { ascending: false })
           .limit(5);
 

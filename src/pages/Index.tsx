@@ -28,6 +28,7 @@ export default function Index() {
           supabase
             .from('articles')
             .select('*')
+            .lte('published_at', new Date().toISOString())
             .order('published_at', { ascending: false })
             .limit(20) // Limit initial load for better performance
         ]);
