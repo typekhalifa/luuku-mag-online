@@ -52,7 +52,7 @@ export default function ArticlesPublic() {
       try {
         let supabaseQuery = supabase
           .from("articles")
-          .select("id, title, excerpt, image_url, category, published_at, our_pick, featured")
+          .select("id, title, excerpt, image_url, category, published_at, our_pick, featured, views")
           .lte('published_at', new Date().toISOString())
           .order("published_at", { ascending: false });
 
