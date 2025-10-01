@@ -21,7 +21,7 @@ const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
     onClose();
   };
 
-  const navItems = ['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'];
+  const navItems = ['Home', 'World', 'Politics', 'Finance', 'Technology', 'Youth', 'Health', 'Sport', 'Opportunities'];
 
   return (
     <div

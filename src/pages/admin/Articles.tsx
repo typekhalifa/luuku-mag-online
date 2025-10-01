@@ -33,7 +33,7 @@ const categories = [
   "Finance",
   "Technology",
   "Youth",
-  "Culture",
+  "Health",
   "Sport",
   "Opportunities"
 ];

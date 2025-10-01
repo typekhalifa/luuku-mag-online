@@ -114,7 +114,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold font-heading mb-4">Categories</h3>
             <ul className="space-y-2">
-              {['World', 'Politics', 'Finance', 'Technology', 'Youth', 'Culture', 'Sport', 'Opportunities'].map((item) => (
+              {['World', 'Politics', 'Finance', 'Technology', 'Youth', 'Health', 'Sport', 'Opportunities'].map((item) => (
                 <li key={item}>
                   <button 
                     onClick={() => handleCategoryClick(item)}

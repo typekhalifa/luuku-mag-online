@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import ArticleScheduler from "./ArticleScheduler";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,7 +18,7 @@ const categories = [
   "Finance",
   "Technology",
   "Youth",
-  "Culture",
+  "Health",
   "Sport",
   "Opportunities"
 ];
@@ -36,6 +37,10 @@ interface CreateArticleDialogProps {
   onSuccess?: () => Promise<void> | void;
 }
 
+interface ArticleCreationResult {
+  id: string;
+}
+
 export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogProps) {
   const { toast } = useToast();
   const form = useForm<FormData>({
@@ -49,6 +54,8 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
+  const [createdArticleId, setCreatedArticleId] = useState<string | null>(null);
+  const [showScheduler, setShowScheduler] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -79,32 +86,29 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
         imageUrl = publicUrl;
       }
 
-      const { error } = await supabase.from('articles').insert({
+      const { data: articleData, error } = await supabase.from('articles').insert({
         ...data,
         image_url: imageUrl,
         published_at: new Date().toISOString(),
-      });
+      }).select('id').single();
 
       if (error) throw error;
 
+      setCreatedArticleId(articleData.id);
+      
       toast({
         title: "Success",
-        description: "Article created successfully",
+        description: "Article created successfully. You can now schedule it or close.",
       });
       
       form.reset({
-        author: "Luuku Magazine", // Reset form but keep default author
+        author: "Luuku Magazine",
         featured: false,
         our_pick: false
       });
       setImageFile(null);
       setImagePreview(null);
-      setOpen(false);
-      
-      // Call the onSuccess callback if provided
-      if (onSuccess) {
-        await onSuccess();
-      }
+      setShowScheduler(true);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -312,6 +316,34 @@ export default function CreateArticleDialog({ onSuccess }: CreateArticleDialogPr
             </div>
           </form>
         </Form>
+        
+        {showScheduler && createdArticleId && (
+          <div className="mt-4 pt-4 border-t">
+            <h3 className="text-sm font-semibold mb-2">Schedule Publication</h3>
+            <div className="flex gap-2 items-center">
+              <ArticleScheduler 
+                articleId={createdArticleId}
+                onScheduled={() => {
+                  setOpen(false);
+                  setShowScheduler(false);
+                  setCreatedArticleId(null);
+                  if (onSuccess) onSuccess();
+                }}
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOpen(false);
+                  setShowScheduler(false);
+                  setCreatedArticleId(null);
+                  if (onSuccess) onSuccess();
+                }}
+              >
+                Skip Scheduling
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

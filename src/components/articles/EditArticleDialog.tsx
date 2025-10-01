@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import ArticleScheduler from "./ArticleScheduler";
 import {
   Dialog,
   DialogContent,
@@ -360,6 +361,13 @@ export default function EditArticleDialog({ article, onSuccess }: EditArticleDia
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Updating..." : "Update Article"}
               </Button>
+              <ArticleScheduler 
+                articleId={article.id}
+                onScheduled={() => {
+                  setOpen(false);
+                  onSuccess();
+                }}
+              />
             </div>
           </form>
         </Form>

@@ -163,7 +163,7 @@ export default function ArticlesPublic() {
   const technologyArticles = articles.filter(a => a.category?.toLowerCase() === 'technology').map(transformArticle);
   const opportunitiesArticles = articles.filter(a => a.category?.toLowerCase() === 'opportunities').map(transformArticle);
   const youthArticles = articles.filter(a => a.category?.toLowerCase() === 'youth').map(transformArticle);
-  const cultureArticles = articles.filter(a => a.category?.toLowerCase() === 'culture').map(transformArticle);
+  const healthArticles = articles.filter(a => a.category?.toLowerCase() === 'health').map(transformArticle);
   const latestArticles = articles.slice(0, 6).map(transformArticle);
 
   // Get "Our Picks" articles from tagged articles, fallback to recent articles
@@ -272,10 +272,10 @@ export default function ArticlesPublic() {
             />
           )}
 
-          {cultureArticles.length > 0 && (
+          {healthArticles.length > 0 && (
             <NewsSection
-              title="Culture"
-              articles={cultureArticles}
+              title="Health"
+              articles={healthArticles}
               layout="grid"
             />
           )}

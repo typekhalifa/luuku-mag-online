@@ -64,7 +64,7 @@ const Header = () => {
     { name: "Finance", category: "finance" },
     { name: "Technology", category: "technology" },
     { name: "Youth", category: "youth" },
-    { name: "Culture", category: "culture" },
+    { name: "Health", category: "health" },
     { name: "Sport", category: "sport" },
     { name: "Opportunities", category: "opportunities" },
   ];
