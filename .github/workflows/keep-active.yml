@@ -2,8 +2,8 @@ name: Keep Supabase Project Active
 
 on:
   schedule:
-    # Run every 14 minutes to keep the project active
-    - cron: '*/14 * * * *'
+    # Run every 48 hours to keep the project active
+    - cron: '0 0 */2 * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
