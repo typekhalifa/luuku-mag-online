@@ -170,6 +170,65 @@ const ArticleDetail = () => {
   return (
     <Layout>
       <ReadingProgress />
+      
+      {/* Breadcrumb Schema for SEO */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://luuku-mag-online.vercel.app/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": article.category,
+              "item": `https://luuku-mag-online.vercel.app/articles?category=${encodeURIComponent(article.category)}`
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": article.title,
+              "item": `https://luuku-mag-online.vercel.app/article/${article.slug || article.id}`
+            }
+          ]
+        })}
+      </script>
+
+      {/* Article Schema for SEO */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "headline": article.title,
+          "description": article.excerpt,
+          "image": article.image_url,
+          "datePublished": article.published_at,
+          "dateModified": article.updated_at,
+          "author": {
+            "@type": "Person",
+            "name": article.author || "LUUKU MAG Editorial Team"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "LUUKU MAG",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://luuku-mag-online.vercel.app/lovable-uploads/logo.png"
+            }
+          },
+          "articleSection": article.category,
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://luuku-mag-online.vercel.app/article/${article.slug || article.id}`
+          }
+        })}
+      </script>
+
       <div className="container py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">

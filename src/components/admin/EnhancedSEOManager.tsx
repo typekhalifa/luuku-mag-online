@@ -249,13 +249,13 @@ const EnhancedSEOManager: React.FC = () => {
 
   const generateSitemap = async () => {
     try {
-      const { data: articles } = await supabase
-        .from("articles")
-        .select("slug, updated_at");
-
+      // Open the sitemap in a new tab
+      const sitemapUrl = 'https://nzdtjhnwkrsyerghdppm.supabase.co/functions/v1/generate-sitemap';
+      window.open(sitemapUrl, '_blank');
+      
       toast({
         title: "Sitemap Generated",
-        description: `Sitemap updated with ${articles?.length || 0} articles.`,
+        description: "Opening your sitemap in a new tab. You can save it as sitemap.xml and submit to Google Search Console.",
       });
     } catch (error) {
       toast({
