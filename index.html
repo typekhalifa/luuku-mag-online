@@ -18,6 +18,47 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@luukumag" />
     <meta name="twitter:image" content="https://luuku-mag-online.vercel.app/lovable-uploads/logo.png" />
+    
+    <!-- Structured Data for Google Sitelinks -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "LUUKU MAG",
+      "url": "https://luuku-mag-online.vercel.app/",
+      "description": "Your source for news, culture, politics, finance, technology and more",
+      "publisher": {
+        "@type": "Organization",
+        "name": "LUUKU MAG",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://luuku-mag-online.vercel.app/lovable-uploads/logo.png"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://luuku-mag-online.vercel.app/articles?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "LUUKU MAG",
+      "url": "https://luuku-mag-online.vercel.app/",
+      "logo": "https://luuku-mag-online.vercel.app/lovable-uploads/logo.png",
+      "sameAs": [
+        "https://twitter.com/luukumag"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "availableLanguage": "English"
+      }
+    }
+    </script>
   </head>
 
   <body>
