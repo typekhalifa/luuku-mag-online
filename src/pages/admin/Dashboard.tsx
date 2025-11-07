@@ -14,6 +14,7 @@ import AnalyticsGrowth from "@/components/admin/AnalyticsGrowth";
 import { SecurityMonitor } from "@/components/admin/SecurityMonitor";
 import DonationAnalytics from "@/components/admin/DonationAnalytics";
 import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
+import EnhancedSiteSettingsManager from "@/components/admin/EnhancedSiteSettingsManager";
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = React.useState({
@@ -175,6 +176,7 @@ const Dashboard: React.FC = () => {
             <TabsTrigger value="analytics" className="shrink-0">Analytics</TabsTrigger>
             <TabsTrigger value="donations" className="shrink-0">Donations</TabsTrigger>
             <TabsTrigger value="payment-settings" className="shrink-0">Payment Settings</TabsTrigger>
+            <TabsTrigger value="site-settings" className="shrink-0">Site Settings</TabsTrigger>
             <TabsTrigger value="overview" className="shrink-0">Overview</TabsTrigger>
           </TabsList>
 
@@ -273,6 +275,20 @@ const Dashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <PaymentSettingsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="site-settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Site Settings</CardTitle>
+                <CardDescription>
+                  Configure site information, SEO, Open Graph tags, and contact details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EnhancedSiteSettingsManager />
               </CardContent>
             </Card>
           </TabsContent>

@@ -17,6 +17,7 @@ interface SiteSettings {
   logoUrl: string;
   favicon: string;
   contactEmail: string;
+  contactPhone: string;
   socialMedia: {
     facebook: string;
     twitter: string;
@@ -33,6 +34,10 @@ interface SiteSettings {
     metaTitle: string;
     metaDescription: string;
     metaKeywords: string;
+    ogTitle: string;
+    ogDescription: string;
+    ogImage: string;
+    twitterHandle: string;
   };
 }
 
@@ -41,9 +46,10 @@ const EnhancedSiteSettingsManager: React.FC = () => {
     siteName: "Luuku Magazine",
     siteDescription: "Your trusted source for news and updates",
     siteUrl: "https://luuku-mag-online.vercel.app",
-    logoUrl: "",
+    logoUrl: "/lovable-uploads/logo.png",
     favicon: "",
     contactEmail: "contact@luukumag.com",
+    contactPhone: "",
     socialMedia: {
       facebook: "",
       twitter: "",
@@ -57,9 +63,13 @@ const EnhancedSiteSettingsManager: React.FC = () => {
       donationsEnabled: true,
     },
     seo: {
-      metaTitle: "Luuku Magazine - Latest News & Updates",
-      metaDescription: "Stay informed with the latest news, technology updates, and opportunities from around the world.",
+      metaTitle: "LUUKU MAG - Modern Online Magazine",
+      metaDescription: "LUUKU MAG - Your source for news, culture, politics, finance, technology and more",
       metaKeywords: "news, technology, world, opportunities, magazine",
+      ogTitle: "LUUKU MAG - Modern Online Magazine",
+      ogDescription: "LUUKU MAG - Your source for news, culture, politics, finance, technology and more",
+      ogImage: "https://luuku-mag-online.vercel.app/lovable-uploads/logo.png",
+      twitterHandle: "@luukumag",
     },
   });
 
@@ -92,6 +102,7 @@ const EnhancedSiteSettingsManager: React.FC = () => {
           logoUrl: (typeof settingsMap.logo_url === 'string' ? settingsMap.logo_url : settings.logoUrl),
           favicon: (typeof settingsMap.favicon === 'string' ? settingsMap.favicon : settings.favicon),
           contactEmail: (typeof settingsMap.contact_email === 'string' ? settingsMap.contact_email : settings.contactEmail),
+          contactPhone: (typeof settingsMap.contact_phone === 'string' ? settingsMap.contact_phone : settings.contactPhone),
           socialMedia: (typeof settingsMap.social_media === 'object' ? settingsMap.social_media : settings.socialMedia),
           features: (typeof settingsMap.features === 'object' ? settingsMap.features : settings.features),
           seo: (typeof settingsMap.seo_meta === 'object' ? settingsMap.seo_meta : settings.seo),
@@ -119,6 +130,7 @@ const EnhancedSiteSettingsManager: React.FC = () => {
         { key: 'logo_url', value: settings.logoUrl, type: 'general' },
         { key: 'favicon', value: settings.favicon, type: 'general' },
         { key: 'contact_email', value: settings.contactEmail, type: 'general' },
+        { key: 'contact_phone', value: settings.contactPhone, type: 'general' },
         { key: 'social_media', value: settings.socialMedia, type: 'social' },
         { key: 'features', value: settings.features, type: 'features' },
         { key: 'seo_meta', value: settings.seo, type: 'seo' },
@@ -258,6 +270,16 @@ const EnhancedSiteSettingsManager: React.FC = () => {
                 />
               </div>
             </div>
+            <div>
+              <Label htmlFor="contactPhone">Contact Phone</Label>
+              <Input
+                id="contactPhone"
+                type="tel"
+                value={settings.contactPhone}
+                onChange={(e) => setSettings(prev => ({ ...prev, contactPhone: e.target.value }))}
+                placeholder="+250 XXX XXX XXX"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -366,11 +388,11 @@ const EnhancedSiteSettingsManager: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* SEO Settings */}
+        {/* SEO & Open Graph Settings */}
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 dark:from-purple-950/50 dark:to-purple-900/50 dark:border-purple-800">
           <CardHeader>
-            <CardTitle>SEO Settings</CardTitle>
-            <CardDescription>Configure search engine optimization settings</CardDescription>
+            <CardTitle>SEO & Open Graph Settings</CardTitle>
+            <CardDescription>Configure meta tags for search engines and social media</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -379,6 +401,7 @@ const EnhancedSiteSettingsManager: React.FC = () => {
                 id="metaTitle"
                 value={settings.seo.metaTitle}
                 onChange={(e) => handleInputChange('seo', 'metaTitle', e.target.value)}
+                placeholder="Your Site - Description"
               />
             </div>
             <div>
@@ -387,7 +410,8 @@ const EnhancedSiteSettingsManager: React.FC = () => {
                 id="metaDescription"
                 value={settings.seo.metaDescription}
                 onChange={(e) => handleInputChange('seo', 'metaDescription', e.target.value)}
-                rows={3}
+                rows={2}
+                placeholder="A compelling description for search results"
               />
             </div>
             <div>
@@ -398,6 +422,48 @@ const EnhancedSiteSettingsManager: React.FC = () => {
                 onChange={(e) => handleInputChange('seo', 'metaKeywords', e.target.value)}
                 placeholder="news, technology, world, opportunities"
               />
+            </div>
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm">Open Graph (Social Media Preview)</h4>
+              <div>
+                <Label htmlFor="ogTitle">OG Title</Label>
+                <Input
+                  id="ogTitle"
+                  value={settings.seo.ogTitle}
+                  onChange={(e) => handleInputChange('seo', 'ogTitle', e.target.value)}
+                  placeholder="Title when shared on social media"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ogDescription">OG Description</Label>
+                <Textarea
+                  id="ogDescription"
+                  value={settings.seo.ogDescription}
+                  onChange={(e) => handleInputChange('seo', 'ogDescription', e.target.value)}
+                  rows={2}
+                  placeholder="Description when shared on social media"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ogImage">OG Image URL</Label>
+                <Input
+                  id="ogImage"
+                  value={settings.seo.ogImage}
+                  onChange={(e) => handleInputChange('seo', 'ogImage', e.target.value)}
+                  placeholder="https://yoursite.com/image.png"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Full URL to image (recommended: 1200x630px)</p>
+              </div>
+              <div>
+                <Label htmlFor="twitterHandle">Twitter Handle</Label>
+                <Input
+                  id="twitterHandle"
+                  value={settings.seo.twitterHandle}
+                  onChange={(e) => handleInputChange('seo', 'twitterHandle', e.target.value)}
+                  placeholder="@yourhandle"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
