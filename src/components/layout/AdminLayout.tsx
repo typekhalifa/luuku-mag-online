@@ -3,6 +3,7 @@ import React from "react";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminRole } from "@/hooks/useAdminRole";
+import { useInactivitySignOut } from "@/hooks/useInactivitySignOut";
 import { UnauthorizedAccess } from "./UnauthorizedAccess";
 import { SecurityEventLogger } from "@/components/security/SecurityEventLogger";
 import { Separator } from "@/components/ui/separator";
@@ -30,6 +31,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { user, signOut, isLoading: authLoading } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useAdminRole();
   const { theme, setTheme } = useTheme();
+  
+  // Auto sign out after 5 minutes of inactivity
+  useInactivitySignOut(5);
 
   // If authentication or role check is still being processed, show loading
   if (authLoading || roleLoading) {
