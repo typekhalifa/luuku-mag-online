@@ -25,7 +25,7 @@ serve(async (req) => {
 
     if (error) throw error;
 
-    const baseUrl = 'https://luuku-mag-online.vercel.app';
+    const baseUrl = 'https://luukumag.com';
     const currentDate = new Date().toISOString();
 
     // Generate XML sitemap

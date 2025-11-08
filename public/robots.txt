@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://luuku-mag-online.vercel.app/sitemap.xml
+Sitemap: https://luukumag.com/sitemap.xml

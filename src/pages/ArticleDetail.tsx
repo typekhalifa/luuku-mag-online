@@ -11,6 +11,7 @@ import ArticleFooter from "@/components/article/ArticleFooter";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import ArticleSkeleton from "@/components/article/ArticleSkeleton";
 import { toast } from "@/components/ui/use-toast";
+import { Helmet } from "react-helmet";
 
 interface ArticleWithViews {
   author: string | null;
@@ -167,8 +168,36 @@ const ArticleDetail = () => {
     );
   }
 
+  const articleUrl = `https://luukumag.com/article/${article.slug || article.id}`;
+  const articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
+
   return (
     <Layout>
+      <Helmet>
+        <title>{article.title} - LUUKU MAG</title>
+        <meta name="description" content={article.excerpt || article.title} />
+        <link rel="canonical" href={articleUrl} />
+        
+        {/* OpenGraph tags for social media */}
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.excerpt || article.title} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:image" content={articleImage} />
+        <meta property="og:site_name" content="LUUKU MAG" />
+        <meta property="article:published_time" content={article.published_at} />
+        <meta property="article:modified_time" content={article.updated_at} />
+        <meta property="article:section" content={article.category} />
+        <meta property="article:author" content={article.author || "LUUKU MAG Editorial Team"} />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@luukumag" />
+        <meta name="twitter:title" content={article.title} />
+        <meta name="twitter:description" content={article.excerpt || article.title} />
+        <meta name="twitter:image" content={articleImage} />
+      </Helmet>
+      
       <ReadingProgress />
       
       {/* Breadcrumb Schema for SEO */}
@@ -181,19 +210,19 @@ const ArticleDetail = () => {
               "@type": "ListItem",
               "position": 1,
               "name": "Home",
-              "item": "https://luuku-mag-online.vercel.app/"
+              "item": "https://luukumag.com/"
             },
             {
               "@type": "ListItem",
               "position": 2,
               "name": article.category,
-              "item": `https://luuku-mag-online.vercel.app/articles?category=${encodeURIComponent(article.category)}`
+              "item": `https://luukumag.com/articles?category=${encodeURIComponent(article.category)}`
             },
             {
               "@type": "ListItem",
               "position": 3,
               "name": article.title,
-              "item": `https://luuku-mag-online.vercel.app/article/${article.slug || article.id}`
+              "item": `https://luukumag.com/article/${article.slug || article.id}`
             }
           ]
         })}
@@ -218,13 +247,13 @@ const ArticleDetail = () => {
             "name": "LUUKU MAG",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://luuku-mag-online.vercel.app/lovable-uploads/logo.png"
+              "url": "https://luukumag.com/lovable-uploads/logo.png"
             }
           },
           "articleSection": article.category,
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://luuku-mag-online.vercel.app/article/${article.slug || article.id}`
+            "@id": `https://luukumag.com/article/${article.slug || article.id}`
           }
         })}
       </script>
