@@ -7,9 +7,9 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_A
 export default async function handler(req: any, res: any) {
   const { id } = req.query;
   
-  // Check if it's a bot/crawler
+  // Check if it's a bot/crawler - expanded detection
   const userAgent = req.headers['user-agent'] || '';
-  const isCrawler = /bot|crawler|spider|crawling|facebook|twitter|linkedinbot|whatsapp|telegram/i.test(userAgent);
+  const isCrawler = /bot|crawler|spider|crawling|facebook|twitter|linkedinbot|whatsapp|telegram|slack|discord|skype|pinterest|tumblr|reddit|instagram/i.test(userAgent);
   
   // If not a crawler, redirect to the SPA
   if (!isCrawler) {
@@ -38,9 +38,9 @@ export default async function handler(req: any, res: any) {
     
     const articleUrl = `https://luukumag.com/article/${article.slug || article.id}`;
     const articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
-    const articleTitle = article.title;
-    const articleDescription = article.excerpt || article.title;
-    const articleAuthor = article.author || 'LUUKU MAG Editorial Team';
+    const articleTitle = article.title.replace(/"/g, '&quot;');
+    const articleDescription = (article.excerpt || article.title).replace(/"/g, '&quot;').substring(0, 160);
+    const articleAuthor = (article.author || 'LUUKU MAG Editorial Team').replace(/"/g, '&quot;');
     
     // Return HTML with proper OG tags
     const html = `
@@ -59,6 +59,10 @@ export default async function handler(req: any, res: any) {
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${articleUrl}" />
     <meta property="og:image" content="${articleImage}" />
+    <meta property="og:image:secure_url" content="${articleImage}" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="LUUKU MAG" />
     <meta property="article:published_time" content="${article.published_at}" />
     <meta property="article:modified_time" content="${article.updated_at}" />
@@ -68,9 +72,15 @@ export default async function handler(req: any, res: any) {
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@luukumag" />
+    <meta name="twitter:creator" content="@luukumag" />
     <meta name="twitter:title" content="${articleTitle}" />
     <meta name="twitter:description" content="${articleDescription}" />
     <meta name="twitter:image" content="${articleImage}" />
+    
+    <!-- Additional meta tags for other platforms -->
+    <meta itemprop="name" content="${articleTitle}" />
+    <meta itemprop="description" content="${articleDescription}" />
+    <meta itemprop="image" content="${articleImage}" />
     
     <meta http-equiv="refresh" content="0;url=/article/${article.slug || article.id}" />
   </head>
