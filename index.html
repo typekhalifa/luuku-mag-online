@@ -31,44 +31,103 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://luukumag.com/" />
     
-    <!-- Structured Data for Google Sitelinks -->
+    <!-- Enhanced Structured Data for Rich Google Results -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "LUUKU MAG",
-      "url": "https://luukumag.com/",
-      "description": "Your source for news, culture, politics, finance, technology and more",
-      "publisher": {
-        "@type": "Organization",
-        "name": "LUUKU MAG",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://luukumag.com/lovable-uploads/logo.png"
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": "https://luukumag.com/#organization",
+          "name": "LUUKU MAG",
+          "alternateName": "LUUKU Magazine",
+          "url": "https://luukumag.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://luukumag.com/lovable-uploads/logo.png",
+            "width": 200,
+            "height": 60
+          },
+          "description": "Modern online magazine covering Politics, Business, Technology, Entertainment, Sports, and more. Breaking news and in-depth analysis.",
+          "sameAs": [
+            "https://twitter.com/luukumag",
+            "https://facebook.com/luukumag",
+            "https://instagram.com/luukumag"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Editorial Office",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://luukumag.com/#website",
+          "url": "https://luukumag.com",
+          "name": "LUUKU MAG - Modern Online Magazine",
+          "description": "Your source for Politics, Business, Technology, Entertainment, Sports, and more. Stay informed with breaking news and in-depth analysis.",
+          "publisher": {
+            "@id": "https://luukumag.com/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://luukumag.com/articles?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          },
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "ItemList",
+          "name": "Main Sections",
+          "itemListElement": [
+            {
+              "@type": "SiteNavigationElement",
+              "position": 1,
+              "name": "Politics",
+              "description": "Political news and analysis",
+              "url": "https://luukumag.com/articles?category=politics"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 2,
+              "name": "Business",
+              "description": "Business news and insights",
+              "url": "https://luukumag.com/articles?category=business"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 3,
+              "name": "Technology",
+              "description": "Latest tech news and innovations",
+              "url": "https://luukumag.com/articles?category=technology"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 4,
+              "name": "Entertainment",
+              "description": "Entertainment news and culture",
+              "url": "https://luukumag.com/articles?category=entertainment"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 5,
+              "name": "Sports",
+              "description": "Sports news and coverage",
+              "url": "https://luukumag.com/articles?category=sports"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 6,
+              "name": "All Articles",
+              "description": "Browse all articles",
+              "url": "https://luukumag.com/articles"
+            }
+          ]
         }
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://luukumag.com/articles?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "LUUKU MAG",
-      "url": "https://luukumag.com/",
-      "logo": "https://luukumag.com/lovable-uploads/logo.png",
-      "sameAs": [
-        "https://twitter.com/luukumag"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "Customer Service",
-        "availableLanguage": "English"
-      }
+      ]
     }
     </script>
   </head>
