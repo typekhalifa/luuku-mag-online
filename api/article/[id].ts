@@ -81,11 +81,13 @@ export default async function handler(req: any, res: any) {
     <meta itemprop="name" content="${articleTitle}" />
     <meta itemprop="description" content="${articleDescription}" />
     <meta itemprop="image" content="${articleImage}" />
-    
-    <meta http-equiv="refresh" content="0;url=/article/${article.slug || article.id}" />
   </head>
   <body>
-    <p>Redirecting to article...</p>
+    <article>
+      <h1>${articleTitle}</h1>
+      <p>${articleDescription}</p>
+      <p>Read the full article at <a href="${articleUrl}">${articleUrl}</a></p>
+    </article>
   </body>
 </html>`;
     
