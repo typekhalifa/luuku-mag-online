@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,20 +47,15 @@ const ArticleDetail = () => {
       try {
         console.log("Fetching article with ID:", id);
         
-        // First check if the article exists with proper UUID validation
         let articleQuery;
-        
-        // Check if ID is a valid UUID format
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         
         if (uuidRegex.test(id)) {
-          // Use UUID for exact match
           articleQuery = supabase
             .from("articles")
             .select("*")
             .eq("id", id);
         } else {
-          // Fallback to slug-based lookup
           articleQuery = supabase
             .from("articles")
             .select("*")
@@ -94,7 +88,6 @@ const ArticleDetail = () => {
         const currentViews = articleData.views || 0;
         setViewCount(currentViews + 1);
         
-        // Update view count
         const { error: updateError } = await supabase
           .from("articles")
           .update({ views: currentViews + 1 })
@@ -104,7 +97,6 @@ const ArticleDetail = () => {
           console.error("Error updating views:", updateError);
         }
         
-        // Fetch related articles
         const { data: related, error: relatedError } = await supabase
           .from("articles")
           .select("id, title, image_url, excerpt, category, published_at, views")
@@ -168,23 +160,38 @@ const ArticleDetail = () => {
     );
   }
 
-  const articleUrl = `https://luukumag.com/article/${article.slug || article.id}`;
+  // FIXED: Correct URL path to match your routing
+  const articleUrl = `https://luukumag.com/articles/${article.slug || article.id}`;
+  
+  // Use article image if available, otherwise fallback to logo
   const articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
+  
+  // Create a clean excerpt (remove HTML tags if any)
+  const cleanExcerpt = article.excerpt 
+    ? article.excerpt.replace(/<[^>]*>/g, '').substring(0, 160)
+    : article.title;
 
   return (
     <Layout>
       <Helmet>
         <title>{article.title} - LUUKU MAG</title>
-        <meta name="description" content={article.excerpt || article.title} />
+        <meta name="description" content={cleanExcerpt} />
         <link rel="canonical" href={articleUrl} />
         
-        {/* OpenGraph tags for social media */}
+        {/* Essential OpenGraph tags for Facebook */}
         <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.excerpt || article.title} />
+        <meta property="og:description" content={cleanExcerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:image" content={articleImage} />
+        <meta property="og:image:secure_url" content={articleImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={article.title} />
         <meta property="og:site_name" content="LUUKU MAG" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Article specific metadata */}
         <meta property="article:published_time" content={article.published_at} />
         <meta property="article:modified_time" content={article.updated_at} />
         <meta property="article:section" content={article.category} />
@@ -193,9 +200,11 @@ const ArticleDetail = () => {
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@luukumag" />
+        <meta name="twitter:creator" content="@luukumag" />
         <meta name="twitter:title" content={article.title} />
-        <meta name="twitter:description" content={article.excerpt || article.title} />
+        <meta name="twitter:description" content={cleanExcerpt} />
         <meta name="twitter:image" content={articleImage} />
+        <meta name="twitter:image:alt" content={article.title} />
       </Helmet>
       
       <ReadingProgress />
@@ -222,7 +231,7 @@ const ArticleDetail = () => {
               "@type": "ListItem",
               "position": 3,
               "name": article.title,
-              "item": `https://luukumag.com/article/${article.slug || article.id}`
+              "item": articleUrl
             }
           ]
         })}
@@ -234,8 +243,13 @@ const ArticleDetail = () => {
           "@context": "https://schema.org",
           "@type": "NewsArticle",
           "headline": article.title,
-          "description": article.excerpt,
-          "image": article.image_url,
+          "description": cleanExcerpt,
+          "image": {
+            "@type": "ImageObject",
+            "url": articleImage,
+            "width": 1200,
+            "height": 630
+          },
           "datePublished": article.published_at,
           "dateModified": article.updated_at,
           "author": {
@@ -247,13 +261,15 @@ const ArticleDetail = () => {
             "name": "LUUKU MAG",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://luukumag.com/lovable-uploads/logo.png"
+              "url": "https://luukumag.com/lovable-uploads/logo.png",
+              "width": 200,
+              "height": 60
             }
           },
           "articleSection": article.category,
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://luukumag.com/article/${article.slug || article.id}`
+            "@id": articleUrl
           }
         })}
       </script>
