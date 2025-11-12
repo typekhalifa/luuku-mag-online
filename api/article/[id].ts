@@ -25,11 +25,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).send('Article ID required');
   }
   
-  // Check if it's a bot/crawler - expanded detection
-  const userAgent = req.headers['user-agent'] || '';
-  const isCrawler = /bot|crawler|spider|crawling|facebook|twitter|linkedinbot|whatsapp|telegram|slack|discord|skype|pinterest|tumblr|reddit|instagram|facebookexternalhit|twitterbot|slackbot/i.test(userAgent);
+  // Check if it's a bot/crawler - MORE aggressive detection
+  const userAgent = (req.headers['user-agent'] || '').toLowerCase();
   
-  // If not a crawler, redirect to the SPA (FIXED: added 's' to articles)
+  // Comprehensive bot detection including all major social media crawlers
+  const botPatterns = [
+    'facebookexternalhit', 'facebot', 'facebook', 
+    'twitterbot', 'twitter',
+    'linkedinbot', 'linkedin',
+    'whatsapp', 'whatsappbot',
+    'telegrambot', 'telegram',
+    'slackbot', 'slack',
+    'discordbot', 'discord',
+    'pinterest', 'pinterestbot',
+    'tumblr', 'reddit',
+    'instagram', 'instagrambot',
+    'skype', 'skypebot',
+    'googlebot', 'bingbot', 'yandex',
+    'bot', 'crawler', 'spider', 'crawling', 'scraper'
+  ];
+  
+  const isCrawler = botPatterns.some(pattern => userAgent.includes(pattern));
+  
+  console.log(`Request from: ${req.headers['user-agent']?.substring(0, 100) || 'unknown'}`);
+  console.log(`Is Crawler: ${isCrawler}`);
+  
+  // If not a crawler, redirect to the SPA
   if (!isCrawler) {
     return res.redirect(307, `/articles/${id}`);
   }
