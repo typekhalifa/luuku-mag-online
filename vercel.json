@@ -1,12 +1,23 @@
 {
   "rewrites": [
     {
-      "source": "/article/:id",
+      "source": "/articles/:id",
       "destination": "/api/article/:id"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/article/:id",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=3600, stale-while-revalidate=86400"
+        }
+      ]
     }
   ]
 }
