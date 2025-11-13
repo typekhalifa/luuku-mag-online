@@ -13,8 +13,28 @@ module.exports = async function handler(req, res) {
   
   const userAgent = (req.headers['user-agent'] || '').toLowerCase();
   
-  console.log(`Crawler request from: ${userAgent.substring(0, 100)}`);
+  const botPatterns = [
+    'facebookexternalhit', 'facebot', 'facebook',
+    'twitterbot', 'twitter',
+    'linkedinbot', 'linkedin',
+    'whatsapp', 'whatsappbot',
+    'telegrambot', 'telegram',
+    'slackbot', 'slack',
+    'discordbot', 'discord',
+    'pinterest', 'pinterestbot',
+    'bot', 'crawler', 'spider'
+  ];
+  
+  const isCrawler = botPatterns.some(pattern => userAgent.includes(pattern));
+  
+  console.log(`Request from: ${userAgent.substring(0, 100)}`);
+  console.log(`Is Crawler: ${isCrawler}`);
   console.log(`Article ID: ${id}`);
+  
+  // If not a crawler, redirect to main domain to let SPA handle it
+  if (!isCrawler) {
+    return res.redirect(301, `https://www.luukumag.com/articles/${id}`);
+  }
   
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -97,6 +117,7 @@ function generateArticleHTML(data) {
     <link rel="canonical" href="${data.url}" />
     
     <!-- Essential OpenGraph tags for Facebook -->
+    <meta property="fb:app_id" content="1234567890" />
     <meta property="og:title" content="${data.title}" />
     <meta property="og:description" content="${data.description}" />
     <meta property="og:type" content="article" />
