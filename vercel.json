@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/articles/:id",
-      "destination": "https://nzdtjhnwkrsyerghdppm.supabase.co/functions/v1/article-preview?id=:id"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
