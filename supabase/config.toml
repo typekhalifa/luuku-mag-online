@@ -53,3 +53,9 @@ enable_confirmations = false
 
 [functions.umvapay-payment]
 verify_jwt = false
+
+[functions.send-newsletter]
+verify_jwt = true
+
+[functions.send-contact-reply]
+verify_jwt = true

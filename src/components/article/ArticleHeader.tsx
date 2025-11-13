@@ -72,7 +72,7 @@ const ArticleHeader = ({
             <span className="mx-1">•</span>
             <div className="flex items-center gap-1">
               <EyeIcon className="h-4 w-4" />
-              <span>{viewCount} views</span>
+              <span>{viewCount.toLocaleString()} views</span>
             </div>
             {content && (
               <>

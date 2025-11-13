@@ -12,7 +12,7 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
       <div className="space-y-6">
         <div className="prose prose-lg max-w-none">
           <ReactMarkdown 
-            className="text-base leading-relaxed"
+            className="text-base leading-relaxed text-justify"
             components={{
               a: ({ href, children, ...props }) => (
                 <a 
@@ -26,7 +26,7 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
                 </a>
               ),
               p: ({ children }) => (
-                <p className="mb-4 text-base leading-relaxed text-gray-700">
+                <p className="mb-4 text-base leading-relaxed text-gray-700 text-justify">
                   {children}
                 </p>
               ),
