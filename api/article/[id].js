@@ -31,9 +31,9 @@ module.exports = async function handler(req, res) {
   console.log(`Request from: ${userAgent.substring(0, 100)}`);
   console.log(`Is Crawler: ${isCrawler}`);
   
-  // If not a crawler, redirect to the SPA
+  // If not a crawler, redirect to the SPA with full URL to avoid rewrite loop
   if (!isCrawler) {
-    return res.redirect(307, `/articles/${id}`);
+    return res.redirect(307, `https://www.luukumag.com/articles/${id}`);
   }
   
   try {
