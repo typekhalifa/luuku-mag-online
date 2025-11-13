@@ -36,9 +36,25 @@ serve(async (req) => {
     console.log(`Request from: ${userAgent.substring(0, 100)}`);
     console.log(`Is Crawler: ${isCrawler}`);
     
-    // If not a crawler, redirect to the SPA
+    // If not a crawler, serve a simple HTML that tells them to use the main site
     if (!isCrawler) {
-      return Response.redirect(`https://www.luukumag.com/articles/${id}`, 307);
+      const simpleHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0;url=https://www.luukumag.com/articles/${id}">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>Redirecting to article... <a href="https://www.luukumag.com/articles/${id}">Click here if not redirected</a></p>
+  <script>window.location.href = 'https://www.luukumag.com/articles/${id}';</script>
+</body>
+</html>`;
+      return new Response(simpleHTML, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' }
+      });
     }
 
     // Create Supabase client
