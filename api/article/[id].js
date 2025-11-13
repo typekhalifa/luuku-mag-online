@@ -31,16 +31,20 @@ module.exports = async function handler(req, res) {
   console.log(`Is Crawler: ${isCrawler}`);
   console.log(`Article ID: ${id}`);
   
-  // If not a crawler, serve a simple redirect page that won't interfere with SPA routing
+  // If not a crawler, redirect to root and let SPA routing handle it client-side
   if (!isCrawler) {
+    // Redirect to root with a hash to prevent rewrite loop
     const redirectPage = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=/">
-  <script>window.location.replace("/articles/${id}");</script>
+  <script>
+    // Store the article ID and redirect to root
+    sessionStorage.setItem('redirectToArticle', '${id}');
+    window.location.href = '/';
+  </script>
 </head>
-<body><p>Loading...</p></body>
+<body><p>Loading article...</p></body>
 </html>`;
     
     res.setHeader('Content-Type', 'text/html');
