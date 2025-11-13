@@ -11,44 +11,10 @@ module.exports = async function handler(req, res) {
     return res.status(400).send('Article ID required');
   }
   
-  // Check if it's a bot/crawler
   const userAgent = (req.headers['user-agent'] || '').toLowerCase();
   
-  const botPatterns = [
-    'facebookexternalhit', 'facebot', 'facebook', 
-    'twitterbot', 'twitter',
-    'linkedinbot', 'linkedin',
-    'whatsapp', 'whatsappbot',
-    'telegrambot', 'telegram',
-    'slackbot', 'slack',
-    'discordbot', 'discord',
-    'pinterest', 'pinterestbot',
-    'bot', 'crawler', 'spider'
-  ];
-  
-  const isCrawler = botPatterns.some(pattern => userAgent.includes(pattern));
-  
-  console.log(`Request from: ${userAgent.substring(0, 100)}`);
-  console.log(`Is Crawler: ${isCrawler}`);
-  
-  // If not a crawler, return HTML with client-side redirect to avoid server-side loop
-  if (!isCrawler) {
-    const redirectHTML = `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0;url=https://www.luukumag.com/articles/${id}" />
-    <script>window.location.href="https://www.luukumag.com/articles/${id}";</script>
-    <title>Redirecting...</title>
-  </head>
-  <body>
-    <p>Redirecting to article...</p>
-  </body>
-</html>`;
-    
-    res.setHeader('Content-Type', 'text/html');
-    return res.status(200).send(redirectHTML);
-  }
+  console.log(`Crawler request from: ${userAgent.substring(0, 100)}`);
+  console.log(`Article ID: ${id}`);
   
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
