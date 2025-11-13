@@ -31,9 +31,23 @@ module.exports = async function handler(req, res) {
   console.log(`Request from: ${userAgent.substring(0, 100)}`);
   console.log(`Is Crawler: ${isCrawler}`);
   
-  // If not a crawler, redirect to the SPA with full URL to avoid rewrite loop
+  // If not a crawler, return HTML with client-side redirect to avoid server-side loop
   if (!isCrawler) {
-    return res.redirect(307, `https://www.luukumag.com/articles/${id}`);
+    const redirectHTML = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0;url=https://www.luukumag.com/articles/${id}" />
+    <script>window.location.href="https://www.luukumag.com/articles/${id}";</script>
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>Redirecting to article...</p>
+  </body>
+</html>`;
+    
+    res.setHeader('Content-Type', 'text/html');
+    return res.status(200).send(redirectHTML);
   }
   
   try {
