@@ -36,12 +36,27 @@ serve(async (req) => {
     console.log(`Request from: ${userAgent.substring(0, 100)}`);
     console.log(`Is Crawler: ${isCrawler}`);
     
-    // If not a crawler, redirect properly so the SPA can handle it
+    // If not a crawler, serve the SPA so it can handle routing client-side
     if (!isCrawler) {
-      return new Response(null, {
-        status: 302,
+      const spaHTML = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/lovable-uploads/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LUUKU MAG - African News & Culture</title>
+    <meta name="description" content="Your source for African news, culture, and stories" />
+    <script type="module" crossorigin src="/assets/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`;
+      return new Response(spaHTML, {
+        status: 200,
         headers: { 
-          'Location': `https://www.luukumag.com/articles/${id}`,
+          'Content-Type': 'text/html',
           ...corsHeaders
         }
       });
