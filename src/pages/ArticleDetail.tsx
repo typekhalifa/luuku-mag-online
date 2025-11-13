@@ -89,11 +89,13 @@ const ArticleDetail = () => {
         setViewCount(currentViews + 1);
         
         // Use RPC function to increment views (bypasses RLS)
-        const { error: updateError } = await supabase
-          .rpc("increment_article_views", { article_id: articleData.id });
+        const { data: rpcData, error: updateError } = await supabase
+          .rpc("increment_article_views" as any, { article_id: articleData.id });
           
         if (updateError) {
           console.error("Error updating views:", updateError);
+        } else {
+          console.log("Views incremented successfully for article:", articleData.id);
         }
         
         const { data: related, error: relatedError } = await supabase
@@ -163,7 +165,12 @@ const ArticleDetail = () => {
   const articleUrl = `https://luukumag.com/articles/${article.slug || article.id}`;
   
   // Use article image if available, otherwise fallback to logo
-  const articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
+  // Ensure image URL is absolute
+  const articleImage = article.image_url && article.image_url.startsWith('http') 
+    ? article.image_url 
+    : article.image_url 
+      ? `https://luukumag.com${article.image_url}`
+      : 'https://luukumag.com/lovable-uploads/logo.png';
   
   // Create a clean excerpt (remove HTML tags if any)
   const cleanExcerpt = article.excerpt 
@@ -178,7 +185,7 @@ const ArticleDetail = () => {
         <link rel="canonical" href={articleUrl} />
         
         {/* Essential OpenGraph tags for Facebook */}
-        <meta property="og:title" content={article.title} />
+        <meta property="og:title" content={`${article.title} - LUUKU MAG`} />
         <meta property="og:description" content={cleanExcerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={articleUrl} />
@@ -187,6 +194,7 @@ const ArticleDetail = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={article.title} />
+        <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:site_name" content="LUUKU MAG" />
         <meta property="og:locale" content="en_US" />
         
