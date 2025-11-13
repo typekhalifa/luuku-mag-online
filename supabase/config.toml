@@ -54,6 +54,9 @@ enable_confirmations = false
 [functions.umvapay-payment]
 verify_jwt = false
 
+[functions.article-preview]
+verify_jwt = false
+
 [functions.send-newsletter]
 verify_jwt = true
 
