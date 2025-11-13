@@ -86,11 +86,22 @@ serve(async (req) => {
     
     const articleUrl = `https://www.luukumag.com/articles/${article.slug || article.id}`;
     
-    // Ensure image URL is absolute
-    let articleImage = article.image_url || 'https://www.luukumag.com/lovable-uploads/logo.png';
-    if (articleImage && !articleImage.startsWith('http')) {
-      articleImage = `https://www.luukumag.com${articleImage}`;
+    // Ensure image URL is absolute with www and proper extension
+    let articleImage = article.image_url;
+    
+    if (!articleImage || articleImage.trim() === '') {
+      articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
+    } else if (!articleImage.startsWith('http')) {
+      // Relative URL - make it absolute
+      articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
+    } else {
+      // Already absolute - ensure www
+      articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
     }
+    
+    console.log('Article URL:', articleUrl);
+    console.log('Article Image from DB:', article.image_url);
+    console.log('Final Article Image:', articleImage);
     
     // Determine image type
     const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
@@ -162,6 +173,7 @@ function generateArticleHTML(data: {
     <link rel="canonical" href="${data.url}" />
     
     <!-- Essential OpenGraph tags -->
+    <meta property="fb:app_id" content="1234567890" />
     <meta property="og:title" content="${data.title}" />
     <meta property="og:description" content="${data.description}" />
     <meta property="og:type" content="article" />
@@ -173,6 +185,7 @@ function generateArticleHTML(data: {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${data.title}" />
     <meta property="og:site_name" content="LUUKU MAG" />
+    <meta property="og:locale" content="en_US" />
     
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
