@@ -88,10 +88,9 @@ const ArticleDetail = () => {
         const currentViews = articleData.views || 0;
         setViewCount(currentViews + 1);
         
+        // Use RPC function to increment views (bypasses RLS)
         const { error: updateError } = await supabase
-          .from("articles")
-          .update({ views: currentViews + 1 })
-          .eq("id", articleData.id);
+          .rpc("increment_article_views", { article_id: articleData.id });
           
         if (updateError) {
           console.error("Error updating views:", updateError);
