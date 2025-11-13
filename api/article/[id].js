@@ -78,15 +78,26 @@ module.exports = async function handler(req, res) {
     // Ensure image URL is absolute with www and proper extension
     let articleImage = article.image_url;
     
+    console.log('=== IMAGE URL DEBUG ===');
+    console.log('Raw article.image_url:', article.image_url);
+    
     if (!articleImage || articleImage.trim() === '') {
+      console.log('No image found, using fallback logo');
       articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
     } else if (!articleImage.startsWith('http')) {
       // Relative URL - make it absolute with www
+      console.log('Converting relative URL to absolute');
       articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
-    } else {
-      // Already absolute - ensure www subdomain
+    } else if (articleImage.includes('luukumag.com')) {
+      // Already absolute luukumag URL - ensure www subdomain
+      console.log('Ensuring www subdomain for luukumag URL');
       articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
+      articleImage = articleImage.replace('://luukumag.com:', '://www.luukumag.com:');
     }
+    // If it's a Supabase or other external URL, leave it as-is
+    
+    console.log('Final articleImage:', articleImage);
+    console.log('======================');
     
     console.log('Article URL:', articleUrl);
     console.log('Article Image from DB:', article.image_url);
