@@ -29,6 +29,11 @@ const Footer = () => {
     setSubLoading(true);
     const { error } = await supabase.from("subscriptions").insert({ email: subEmail.trim() });
     if (!error) {
+      // Send welcome email in the background
+      supabase.functions.invoke("send-welcome-email", {
+        body: { email: subEmail.trim() }
+      }).catch(err => console.error("Failed to send welcome email:", err));
+      
       navigate(`/newsletter/confirmation?email=${encodeURIComponent(subEmail.trim())}`);
       setSubEmail("");
     } else if (error.code === "23505") {
