@@ -94,15 +94,26 @@ serve(async (req) => {
     // Ensure image URL is absolute with www and proper extension
     let articleImage = article.image_url;
     
+    console.log('=== IMAGE URL DEBUG ===');
+    console.log('Raw article.image_url:', article.image_url);
+    
     if (!articleImage || articleImage.trim() === '') {
+      console.log('No image found, using fallback logo');
       articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
     } else if (!articleImage.startsWith('http')) {
-      // Relative URL - make it absolute
+      // Relative URL - make it absolute with www
+      console.log('Converting relative URL to absolute');
       articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
-    } else {
-      // Already absolute - ensure www
+    } else if (articleImage.includes('luukumag.com')) {
+      // Already absolute luukumag URL - ensure www subdomain
+      console.log('Ensuring www subdomain for luukumag URL');
       articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
+      articleImage = articleImage.replace('://luukumag.com:', '://www.luukumag.com:');
     }
+    // If it's a Supabase or other external URL, leave it as-is
+    
+    console.log('Final articleImage:', articleImage);
+    console.log('======================');
     
     console.log('Article URL:', articleUrl);
     console.log('Article Image from DB:', article.image_url);
@@ -177,7 +188,7 @@ function generateArticleHTML(data: {
     <meta name="description" content="${data.description}" />
     <link rel="canonical" href="${data.url}" />
     
-    <!-- Essential OpenGraph tags -->
+    <!-- Essential OpenGraph tags for Facebook -->
     <meta property="fb:app_id" content="1234567890" />
     <meta property="og:title" content="${data.title}" />
     <meta property="og:description" content="${data.description}" />
@@ -192,14 +203,22 @@ function generateArticleHTML(data: {
     <meta property="og:site_name" content="LUUKU MAG" />
     <meta property="og:locale" content="en_US" />
     
+    <!-- Article metadata -->
+    <meta property="article:published_time" content="${data.publishedAt}" />
+    <meta property="article:modified_time" content="${data.updatedAt}" />
+    <meta property="article:section" content="${data.category}" />
+    <meta property="article:author" content="${data.author}" />
+    
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@luukumag" />
+    <meta name="twitter:creator" content="@luukumag" />
     <meta name="twitter:title" content="${data.title}" />
     <meta name="twitter:description" content="${data.description}" />
     <meta name="twitter:image" content="${data.image}" />
+    <meta name="twitter:image:alt" content="${data.title}" />
     
-    <!-- Redirect to actual article -->
+    <!-- Redirect to actual article after meta tags load -->
     <meta http-equiv="refresh" content="0;url=${data.url}" />
     <script>window.location.href="${data.url}";</script>
   </head>
