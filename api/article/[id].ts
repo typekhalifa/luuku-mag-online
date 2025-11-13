@@ -78,7 +78,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // FIXED: Use /articles/ path (with 's')
     const articleUrl = `https://luukumag.com/articles/${article.slug || article.id}`;
-    const articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
+    
+    // Ensure image URL is absolute
+    let articleImage = article.image_url || 'https://luukumag.com/lovable-uploads/logo.png';
+    if (articleImage && !articleImage.startsWith('http')) {
+      articleImage = `https://luukumag.com${articleImage}`;
+    }
+    
+    // Determine image type from URL
+    const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
+    const imageType = imageExtension === 'png' ? 'image/png' : 'image/jpeg';
     
     // Better HTML escaping
     const escapeHtml = (text: string) => {
@@ -103,6 +112,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       description: articleDescription,
       url: articleUrl,
       image: articleImage,
+      imageType: imageType,
       author: articleAuthor,
       publishedAt: article.published_at,
       updatedAt: article.updated_at,
@@ -123,6 +133,7 @@ function generateArticleHTML(data: {
   description: string;
   url: string;
   image: string;
+  imageType: string;
   author: string;
   publishedAt: string;
   updatedAt: string;
@@ -153,7 +164,7 @@ function generateArticleHTML(data: {
     <meta property="og:url" content="${data.url}" />
     <meta property="og:image" content="${data.image}" />
     <meta property="og:image:secure_url" content="${data.image}" />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:type" content="${data.imageType}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${data.title}" />
