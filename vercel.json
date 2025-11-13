@@ -2,6 +2,13 @@
   "rewrites": [
     {
       "source": "/articles/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|crawler|spider|facebookexternalhit|twitterbot|whatsapp|linkedinbot|telegrambot|slackbot|discordbot|pinterest).*"
+        }
+      ],
       "destination": "/api/article/:id"
     },
     {
