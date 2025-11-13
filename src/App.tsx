@@ -1,10 +1,10 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DDoSProtection } from "@/components/DDoSProtection";
@@ -26,6 +26,21 @@ import NewsletterConfirmation from "./pages/NewsletterConfirmation";
 
 const queryClient = new QueryClient();
 
+// Component to handle redirects from social preview
+const RedirectHandler = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const redirectArticle = sessionStorage.getItem('redirectToArticle');
+    if (redirectArticle) {
+      sessionStorage.removeItem('redirectToArticle');
+      navigate(`/articles/${redirectArticle}`, { replace: true });
+    }
+  }, [navigate]);
+  
+  return null;
+};
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -37,6 +52,7 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <RedirectHandler />
                   <ScrollToTop />
                   <Routes>
                     <Route path="/" element={<Index />} />

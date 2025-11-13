@@ -161,16 +161,22 @@ const ArticleDetail = () => {
     );
   }
 
-  // FIXED: Correct URL path to match your routing
-  const articleUrl = `https://luukumag.com/articles/${article.slug || article.id}`;
+  // FIXED: Correct URL path to match your routing with www subdomain
+  const articleUrl = `https://www.luukumag.com/articles/${article.slug || article.id}`;
   
   // Use article image if available, otherwise fallback to logo
-  // Ensure image URL is absolute
-  const articleImage = article.image_url && article.image_url.startsWith('http') 
-    ? article.image_url 
-    : article.image_url 
-      ? `https://luukumag.com${article.image_url}`
-      : 'https://luukumag.com/lovable-uploads/logo.png';
+  // Ensure image URL is absolute with www subdomain
+  let articleImage = article.image_url;
+  
+  if (!articleImage || articleImage.trim() === '') {
+    articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
+  } else if (!articleImage.startsWith('http')) {
+    // Relative URL - make it absolute with www
+    articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
+  } else {
+    // Already absolute - ensure www subdomain
+    articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
+  }
   
   // Determine image type from URL
   const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
