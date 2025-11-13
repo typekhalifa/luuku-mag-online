@@ -172,6 +172,10 @@ const ArticleDetail = () => {
       ? `https://luukumag.com${article.image_url}`
       : 'https://luukumag.com/lovable-uploads/logo.png';
   
+  // Determine image type from URL
+  const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
+  const imageType = imageExtension === 'png' ? 'image/png' : 'image/jpeg';
+  
   // Create a clean excerpt (remove HTML tags if any)
   const cleanExcerpt = article.excerpt 
     ? article.excerpt.replace(/<[^>]*>/g, '').substring(0, 160)
@@ -194,7 +198,7 @@ const ArticleDetail = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={article.title} />
-        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:type" content={imageType} />
         <meta property="og:site_name" content="LUUKU MAG" />
         <meta property="og:locale" content="en_US" />
         
