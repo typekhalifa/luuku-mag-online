@@ -31,10 +31,23 @@ module.exports = async function handler(req, res) {
   console.log(`Is Crawler: ${isCrawler}`);
   console.log(`Article ID: ${id}`);
   
-  // If not a crawler, redirect to main domain to let SPA handle it
+  // If not a crawler, serve a simple redirect page that won't interfere with SPA routing
   if (!isCrawler) {
-    return res.redirect(301, `https://www.luukumag.com/articles/${id}`);
+    const redirectPage = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url=/">
+  <script>window.location.replace("/articles/${id}");</script>
+</head>
+<body><p>Loading...</p></body>
+</html>`;
+    
+    res.setHeader('Content-Type', 'text/html');
+    return res.status(200).send(redirectPage);
   }
+  
+  // For crawlers, continue to generate proper meta tags below
   
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -59,11 +72,16 @@ module.exports = async function handler(req, res) {
     
     const articleUrl = `https://www.luukumag.com/articles/${article.slug || article.id}`;
     
-    // Ensure image URL is absolute
+    // Ensure image URL is absolute with www
     let articleImage = article.image_url || 'https://www.luukumag.com/lovable-uploads/logo.png';
     if (articleImage && !articleImage.startsWith('http')) {
       articleImage = `https://www.luukumag.com${articleImage}`;
     }
+    // Force www if missing
+    articleImage = articleImage.replace('https://luukumag.com/', 'https://www.luukumag.com/');
+    
+    console.log('Article URL:', articleUrl);
+    console.log('Article Image:', articleImage);
     
     // Determine image type from URL
     const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
