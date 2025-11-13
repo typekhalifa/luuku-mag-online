@@ -72,16 +72,22 @@ module.exports = async function handler(req, res) {
     
     const articleUrl = `https://www.luukumag.com/articles/${article.slug || article.id}`;
     
-    // Ensure image URL is absolute with www
-    let articleImage = article.image_url || 'https://www.luukumag.com/lovable-uploads/logo.png';
-    if (articleImage && !articleImage.startsWith('http')) {
-      articleImage = `https://www.luukumag.com${articleImage}`;
+    // Ensure image URL is absolute with www and proper extension
+    let articleImage = article.image_url;
+    
+    if (!articleImage || articleImage.trim() === '') {
+      articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
+    } else if (!articleImage.startsWith('http')) {
+      // Relative URL - make it absolute
+      articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
+    } else {
+      // Already absolute - ensure www
+      articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
     }
-    // Force www if missing
-    articleImage = articleImage.replace('https://luukumag.com/', 'https://www.luukumag.com/');
     
     console.log('Article URL:', articleUrl);
-    console.log('Article Image:', articleImage);
+    console.log('Article Image from DB:', article.image_url);
+    console.log('Final Article Image:', articleImage);
     
     // Determine image type from URL
     const imageExtension = articleImage.split('.').pop()?.toLowerCase() || 'jpeg';
