@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/articles/:id",
-      "destination": "/api/article/:id"
+      "destination": "https://nzdtjhnwkrsyerghdppm.supabase.co/functions/v1/article-preview?id=:id"
     },
     {
       "source": "/(.*)",
