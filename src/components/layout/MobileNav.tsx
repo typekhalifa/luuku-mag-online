@@ -70,21 +70,27 @@ const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
         
         <div className="flex items-center justify-center p-4 border-t dark:border-gray-800 gap-6">
           <a
-            href="#"
+            href="https://facebook.com/luukumag1"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Facebook"
             className="p-2 transition-colors hover:text-highlight"
           >
             <Facebook size={20} />
           </a>
           <a
-            href="#"
+            href="https://twitter.com/luukumag1"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Twitter"
             className="p-2 transition-colors hover:text-highlight"
           >
             <Twitter size={20} />
           </a>
           <a
-            href="#"
+            href="https://instagram.com/luukumag1"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Instagram"
             className="p-2 transition-colors hover:text-highlight"
           >

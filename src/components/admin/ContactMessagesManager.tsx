@@ -130,10 +130,34 @@ const ContactMessagesManager: React.FC = () => {
     }
   };
 
-  const replyToMessage = (email: string, name: string | null) => {
-    const subject = `Re: Your message to our magazine`;
-    const body = `Hello ${name || 'there'},\n\nThank you for contacting us. We have received your message and will get back to you soon.\n\nBest regards,\nThe Magazine Team`;
-    window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  const replyToMessage = async (messageId: string, email: string, name: string | null) => {
+    const replyMessage = prompt(`Enter your reply to ${name || email}:`);
+    if (!replyMessage) return;
+
+    try {
+      const { error } = await supabase.functions.invoke("send-contact-reply", {
+        body: {
+          messageId,
+          replyMessage,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Reply sent successfully",
+      });
+
+      fetchMessages();
+    } catch (error) {
+      console.error("Error sending reply:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send reply",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -254,7 +278,7 @@ const ContactMessagesManager: React.FC = () => {
                               </div>
                               <div className="flex gap-2 pt-4">
                                 <Button
-                                  onClick={() => replyToMessage(message.email, message.name)}
+                                  onClick={() => replyToMessage(message.id, message.email, message.name)}
                                   className="flex-1"
                                 >
                                   <ReplyIcon className="h-4 w-4 mr-2" />
@@ -290,7 +314,7 @@ const ContactMessagesManager: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => replyToMessage(message.email, message.name)}
+                          onClick={() => replyToMessage(message.id, message.email, message.name)}
                         >
                           <ReplyIcon className="h-4 w-4" />
                         </Button>

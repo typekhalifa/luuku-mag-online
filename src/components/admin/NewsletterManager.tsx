@@ -92,8 +92,15 @@ const NewsletterManager: React.FC = () => {
 
     setSending(true);
     try {
-      // In a real application, you would integrate with an email service like SendGrid, Mailgun, etc.
-      // For now, we'll just show a success message
+      const { error } = await supabase.functions.invoke("send-newsletter", {
+        body: {
+          subject: sanitizedSubject,
+          content: sanitizedContent,
+        },
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Newsletter Sent",
         description: `Newsletter sent to ${subscriptions.length} subscribers`,
