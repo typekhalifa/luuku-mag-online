@@ -81,10 +81,10 @@ module.exports = async function handler(req, res) {
     if (!articleImage || articleImage.trim() === '') {
       articleImage = 'https://www.luukumag.com/lovable-uploads/logo.png';
     } else if (!articleImage.startsWith('http')) {
-      // Relative URL - make it absolute
+      // Relative URL - make it absolute with www
       articleImage = `https://www.luukumag.com${articleImage.startsWith('/') ? '' : '/'}${articleImage}`;
     } else {
-      // Already absolute - ensure www
+      // Already absolute - ensure www subdomain
       articleImage = articleImage.replace('://luukumag.com/', '://www.luukumag.com/');
     }
     
