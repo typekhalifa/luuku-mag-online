@@ -26,22 +26,61 @@ const Footer = () => {
   async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     if (!subEmail.trim()) return;
+
     setSubLoading(true);
-    const { error } = await supabase.from("subscriptions").insert({ email: subEmail.trim() });
-    if (!error) {
-      // Send welcome email in the background
-      supabase.functions.invoke("send-welcome-email", {
-        body: { email: subEmail.trim() }
-      }).catch(err => console.error("Failed to send welcome email:", err));
-      
+    try {
+      // Check if already subscribed
+      const { data: existing } = await supabase
+        .from("newsletter_subscriptions")
+        .select("status")
+        .eq("email", subEmail.trim())
+        .single();
+
+      if (existing) {
+        if (existing.status === "active") {
+          toast.info("Already subscribed", { description: "You're already subscribed to our newsletter!" });
+          setSubEmail("");
+          setSubLoading(false);
+          return;
+        } else {
+          // Reactivate subscription
+          const { error } = await supabase
+            .from("newsletter_subscriptions")
+            .update({ status: "active", unsubscribed_at: null })
+            .eq("email", subEmail.trim());
+
+          if (error) throw error;
+          toast.success("Welcome back!", { description: "You're subscribed again 🎉" });
+          setSubEmail("");
+          setSubLoading(false);
+          return;
+        }
+      }
+
+      // New subscription
+      const { data: newSub, error: insertError } = await supabase
+        .from("newsletter_subscriptions")
+        .insert({ email: subEmail.trim(), status: "active" })
+        .select("unsubscribe_token")
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Send welcome email
+      if (newSub?.unsubscribe_token) {
+        supabase.functions.invoke("send-welcome-email", {
+          body: { email: subEmail.trim(), unsubscribeToken: newSub.unsubscribe_token },
+        }).catch(err => console.error("Failed to send welcome email:", err));
+      }
+
       navigate(`/newsletter/confirmation?email=${encodeURIComponent(subEmail.trim())}`);
       setSubEmail("");
-    } else if (error.code === "23505") {
-      toast.error("Already subscribed", { description: "This email is already signed up." });
-    } else {
+    } catch (error: any) {
+      console.error("Error subscribing:", error);
       toast.error("Something went wrong", { description: error.message });
+    } finally {
+      setSubLoading(false);
     }
-    setSubLoading(false);
   }
 
   // Contact Us form handler

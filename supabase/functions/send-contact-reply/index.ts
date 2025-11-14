@@ -46,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { messageId, replyMessage }: ContactReplyRequest = await req.json();
 
     const { data: message, error: messageError } = await supabaseClient
-      .from("contact_messages")
+      .from("contacts")
       .select("*")
       .eq("id", messageId)
       .single();
@@ -65,7 +65,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "LUUKU MAG <support@luukumag.com>",
       to: message.email,
-      subject: `Re: ${message.subject}`,
+      subject: `Re: ${message.subject || 'Your message'}`,
       html: `
         <h2>Thank you for contacting LUUKU MAG</h2>
         <p>Dear ${message.name},</p>
@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     await supabaseClient
-      .from("contact_messages")
+      .from("contacts")
       .update({ replied: true, reply_message: replyMessage })
       .eq("id", messageId);
 
