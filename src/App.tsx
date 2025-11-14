@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DDoSProtection } from "@/components/DDoSProtection";
@@ -26,6 +25,22 @@ import NewsletterConfirmation from "./pages/NewsletterConfirmation";
 
 const queryClient = new QueryClient();
 
+// Wrapper component to handle redirects from edge function
+const IndexWithRedirect = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const redirectPath = searchParams.get('redirect');
+    if (redirectPath) {
+      // Remove the redirect param and navigate to the intended path
+      navigate(redirectPath, { replace: true });
+    }
+  }, [searchParams, navigate]);
+
+  return <Index />;
+};
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -39,7 +54,7 @@ const App = () => {
                 <BrowserRouter>
                   <ScrollToTop />
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<IndexWithRedirect />} />
                     <Route path="/articles" element={<ArticlesPublic />} />
                     <Route path="/donate" element={<Donate />} />
                     <Route path="/checkout" element={<Checkout />} />
