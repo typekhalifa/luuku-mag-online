@@ -36,39 +36,38 @@ serve(async (req) => {
     console.log(`Request from: ${userAgent.substring(0, 100)}`);
     console.log(`Is Crawler: ${isCrawler}`);
     
-    // If not a crawler, serve the SPA's index.html so it can handle routing client-side
+    // If not a crawler, redirect to home and let React Router handle the article
     if (!isCrawler) {
-      try {
-        const spaResponse = await fetch('https://www.luukumag.com/index.html');
-        const spaHtml = await spaResponse.text();
-        
-        return new Response(spaHtml, {
-          status: 200,
-          headers: { 
-            'Content-Type': 'text/html',
-            ...corsHeaders
-          }
-        });
-      } catch (error) {
-        console.error('Failed to fetch SPA:', error);
-        // Fallback: serve basic HTML with client-side navigation
-        return new Response(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <script>window.location.href = '/articles/${id}';</script>
-            </head>
-            <body>Loading...</body>
-          </html>
-        `, {
-          status: 200,
-          headers: { 
-            'Content-Type': 'text/html',
-            ...corsHeaders
-          }
-        });
-      }
+      // Use a client-side redirect that preserves the URL path
+      const redirectHtml = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading...</title>
+    <script>
+      // Preserve the current URL path and redirect to root
+      // React Router will then handle the routing
+      const currentPath = window.location.pathname;
+      window.location.replace('/?redirect=' + encodeURIComponent(currentPath));
+    </script>
+  </head>
+  <body>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+      Loading article...
+    </div>
+  </body>
+</html>
+      `;
+      
+      return new Response(redirectHtml, {
+        status: 200,
+        headers: { 
+          'Content-Type': 'text/html',
+          ...corsHeaders
+        }
+      });
     }
 
     // Create Supabase client
