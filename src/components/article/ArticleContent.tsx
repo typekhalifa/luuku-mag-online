@@ -27,11 +27,6 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="text-highlight hover:underline font-medium"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      window.open(finalHref, '_blank', 'noopener,noreferrer');
-                    }}
                     {...props}
                   >
                     {children}
