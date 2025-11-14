@@ -1,5 +1,4 @@
 import React from "react";
-import { lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,8 @@ import Donate from "./pages/Donate";
 import Checkout from "./pages/Checkout";
 import Unsubscribe from "./pages/Unsubscribe";
 import AdminAnalytics from "./pages/Analytics";
+import NewsletterConfirmation from "./pages/NewsletterConfirmation";
+import NewsletterTemplatesPage from "./pages/admin/NewsletterTemplates";
 
 const queryClient = new QueryClient();
 
@@ -61,12 +62,12 @@ const App = () => {
                     <Route path="/donate" element={<Donate />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/unsubscribe" element={<Unsubscribe />} />
-                    <Route path="/newsletter/confirmation" element={lazy(() => import("./pages/NewsletterConfirmation"))} />
+                    <Route path="/newsletter/confirmation" element={<NewsletterConfirmation />} />
                     <Route path="/admin/login" element={<Login />} />
                     <Route path="/admin" element={<Dashboard />} />
                     <Route path="/admin/articles" element={<Articles />} />
                     <Route path="/admin/analytics" element={<Analytics />} />
-                    <Route path="/admin/newsletter-templates" element={lazy(() => import("./pages/admin/NewsletterTemplates"))} />
+                    <Route path="/admin/newsletter-templates" element={<NewsletterTemplatesPage />} />
                     <Route path="/admin/users" element={<Users />} />
                     <Route path="/admin/comments" element={<Comments />} />
                     <Route path="/articles/:id" element={<ArticleDetail />} />
