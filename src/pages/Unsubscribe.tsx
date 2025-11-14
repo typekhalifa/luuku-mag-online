@@ -27,14 +27,14 @@ const Unsubscribe = () => {
     if (!token) return;
     
     const { data } = await supabase
-      .from("newsletter_subscriptions")
+      .from("newsletter_subscriptions" as any)
       .select("email, status")
       .eq("unsubscribe_token", token)
-      .single();
+      .maybeSingle();
     
     if (data) {
-      setEmail(data.email);
-      if (data.status === "unsubscribed") {
+      setEmail((data as any).email);
+      if ((data as any).status === "unsubscribed") {
         setUnsubscribed(true);
       }
     }
@@ -49,7 +49,7 @@ const Unsubscribe = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from("newsletter_subscriptions")
+        .from("newsletter_subscriptions" as any)
         .update({ 
           status: "unsubscribed",
           unsubscribed_at: new Date().toISOString()
@@ -84,7 +84,7 @@ const Unsubscribe = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from("newsletter_subscriptions")
+        .from("newsletter_subscriptions" as any)
         .update({ 
           status: "active",
           unsubscribed_at: null

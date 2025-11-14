@@ -31,13 +31,13 @@ const Footer = () => {
     try {
       // Check if already subscribed
       const { data: existing } = await supabase
-        .from("newsletter_subscriptions")
+        .from("newsletter_subscriptions" as any)
         .select("status")
         .eq("email", subEmail.trim())
-        .single();
+        .maybeSingle();
 
       if (existing) {
-        if (existing.status === "active") {
+        if ((existing as any).status === "active") {
           toast.info("Already subscribed", { description: "You're already subscribed to our newsletter!" });
           setSubEmail("");
           setSubLoading(false);
@@ -45,7 +45,7 @@ const Footer = () => {
         } else {
           // Reactivate subscription
           const { error } = await supabase
-            .from("newsletter_subscriptions")
+            .from("newsletter_subscriptions" as any)
             .update({ status: "active", unsubscribed_at: null })
             .eq("email", subEmail.trim());
 
@@ -59,7 +59,7 @@ const Footer = () => {
 
       // New subscription
       const { data: newSub, error: insertError } = await supabase
-        .from("newsletter_subscriptions")
+        .from("newsletter_subscriptions" as any)
         .insert({ email: subEmail.trim(), status: "active" })
         .select("unsubscribe_token")
         .single();
@@ -67,9 +67,9 @@ const Footer = () => {
       if (insertError) throw insertError;
 
       // Send welcome email
-      if (newSub?.unsubscribe_token) {
+      if ((newSub as any)?.unsubscribe_token) {
         supabase.functions.invoke("send-welcome-email", {
-          body: { email: subEmail.trim(), unsubscribeToken: newSub.unsubscribe_token },
+          body: { email: subEmail.trim(), unsubscribeToken: (newSub as any).unsubscribe_token },
         }).catch(err => console.error("Failed to send welcome email:", err));
       }
 

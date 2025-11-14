@@ -16,6 +16,8 @@ interface Subscription {
   id: string;
   email: string;
   subscribed_at: string;
+  status: string;
+  unsubscribed_at?: string;
 }
 
 const NewsletterManager: React.FC = () => {
@@ -33,12 +35,12 @@ const NewsletterManager: React.FC = () => {
   const fetchSubscriptions = async () => {
     try {
       const { data, error } = await supabase
-        .from("subscriptions")
+        .from("newsletter_subscriptions" as any)
         .select("*")
         .order("subscribed_at", { ascending: false });
 
       if (error) throw error;
-      setSubscriptions(data || []);
+      setSubscriptions((data as any) || []);
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
       toast({
@@ -134,7 +136,7 @@ const NewsletterManager: React.FC = () => {
     
     try {
       const { error } = await supabase
-        .from("subscriptions")
+        .from("newsletter_subscriptions" as any)
         .delete()
         .eq("id", id);
 
