@@ -36,15 +36,39 @@ serve(async (req) => {
     console.log(`Request from: ${userAgent.substring(0, 100)}`);
     console.log(`Is Crawler: ${isCrawler}`);
     
-    // If not a crawler, redirect immediately to let the SPA handle routing
+    // If not a crawler, serve the SPA's index.html so it can handle routing client-side
     if (!isCrawler) {
-      return new Response(null, {
-        status: 307,
-        headers: { 
-          'Location': `https://www.luukumag.com/articles/${id}`,
-          ...corsHeaders
-        }
-      });
+      try {
+        const spaResponse = await fetch('https://www.luukumag.com/index.html');
+        const spaHtml = await spaResponse.text();
+        
+        return new Response(spaHtml, {
+          status: 200,
+          headers: { 
+            'Content-Type': 'text/html',
+            ...corsHeaders
+          }
+        });
+      } catch (error) {
+        console.error('Failed to fetch SPA:', error);
+        // Fallback: serve basic HTML with client-side navigation
+        return new Response(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <script>window.location.href = '/articles/${id}';</script>
+            </head>
+            <body>Loading...</body>
+          </html>
+        `, {
+          status: 200,
+          headers: { 
+            'Content-Type': 'text/html',
+            ...corsHeaders
+          }
+        });
+      }
     }
 
     // Create Supabase client
