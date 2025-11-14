@@ -38,33 +38,10 @@ serve(async (req) => {
     
     // If not a crawler, redirect to home and let React Router handle the article
     if (!isCrawler) {
-      // Use a client-side redirect that preserves the URL path
-      const redirectHtml = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Loading...</title>
-    <script>
-      // Preserve the current URL path and redirect to root
-      // React Router will then handle the routing
-      const currentPath = window.location.pathname;
-      window.location.replace('/?redirect=' + encodeURIComponent(currentPath));
-    </script>
-  </head>
-  <body>
-    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
-      Loading article...
-    </div>
-  </body>
-</html>
-      `;
-      
-      return new Response(redirectHtml, {
-        status: 200,
-        headers: { 
-          'Content-Type': 'text/html',
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `/?redirect=/articles/${id}`,
           ...corsHeaders
         }
       });
