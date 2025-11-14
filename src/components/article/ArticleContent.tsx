@@ -14,17 +14,28 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
           <ReactMarkdown 
             className="text-base leading-relaxed text-justify"
             components={{
-              a: ({ href, children, ...props }) => (
-                <a 
-                  href={href} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-highlight hover:underline font-medium"
-                  {...props}
-                >
-                  {children}
-                </a>
-              ),
+              a: ({ href, children, ...props }) => {
+                // Ensure external links have proper protocol
+                let finalHref = href || '';
+                if (finalHref && !finalHref.startsWith('http://') && !finalHref.startsWith('https://') && !finalHref.startsWith('#') && !finalHref.startsWith('/')) {
+                  finalHref = 'https://' + finalHref;
+                }
+                
+                return (
+                  <a 
+                    href={finalHref} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-highlight hover:underline font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    {...props}
+                  >
+                    {children}
+                  </a>
+                );
+              },
               p: ({ children }) => (
                 <p className="mb-4 text-base leading-relaxed text-gray-700 text-justify">
                   {children}
