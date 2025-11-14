@@ -1,12 +1,19 @@
 {
   "rewrites": [
     {
-      "source": "/articles/:id",
-      "destination": "https://nzdtjhnwkrsyerghdppm.supabase.co/functions/v1/article-preview?id=:id"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/articles/:id",
+      "headers": [
+        {
+          "key": "x-article-id",
+          "value": ":id"
+        }
+      ]
     }
   ]
 }
