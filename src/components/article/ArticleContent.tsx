@@ -17,15 +17,38 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
               a: ({ href, children, ...props }) => {
                 // Ensure external links have proper protocol
                 let finalHref = href || '';
-                if (finalHref && !finalHref.startsWith('http://') && !finalHref.startsWith('https://') && !finalHref.startsWith('#') && !finalHref.startsWith('/')) {
+                const isInternalLink = finalHref.startsWith('#') || finalHref.startsWith('/');
+                
+                // Add https:// if it's an external link without protocol
+                if (finalHref && !finalHref.startsWith('http://') && !finalHref.startsWith('https://') && !isInternalLink) {
                   finalHref = 'https://' + finalHref;
                 }
                 
+                // For external links, force them to open in new tab and prevent routing
+                const isExternal = finalHref.startsWith('http://') || finalHref.startsWith('https://');
+                
+                if (isExternal) {
+                  return (
+                    <a 
+                      href={finalHref} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-highlight hover:underline font-medium"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = finalHref;
+                      }}
+                      {...props}
+                    >
+                      {children}
+                    </a>
+                  );
+                }
+                
+                // Internal links
                 return (
                   <a 
                     href={finalHref} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
                     className="text-highlight hover:underline font-medium"
                     {...props}
                   >
