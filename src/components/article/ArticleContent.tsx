@@ -36,7 +36,7 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
                       className="text-highlight hover:underline font-medium"
                       onClick={(e) => {
                         e.preventDefault();
-                        window.location.href = finalHref;
+                        window.open(finalHref, '_blank', 'noopener,noreferrer');
                       }}
                       {...props}
                     >
