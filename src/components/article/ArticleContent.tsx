@@ -28,7 +28,9 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
                     rel="noopener noreferrer" 
                     className="text-highlight hover:underline font-medium"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
+                      window.open(finalHref, '_blank', 'noopener,noreferrer');
                     }}
                     {...props}
                   >
