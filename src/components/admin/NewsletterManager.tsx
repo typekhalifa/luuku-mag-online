@@ -39,6 +39,7 @@ const NewsletterManager: React.FC = () => {
       const { data, error } = await supabase
         .from("newsletter_subscriptions" as any)
         .select("*")
+        .eq("status", "active")
         .order("subscribed_at", { ascending: false });
 
       if (error) throw error;
