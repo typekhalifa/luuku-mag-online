@@ -50,8 +50,22 @@ serve(async (req) => {
 
     // UmvaPay API configuration
     const UMVAPAY_BASE_URL = 'https://umvapay.com/api/v1';
-    const PUBLIC_KEY = 'zxfk70rif9y4mxzw1cvthkd6refpwga9g4l4ps7tjppffxptvk';
-    const SECRET_KEY = 'dmhw53gfjtzxnd38jx74n8qsxi815xh9fs6ebft4mwk9f23zn4';
+    const PUBLIC_KEY = Deno.env.get('UMVAPAY_PUBLIC_KEY');
+    const SECRET_KEY = Deno.env.get('UMVAPAY_SECRET_KEY');
+
+    if (!PUBLIC_KEY || !SECRET_KEY) {
+      console.error('UmvaPay API keys not configured');
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Payment service not configured' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500 
+        }
+      );
+    }
 
     // Create payment request to UmvaPay
     const paymentData = {
