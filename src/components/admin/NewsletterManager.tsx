@@ -56,51 +56,87 @@ const NewsletterManager: React.FC = () => {
     {
       name: "Weekly Roundup",
       subject: "Your Weekly LUUKU MAG Update 📰",
-      content: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #00d4ff; margin-bottom: 20px;">This Week at LUUKU MAG</h1>
-        <p style="color: #333; line-height: 1.6;">Hello!</p>
-        <p style="color: #333; line-height: 1.6;">Here's what you might have missed this week...</p>
-        <div style="margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-          <h3 style="color: #00d4ff; margin-bottom: 10px;">Top Stories</h3>
-          <ul style="color: #555; line-height: 1.8;">
-            <li>Story headline 1</li>
-            <li>Story headline 2</li>
-            <li>Story headline 3</li>
-          </ul>
-        </div>
-        <p style="color: #333; line-height: 1.6;">Stay tuned for more!</p>
-        <p style="color: #333; line-height: 1.6;">Best,<br>The LUUKU MAG Team</p>
-      </div>`
+      content: `Hello Dear Readers,
+
+We hope this message finds you well! Here's your weekly roundup of the most interesting stories and updates from LUUKU MAG.
+
+TOP STORIES THIS WEEK:
+
+• [Story Headline 1] - Brief description of what makes this story important and why readers should care.
+
+• [Story Headline 2] - Another compelling story that caught our attention this week.
+
+• [Story Headline 3] - The third must-read piece that you won't want to miss.
+
+WHAT'S COMING NEXT:
+
+We have some exciting content lined up for next week, including exclusive interviews, in-depth features, and breaking news coverage.
+
+Thank you for being part of the LUUKU MAG community. Your continued support means the world to us.
+
+Stay informed, stay inspired!
+
+Best regards,
+The LUUKU MAG Team`
     },
     {
       name: "Breaking News",
       subject: "🔴 Breaking: Important Update",
-      content: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #ff4444; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-          <h2 style="margin: 0;">🔴 BREAKING NEWS</h2>
-        </div>
-        <h1 style="color: #333; margin-bottom: 20px;">Headline Goes Here</h1>
-        <p style="color: #555; line-height: 1.6;">Your breaking news content...</p>
-        <a href="#" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #00d4ff; color: white; text-decoration: none; border-radius: 5px;">Read Full Story</a>
-      </div>`
+      content: `🔴 BREAKING NEWS ALERT
+
+Dear Readers,
+
+We're reaching out with an urgent update that we believe you need to know about immediately.
+
+HEADLINE: [Insert Breaking News Headline]
+
+THE STORY:
+[Provide the key details of the breaking news. Include who, what, when, where, and why. Keep it concise but informative.]
+
+WHAT THIS MEANS:
+[Explain the significance and impact of this news.]
+
+WHY IT MATTERS:
+[Tell readers why they should care and how this affects them or their community.]
+
+We'll continue to monitor this developing story and bring you updates as more information becomes available.
+
+For the full coverage and latest updates, visit LUUKU MAG.
+
+Stay informed,
+The LUUKU MAG Team`
     },
     {
       name: "Announcement",
       subject: "Important Announcement from LUUKU MAG",
-      content: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #00d4ff; margin-bottom: 20px;">📢 Announcement</h1>
-        <p style="color: #333; line-height: 1.6;">Dear Readers,</p>
-        <p style="color: #333; line-height: 1.6;">We have an exciting update to share with you...</p>
-        <div style="margin: 30px 0; padding: 20px; background: #e8f4ff; border-left: 4px solid #00d4ff; border-radius: 4px;">
-          <p style="color: #333; margin: 0; line-height: 1.6;"><strong>Key points:</strong></p>
-          <ul style="color: #555; line-height: 1.8; margin-top: 10px;">
-            <li>Point 1</li>
-            <li>Point 2</li>
-            <li>Point 3</li>
-          </ul>
-        </div>
-        <p style="color: #333; line-height: 1.6;">Thank you for being part of our community!</p>
-      </div>`
+      content: `Dear Valued Readers,
+
+We have an exciting update to share with you today!
+
+ANNOUNCEMENT: [Your Announcement Title]
+
+We are thrilled to announce [describe your announcement in detail. This could be a new feature, partnership, event, or any significant update].
+
+KEY HIGHLIGHTS:
+
+• Point 1: [First key detail about the announcement]
+
+• Point 2: [Second important aspect readers should know]
+
+• Point 3: [Third highlight or benefit for the community]
+
+WHAT YOU NEED TO KNOW:
+
+[Provide additional context or instructions if readers need to take any action]
+
+We're incredibly excited about this development and believe it will bring great value to our community. Your feedback and support have been instrumental in making this possible.
+
+If you have any questions or would like more information, please don't hesitate to reach out to us.
+
+Thank you for being part of the LUUKU MAG family.
+
+Best regards,
+The LUUKU MAG Team`
     }
   ];
 
@@ -145,6 +181,39 @@ const NewsletterManager: React.FC = () => {
     }
   };
 
+  const convertToHtml = (plainText: string): string => {
+    // Convert plain text to styled HTML
+    const lines = plainText.split('\n');
+    let html = '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">';
+    
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      
+      if (!trimmed) {
+        html += '<br>';
+      } else if (trimmed.startsWith('•')) {
+        // Bullet points
+        const text = trimmed.substring(1).trim();
+        html += `<p style="color: #333; line-height: 1.6; margin-left: 20px;">• ${text}</p>`;
+      } else if (trimmed.toUpperCase() === trimmed && trimmed.length > 3 && !trimmed.includes(':')) {
+        // Section headers (all caps)
+        html += `<h2 style="color: #00d4ff; margin-top: 30px; margin-bottom: 15px;">${trimmed}</h2>`;
+      } else if (trimmed.endsWith(':') && trimmed.length < 50) {
+        // Subheaders (ending with colon)
+        html += `<h3 style="color: #00d4ff; margin-top: 20px; margin-bottom: 10px;">${trimmed}</h3>`;
+      } else if (trimmed.startsWith('🔴')) {
+        // Breaking news banner
+        html += `<div style="background: #ff4444; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold;">${trimmed}</div>`;
+      } else {
+        // Regular paragraph
+        html += `<p style="color: #333; line-height: 1.6; margin-bottom: 10px;">${trimmed}</p>`;
+      }
+    });
+    
+    html += '</div>';
+    return html;
+  };
+
   const exportSubscriptions = () => {
     const csvContent = [
       "Email,Subscribed Date",
@@ -187,6 +256,9 @@ const NewsletterManager: React.FC = () => {
 
     setSending(true);
     try {
+      // Convert plain text to HTML
+      const htmlContent = convertToHtml(sanitizedContent);
+      
       // Save campaign first
       const { data: { user } } = await supabase.auth.getUser();
       const { data: campaign, error: campaignError } = await supabase
@@ -194,7 +266,7 @@ const NewsletterManager: React.FC = () => {
         .insert({
           title: sanitizedTitle,
           subject: sanitizedSubject,
-          content: sanitizedContent,
+          content: sanitizedContent, // Store plain text version
           template_name: selectedTemplate || null,
           status: 'sending',
           recipients_count: subscriptions.length,
@@ -205,11 +277,11 @@ const NewsletterManager: React.FC = () => {
 
       if (campaignError) throw campaignError;
 
-      // Send newsletter
+      // Send newsletter with HTML version
       const { error } = await supabase.functions.invoke("send-newsletter", {
         body: {
           subject: sanitizedSubject,
-          content: sanitizedContent,
+          content: htmlContent, // Send HTML version
         },
       });
 
