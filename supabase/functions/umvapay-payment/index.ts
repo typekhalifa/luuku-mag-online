@@ -49,7 +49,7 @@ serve(async (req) => {
     console.log('Processing UmvaPay payment request:', { amount, currency, phone, email, name });
 
     // UmvaPay API configuration
-    const UMVAPAY_BASE_URL = 'https://pay.umva.net/api/v1';
+    const UMVAPAY_BASE_URL = 'https://umva.net';
     const PUBLIC_KEY = Deno.env.get('UMVAPAY_PUBLIC_KEY');
     const SECRET_KEY = Deno.env.get('UMVAPAY_SECRET_KEY');
 
@@ -67,41 +67,48 @@ serve(async (req) => {
       );
     }
 
-    // Create payment request to UmvaPay
-    const paymentData = {
-      amount: amount,
-      currency: currency || 'USD',
-      phone: phone,
-      email: email,
-      name: name,
-      description: description || 'Donation to support independent journalism',
-      callback_url: `${req.headers.get('origin')}/donate?status=success`,
-      cancel_url: `${req.headers.get('origin')}/donate?status=cancelled`,
-      public_key: PUBLIC_KEY
-    };
+    // Generate unique identifier for this transaction
+    const identifier = `DONATION-${Date.now()}`;
 
-    console.log('Sending payment request to UmvaPay:', paymentData);
+    // Create form data for UmvaPay API
+    const formData = new URLSearchParams();
+    formData.append('public_key', PUBLIC_KEY);
+    formData.append('identifier', identifier);
+    formData.append('amount', amount.toString());
+    formData.append('currency', currency || 'USD');
+    formData.append('details', description || 'Donation to support independent journalism');
+    formData.append('ipn_url', `${req.headers.get('origin')}/api/umvapay-ipn`);
+    formData.append('success_url', `${req.headers.get('origin')}/donate?status=success`);
+    formData.append('cancel_url', `${req.headers.get('origin')}/donate?status=cancelled`);
+    formData.append('customer_name', name);
+    formData.append('customer_email', email);
+
+    console.log('Sending payment request to UmvaPay:', {
+      identifier,
+      amount,
+      currency: currency || 'USD',
+      email,
+      name
+    });
 
     // Make request to UmvaPay API
-    const response = await fetch(`${UMVAPAY_BASE_URL}/payments`, {
+    const response = await fetch(`${UMVAPAY_BASE_URL}/payment/initiate`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SECRET_KEY}`,
-        'X-Public-Key': PUBLIC_KEY
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(paymentData)
+      body: formData.toString()
     });
 
     const result = await response.json();
     console.log('UmvaPay response:', result);
 
-    if (response.ok && result.checkout_url) {
+    if (result.success === 'ok' && result.url) {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          checkout_url: result.checkout_url,
-          transaction_id: result.transaction_id || result.id
+          checkout_url: result.url,
+          transaction_id: identifier
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
