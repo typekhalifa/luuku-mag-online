@@ -52,7 +52,7 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [functions.umvapay-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.article-preview]
 verify_jwt = false
