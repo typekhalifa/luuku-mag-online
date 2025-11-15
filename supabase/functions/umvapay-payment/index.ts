@@ -67,8 +67,8 @@ serve(async (req) => {
       );
     }
 
-    // Generate unique identifier for this transaction
-    const identifier = `DONATION-${Date.now()}`;
+    // Generate unique identifier for this transaction (max 20 chars for UmvaPay)
+    const identifier = `DON-${Date.now().toString().slice(-12)}`;
 
     // Create form data for UmvaPay API
     const formData = new URLSearchParams();
