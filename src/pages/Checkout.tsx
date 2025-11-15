@@ -153,7 +153,7 @@ const Checkout = () => {
         const { data, error } = await supabase.functions.invoke('umvapay-payment', {
           body: {
             amount: checkoutData.amount,
-            currency: checkoutData.currency.toLowerCase(),
+            currency: checkoutData.currency,
             phone: checkoutData.donorInfo.phone,
             email: checkoutData.donorInfo.email,
             name: checkoutData.donorInfo.name,
