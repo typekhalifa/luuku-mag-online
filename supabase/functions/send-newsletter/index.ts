@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { data: subscribers, error: subError } = await supabaseClient
       .from("newsletter_subscriptions")
-      .select("email")
+      .select("email, unsubscribe_token")
       .eq("status", "active");
 
     if (subError) {
@@ -71,21 +71,37 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const emails = subscribers.map((sub) => sub.email);
-
-    const emailResponse = await resend.emails.send({
-      from: "LUUKU MAG <newsletter@luukumag.com>",
-      to: emails,
-      subject: subject,
-      html: content,
+    // Send individual emails with personalized unsubscribe links
+    const emailPromises = subscribers.map((sub) => {
+      const unsubscribeLink = sub.unsubscribe_token 
+        ? `https://luukumag.com/unsubscribe?token=${sub.unsubscribe_token}`
+        : 'https://luukumag.com';
+      
+      const htmlWithUnsubscribe = `
+        ${content}
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #e0e0e0;">
+        <p style="text-align: center; color: #999999; font-size: 12px; line-height: 1.5;">
+          © ${new Date().getFullYear()} LUUKU MAG. All rights reserved.<br>
+          <a href="${unsubscribeLink}" style="color: #00d4ff; text-decoration: underline;">Unsubscribe from this list</a>
+        </p>
+      `;
+      
+      return resend.emails.send({
+        from: "LUUKU MAG <newsletter@luukumag.com>",
+        to: [sub.email],
+        subject: subject,
+        html: htmlWithUnsubscribe,
+      });
     });
+
+    const emailResponse = await Promise.all(emailPromises);
 
     console.log("Newsletter sent successfully:", emailResponse);
 
     return new Response(
       JSON.stringify({
         success: true,
-        sentTo: emails.length,
+        sentTo: subscribers.length,
         response: emailResponse,
       }),
       {
