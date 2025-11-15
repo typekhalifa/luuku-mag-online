@@ -218,7 +218,7 @@ const Unsubscribe = () => {
           </div>
 
           <p className="text-xs text-center text-muted-foreground">
-            You can always resubscribe later on our website
+            You can always resubscribe later on our website.
           </p>
         </CardContent>
       </Card>
