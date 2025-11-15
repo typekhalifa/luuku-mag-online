@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
           supabase.from('comments').select('id', { count: 'exact' }),
           supabase.from('likes').select('id', { count: 'exact' }),
           supabase.from('contacts').select('id', { count: 'exact' }),
-          supabase.from('subscriptions').select('id', { count: 'exact' }),
+          supabase.from('newsletter_subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
           supabase.from('comments').select('id', { count: 'exact' }).eq('status', 'pending'),
           supabase.from('donations').select('id', { count: 'exact' }),
           supabase.from('donations').select('amount')
