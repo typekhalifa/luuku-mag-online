@@ -49,7 +49,7 @@ serve(async (req) => {
     console.log('Processing UmvaPay payment request:', { amount, currency, phone, email, name });
 
     // UmvaPay API configuration
-    const UMVAPAY_BASE_URL = 'https://umva.net';
+    const UMVAPAY_BASE_URL = 'https://pay.umva.net';
     const PUBLIC_KEY = Deno.env.get('UMVAPAY_PUBLIC_KEY');
     const SECRET_KEY = Deno.env.get('UMVAPAY_SECRET_KEY');
 
