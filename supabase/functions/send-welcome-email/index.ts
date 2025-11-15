@@ -11,6 +11,7 @@ const corsHeaders = {
 
 interface WelcomeEmailRequest {
   email: string;
+  unsubscribeToken?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,7 +20,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email }: WelcomeEmailRequest = await req.json();
+    const { email, unsubscribeToken }: WelcomeEmailRequest = await req.json();
 
     if (!email) {
       return new Response(
@@ -30,6 +31,10 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
+
+    const unsubscribeLink = unsubscribeToken 
+      ? `https://luukumag.com/unsubscribe?token=${unsubscribeToken}`
+      : 'https://luukumag.com';
 
     const emailResponse = await resend.emails.send({
       from: "LUUKU MAG <newsletter@luukumag.com>",
@@ -145,7 +150,7 @@ const handler = async (req: Request): Promise<Response> => {
                         </p>
                         <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">
                           You're receiving this email because you subscribed to our newsletter.<br>
-                          Don't want these emails? You can unsubscribe anytime from our website.
+                          Don't want these emails? <a href="${unsubscribeLink}" style="color: #00d4ff; text-decoration: underline;">Unsubscribe here</a>
                         </p>
                       </td>
                     </tr>
