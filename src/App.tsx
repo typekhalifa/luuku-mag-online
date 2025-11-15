@@ -25,6 +25,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import AdminAnalytics from "./pages/Analytics";
 import NewsletterConfirmation from "./pages/NewsletterConfirmation";
 import NewsletterTemplatesPage from "./pages/admin/NewsletterTemplates";
+import NewsletterPage from "./pages/admin/Newsletter";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => {
                     <Route path="/admin" element={<Dashboard />} />
                     <Route path="/admin/articles" element={<Articles />} />
                     <Route path="/admin/analytics" element={<Analytics />} />
+                    <Route path="/admin/newsletter" element={<NewsletterPage />} />
                     <Route path="/admin/newsletter-templates" element={<NewsletterTemplatesPage />} />
                     <Route path="/admin/users" element={<Users />} />
                     <Route path="/admin/comments" element={<Comments />} />

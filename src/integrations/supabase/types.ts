@@ -395,6 +395,45 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_campaigns: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          recipients_count: number | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_name: string | null
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_name?: string | null
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_name?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       newsletter_subscriptions: {
         Row: {
           email: string

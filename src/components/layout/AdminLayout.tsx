@@ -20,7 +20,7 @@ import {
   SidebarTrigger,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon, SunIcon, MoonIcon, CreditCardIcon } from "lucide-react";
+import { FileTextIcon, LineChartIcon, Users2Icon, LogOutIcon, MessageSquareIcon, SunIcon, MoonIcon, CreditCardIcon, MailIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 interface AdminLayoutProps {
@@ -131,6 +131,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <SidebarMenuButton className="w-full">
                     <Users2Icon className="mr-2 h-5 w-5" />
                     <span>Users</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/newsletter">
+                  <SidebarMenuButton className="w-full">
+                    <MailIcon className="mr-2 h-5 w-5" />
+                    <span>Newsletter</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
