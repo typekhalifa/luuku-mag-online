@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { SaveIcon, RefreshCwIcon, MailIcon, SendIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EmailSettings {
   smtp: {
@@ -64,6 +65,7 @@ const EmailSettingsManager: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleInputChange = (section: keyof EmailSettings, field: string, value: string | boolean | number) => {
     setSettings(prev => ({
@@ -75,8 +77,25 @@ const EmailSettingsManager: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // In a real app, this would save to a secure settings table
-      localStorage.setItem('emailSettings', JSON.stringify(settings));
+      const settingsToSave = [
+        { key: "email_smtp", value: JSON.stringify(settings.smtp) },
+        { key: "email_newsletter", value: JSON.stringify(settings.newsletter) },
+        { key: "email_notifications", value: JSON.stringify(settings.notifications) }
+      ];
+
+      for (const setting of settingsToSave) {
+        const { error } = await supabase
+          .from("site_settings")
+          .upsert({
+            setting_key: setting.key,
+            setting_value: setting.value,
+            setting_type: "email"
+          }, {
+            onConflict: "setting_key"
+          });
+
+        if (error) throw error;
+      }
       
       toast({
         title: "Email Settings Saved",
@@ -115,20 +134,60 @@ const EmailSettingsManager: React.FC = () => {
     }
   };
 
-  const loadSettings = () => {
+  const loadSettings = async () => {
     try {
-      const saved = localStorage.getItem('emailSettings');
-      if (saved) {
-        setSettings(JSON.parse(saved));
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("setting_key, setting_value")
+        .in("setting_key", ["email_smtp", "email_newsletter", "email_notifications"]);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const settingsMap: Record<string, any> = {};
+        data.forEach((item) => {
+          try {
+            settingsMap[item.setting_key] = typeof item.setting_value === 'string' 
+              ? JSON.parse(item.setting_value) 
+              : item.setting_value;
+          } catch (e) {
+            console.error("Error parsing setting:", item.setting_key, e);
+          }
+        });
+
+        setSettings(prev => ({
+          smtp: settingsMap.email_smtp || prev.smtp,
+          newsletter: settingsMap.email_newsletter || prev.newsletter,
+          notifications: settingsMap.email_notifications || prev.notifications
+        }));
       }
     } catch (error) {
       console.error("Error loading email settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load email settings.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <RefreshCwIcon className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p>Loading email settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
