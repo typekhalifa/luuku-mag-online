@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MailIcon, SendIcon, UsersIcon, DownloadIcon } from "lucide-react";
+import { MailIcon, SendIcon, UsersIcon, DownloadIcon, FileTextIcon } from "lucide-react";
+import NewsletterTemplates from "./NewsletterTemplates";
 import { formatDistanceToNow } from "date-fns";
 
 interface Subscription {
@@ -27,6 +28,7 @@ const NewsletterManager: React.FC = () => {
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [showTemplates, setShowTemplates] = useState(false);
 
   useEffect(() => {
     fetchSubscriptions();
@@ -131,21 +133,34 @@ const NewsletterManager: React.FC = () => {
     return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   };
 
+  const useTemplate = (templateSubject: string, templateContent: string) => {
+    setSubject(templateSubject);
+    setContent(templateContent);
+    setShowTemplates(false);
+    toast({
+      title: "Template Loaded",
+      description: "You can now customize the template before sending",
+    });
+  };
+
   const removeSubscription = async (id: string) => {
-    if (!confirm("Are you sure you want to remove this subscription?")) return;
+    if (!confirm("Are you sure you want to unsubscribe this email? They can resubscribe later.")) return;
     
     try {
       const { error } = await supabase
         .from("newsletter_subscriptions" as any)
-        .delete()
+        .update({ 
+          status: "unsubscribed",
+          unsubscribed_at: new Date().toISOString()
+        })
         .eq("id", id);
 
       if (error) throw error;
 
-      setSubscriptions(prev => prev.filter(sub => sub.id !== id));
+      fetchSubscriptions();
       toast({
         title: "Success",
-        description: "Subscription removed",
+        description: "Subscriber unsubscribed successfully",
       });
     } catch (error) {
       console.error("Error removing subscription:", error);
@@ -247,6 +262,7 @@ const NewsletterManager: React.FC = () => {
       <Tabs defaultValue="compose" className="space-y-4">
         <TabsList>
           <TabsTrigger value="compose">Compose Newsletter</TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="subscribers">Manage Subscribers</TabsTrigger>
         </TabsList>
 
@@ -268,9 +284,9 @@ const NewsletterManager: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Content</label>
+                <label className="text-sm font-medium mb-2 block">Content (HTML supported)</label>
                 <Textarea
-                  placeholder="Enter newsletter content..."
+                  placeholder="Enter newsletter content (HTML supported)..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={10}
@@ -279,9 +295,23 @@ const NewsletterManager: React.FC = () => {
               <div className="flex gap-2">
                 <Button onClick={sendNewsletter} disabled={sending}>
                   <SendIcon className="h-4 w-4 mr-2" />
-                  {sending ? "Sending..." : `Send to ${subscriptions.length} subscribers`}
+                  {sending ? "Sending..." : `Send to ${subscriptions.filter(s => s.status === 'active').length} subscribers`}
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="templates">
+          <Card>
+            <CardHeader>
+              <CardTitle>Newsletter Templates</CardTitle>
+              <CardDescription>
+                Choose a pre-designed template to get started
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NewsletterTemplates onSelectTemplate={useTemplate} />
             </CardContent>
           </Card>
         </TabsContent>

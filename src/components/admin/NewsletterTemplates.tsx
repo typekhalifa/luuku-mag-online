@@ -10,6 +10,10 @@ interface Template {
   description: string;
 }
 
+interface NewsletterTemplatesProps {
+  onSelectTemplate?: (subject: string, content: string) => void;
+}
+
 const templates: Template[] = [
   {
     name: "Weekly Roundup",
@@ -281,10 +285,15 @@ const templates: Template[] = [
   }
 ];
 
-const NewsletterTemplates = () => {
+const NewsletterTemplates: React.FC<NewsletterTemplatesProps> = ({ onSelectTemplate }) => {
   const copyTemplate = (template: Template) => {
-    navigator.clipboard.writeText(template.content);
-    toast.success(`"${template.name}" template copied to clipboard!`);
+    if (onSelectTemplate) {
+      onSelectTemplate(template.subject, template.content);
+      toast.success(`"${template.name}" template loaded!`);
+    } else {
+      navigator.clipboard.writeText(template.content);
+      toast.success(`"${template.name}" template copied to clipboard!`);
+    }
   };
 
   return (
@@ -308,7 +317,7 @@ const NewsletterTemplates = () => {
                   onClick={() => copyTemplate(template)}
                 >
                   <Copy className="h-4 w-4 mr-2" />
-                  Copy
+                  {onSelectTemplate ? "Use Template" : "Copy"}
                 </Button>
               </CardTitle>
               <CardDescription>{template.description}</CardDescription>

@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { MailIcon, TrashIcon, ReplyIcon, EyeIcon, EyeOffIcon, FilterIcon } from "lucide-react";
+import { MailIcon, TrashIcon, ReplyIcon, EyeIcon, EyeOffIcon, FilterIcon, SendIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -130,15 +131,24 @@ const ContactMessagesManager: React.FC = () => {
     }
   };
 
-  const replyToMessage = async (messageId: string, email: string, name: string | null) => {
-    const replyMessage = prompt(`Enter your reply to ${name || email}:`);
-    if (!replyMessage) return;
+  const [replyDialogOpen, setReplyDialogOpen] = useState(false);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [replyingTo, setReplyingTo] = useState<ContactMessage | null>(null);
+
+  const openReplyDialog = (message: ContactMessage) => {
+    setReplyingTo(message);
+    setReplyMessage("");
+    setReplyDialogOpen(true);
+  };
+
+  const replyToMessage = async () => {
+    if (!replyingTo || !replyMessage.trim()) return;
 
     try {
       const { error } = await supabase.functions.invoke("send-contact-reply", {
         body: {
-          messageId,
-          replyMessage,
+          messageId: replyingTo.id,
+          replyMessage: replyMessage.trim(),
         },
       });
 
@@ -149,6 +159,9 @@ const ContactMessagesManager: React.FC = () => {
         description: "Reply sent successfully",
       });
 
+      setReplyDialogOpen(false);
+      setReplyMessage("");
+      setReplyingTo(null);
       fetchMessages();
     } catch (error) {
       console.error("Error sending reply:", error);
@@ -278,7 +291,7 @@ const ContactMessagesManager: React.FC = () => {
                               </div>
                               <div className="flex gap-2 pt-4">
                                 <Button
-                                  onClick={() => replyToMessage(message.id, message.email, message.name)}
+                                  onClick={() => openReplyDialog(message)}
                                   className="flex-1"
                                 >
                                   <ReplyIcon className="h-4 w-4 mr-2" />
@@ -314,7 +327,7 @@ const ContactMessagesManager: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => replyToMessage(message.id, message.email, message.name)}
+                          onClick={() => openReplyDialog(message)}
                         >
                           <ReplyIcon className="h-4 w-4" />
                         </Button>
@@ -334,6 +347,39 @@ const ContactMessagesManager: React.FC = () => {
           </>
         )}
       </CardContent>
+
+      {/* Reply Dialog */}
+      <Dialog open={replyDialogOpen} onOpenChange={setReplyDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Reply to {replyingTo?.name || "Contact"}</DialogTitle>
+            <DialogDescription>
+              Send a reply to {replyingTo?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Your Reply</label>
+              <Textarea
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="Type your reply message here..."
+                rows={8}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReplyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={replyToMessage} disabled={!replyMessage.trim()}>
+              <SendIcon className="h-4 w-4 mr-2" />
+              Send Reply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
